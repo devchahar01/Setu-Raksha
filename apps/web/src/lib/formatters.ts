@@ -11,6 +11,15 @@ export function toDevanagariDigits(num: number | string): string {
   return String(num).replace(/\d/g, (d) => DEVANAGARI_DIGITS[parseInt(d, 10)]);
 }
 
+export function formatNumber(
+  val: number | string,
+  locale: "en" | "hi" | "mr" = "en",
+  useDevanagariDigits: boolean = false
+): string {
+  const str = String(val);
+  return useDevanagariDigits ? toDevanagariDigits(str) : str;
+}
+
 export function formatDateIST(
   date: Date | string | null | undefined,
   useDevanagariDigits: boolean = false

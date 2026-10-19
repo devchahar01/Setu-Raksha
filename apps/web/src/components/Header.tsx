@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { Shield, Globe, Activity } from "lucide-react";
+import { useAppStore } from "@/lib/store";
 
 export const Header: React.FC = () => {
-  const [currentLocale, setCurrentLocale] = useState<string>("en");
+  const { activeLocale, setLocale } = useAppStore();
 
-  const languages = [
+  const languages: { code: "en" | "hi" | "mr"; label: string }[] = [
     { code: "en", label: "English" },
     { code: "hi", label: "हिन्दी" },
     { code: "mr", label: "मराठी" },
@@ -76,10 +77,10 @@ export const Header: React.FC = () => {
               {languages.map((lang) => (
                 <button
                   key={lang.code}
-                  onClick={() => setCurrentLocale(lang.code)}
-                  aria-pressed={currentLocale === lang.code}
+                  onClick={() => setLocale(lang.code)}
+                  aria-pressed={activeLocale === lang.code}
                   className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
-                    currentLocale === lang.code
+                    activeLocale === lang.code
                       ? "bg-teal-600 text-white shadow-sm"
                       : "text-navy-200 hover:text-white hover:bg-navy-700"
                   }`}
