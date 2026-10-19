@@ -1,0 +1,19 @@
+{
+  "benchmark_title": "Setu Raksha Synthetic Disaster Prevention Evaluation",
+  "cohort_size": 100,
+  "setu_raksha_interventions": 99,
+  "setu_raksha_prevention_rate_pct": 99.0,
+  "setu_raksha_95_ci_pct": [
+    94.6,
+    99.8
+  ],
+  "legacy_baseline_prevention_rate_pct": 20.0,
+  "relative_risk_reduction_pct": 98.8,
+  "mean_advance_lead_time_hours": 6.63,
+  "target_met": true,
+  "honest_labelling": {
+    "source": "simulated",
+    "protocol": "Synthetic multi-basin stress-testing benchmark",
+    "disclaimer": "Decision support system only. Does not replace physical civil engineering inspection."
+  }
+}
