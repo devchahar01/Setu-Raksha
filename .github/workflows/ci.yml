@@ -1,0 +1,89 @@
+name: Continuous Integration & Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-typecheck-python:
+    name: Python Lint & Types (Ruff & Mypy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install Python dependencies
+        run: |
+          uv venv
+          uv pip install -e "apps/api[dev]" greenlet
+
+      - name: Run Ruff Lint Check
+        run: uv run ruff check .
+
+      - name: Run Mypy Type Check
+        run: uv run mypy apps/api
+
+      - name: Run Backend Unit Tests
+        run: uv run pytest apps/api/tests
+
+  lint-and-typecheck-web:
+    name: Web Lint & Types (ESLint, TSC & Build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.14.0
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Typecheck Shared Package
+        run: pnpm --filter @setu-raksha/shared build
+
+      - name: Next.js Production Build
+        run: pnpm --filter @setu-raksha/web build
+
+  security-and-secret-scan:
+    name: Secret & Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+  docker-compose-validate:
+    name: Container Configuration Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Docker Compose Config
+        run: docker compose config

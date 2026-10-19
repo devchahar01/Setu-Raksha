@@ -1,0 +1,22 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=ghcr.io/astral-sh/uv:0.4.20 /uv /bin/uv
+
+COPY services/worker/pyproject.toml /app/services/worker/
+RUN uv pip install --system -e "/app/services/worker"
+
+COPY services/worker /app/services/worker
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD python -c "import os; from celery import Celery; c=Celery(broker=os.getenv('REDIS_URL')); c.control.ping() or exit(1)" || exit 1
+
+CMD ["celery", "-A", "worker.celery_app", "worker", "--loglevel=INFO"]

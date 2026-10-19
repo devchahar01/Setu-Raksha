@@ -1,0 +1,48 @@
+version: "3.9"
+
+# See root docker-compose.yml for primary orchestration
+services:
+  postgres:
+    extends:
+      file: ../docker-compose.yml
+      service: postgres
+
+  redis:
+    extends:
+      file: ../docker-compose.yml
+      service: redis
+
+  minio:
+    extends:
+      file: ../docker-compose.yml
+      service: minio
+
+  mailpit:
+    extends:
+      file: ../docker-compose.yml
+      service: mailpit
+
+  api:
+    extends:
+      file: ../docker-compose.yml
+      service: api
+
+  worker:
+    extends:
+      file: ../docker-compose.yml
+      service: worker
+
+  beat:
+    extends:
+      file: ../docker-compose.yml
+      service: beat
+
+  simulator:
+    extends:
+      file: ../docker-compose.yml
+      service: simulator
+
+  web:
+    extends:
+      file: ../docker-compose.yml
+      service: web

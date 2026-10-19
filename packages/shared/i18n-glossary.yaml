@@ -1,0 +1,60 @@
+# Engineering Terms Glossary
+# Reference: IRC:SP:35, IS 1893, FHWA HEC-18
+# Note: Every term marked as pending review by a Hindi and Marathi speaker with civil engineering background.
+
+terms:
+  bridge:
+    en: "Bridge"
+    hi: "पुल"
+    mr: "पूल"
+    reviewed_by: "Pending civil engineering review"
+  risk:
+    en: "Risk"
+    hi: "जोखिम"
+    mr: "जोखीम"
+    reviewed_by: "Pending civil engineering review"
+  scour:
+    en: "Scour"
+    hi: "जलक्षरण / धारा-कटाव"
+    mr: "जलक्षरण / पायाची झीज"
+    reviewed_by: "Pending civil engineering review"
+  riprap:
+    en: "Riprap / Apron"
+    hi: "पत्थर की सुरक्षा / रिपरैप"
+    mr: "दगडी भराव / रिपरॅप"
+    reviewed_by: "Pending civil engineering review"
+  bearing:
+    en: "Bearing"
+    hi: "बेयरिंग / धारक"
+    mr: "बेअरिंग / आधारक"
+    reviewed_by: "Pending civil engineering review"
+  pier:
+    en: "Pier"
+    hi: "पाया / खंभा (पियर)"
+    mr: "खांब (पियर)"
+    reviewed_by: "Pending civil engineering review"
+  abutment:
+    en: "Abutment"
+    hi: "तटबंध आधार (एबटमेंट)"
+    mr: "तटबंध खांब (अॅबटमेंट)"
+    reviewed_by: "Pending civil engineering review"
+  superstructure:
+    en: "Superstructure"
+    hi: "अधिरचना"
+    mr: "अधिरचना (सुपरस्ट्रक्चर)"
+    reviewed_by: "Pending civil engineering review"
+  substructure:
+    en: "Substructure"
+    hi: "अधोरचना"
+    mr: "अधोरचना (सबस्ट्रक्चर)"
+    reviewed_by: "Pending civil engineering review"
+  deck:
+    en: "Deck"
+    hi: "पुल का फर्श / डेक"
+    mr: "पुलाचा डेक"
+    reviewed_by: "Pending civil engineering review"
+  high_flood_level:
+    en: "High Flood Level (HFL)"
+    hi: "उच्च बाढ़ स्तर (एचएफएल)"
+    mr: "उच्च पूर पातळी (एचएफएल)"
+    reviewed_by: "Pending civil engineering review"
