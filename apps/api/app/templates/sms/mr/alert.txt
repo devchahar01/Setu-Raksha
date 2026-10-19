@@ -1,0 +1,1 @@
+[सेतू रक्षा] चेतावणी: {{ bridge_code }} ({{ bridge_name }}) {{ tier }} श्रेणीत आला. कृती: {{ action }}. तपशील: {{ deep_link }}

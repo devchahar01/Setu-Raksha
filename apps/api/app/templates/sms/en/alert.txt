@@ -1,0 +1,1 @@
+[SETU RAKSHA] ALERT: {{ bridge_code }} ({{ bridge_name }}) reached {{ tier }} tier. Action: {{ action }}. View: {{ deep_link }}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Setu Raksha Infrastructure Alert</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #0f172a;">
+  <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
+    <div style="background-color: #0a192f; color: #ffffff; padding: 16px 24px;">
+      <h2 style="margin: 0; font-size: 18px;">SETU RAKSHA | National Bridge Safety Grid</h2>
+      <p style="margin: 4px 0 0 0; font-size: 12px; color: #5eead4;">Official Infrastructure Safety Notification</p>
+    </div>
+    <div style="padding: 24px;">
+      <h3 style="color: #ef4444; margin-top: 0;">Risk Tier Escalation: {{ tier }}</h3>
+      <p>Bridge: <strong>{{ bridge_name }}</strong> (Code: <code>{{ bridge_code }}</code>)</p>
+      <p>River Basin: <strong>{{ river }}</strong> | District: <strong>{{ district }}</strong></p>
+      <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 12px; margin: 16px 0;">
+        <p style="margin: 0; font-weight: bold; color: #991b1b;">Prescriptive Remediation Action:</p>
+        <p style="margin: 4px 0 0 0; color: #7f1d1d;">{{ action }}</p>
+      </div>
+      <p style="font-size: 13px; color: #475569;">Please log in to the Division Console to review telemetry, structural measurements, and record interventions.</p>
+      <a href="{{ deep_link }}" style="display: inline-block; background-color: #0d9488; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 12px;">Review Bridge Console</a>
+    </div>
+    <div style="background-color: #f1f5f9; padding: 12px 24px; font-size: 11px; color: #64748b; border-top: 1px solid #e2e8f0;">
+      Engineering Advisory: Decision support system only. Does not replace physical certified engineering inspections.
+    </div>
+  </div>
+</body>
+</html>

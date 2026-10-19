@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>सेतू रक्षा पायाभूत सुविधा चेतावणी</title>
+</head>
+<body style="font-family: 'Noto Sans Devanagari', Arial, sans-serif; background-color: #f8fafc; padding: 20px; color: #0f172a;">
+  <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
+    <div style="background-color: #0a192f; color: #ffffff; padding: 16px 24px;">
+      <h2 style="margin: 0; font-size: 18px;">सेतू रक्षा | राष्ट्रीय पूल सुरक्षा ग्रीड</h2>
+      <p style="margin: 4px 0 0 0; font-size: 12px; color: #5eead4;">अधिकृत पायाभूत सुविधा सुरक्षा सूचना</p>
+    </div>
+    <div style="padding: 24px;">
+      <h3 style="color: #ef4444; margin-top: 0;">जोखीम पातळी वाढ: {{ tier }}</h3>
+      <p>पूल: <strong>{{ bridge_name }}</strong> (कोड: <code>{{ bridge_code }}</code>)</p>
+      <p>नदीचे खोरे: <strong>{{ river }}</strong> | जिल्हा: <strong>{{ district }}</strong></p>
+      <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 12px; margin: 16px 0;">
+        <p style="margin: 0; font-weight: bold; color: #991b1b;">शिफारस केलेली कृती:</p>
+        <p style="margin: 4px 0 0 0; color: #7f1d1d;">{{ action }}</p>
+      </div>
+      <p style="font-size: 13px; color: #475569;">कृपया सेन्सर आणि तपासणी नोंदी तपासण्यासाठी विभाग कन्सोलवर लॉगिन करा.</p>
+      <a href="{{ deep_link }}" style="display: inline-block; background-color: #0d9488; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 12px;">पूल कन्सोल उघडा</a>
+    </div>
+    <div style="background-color: #f1f5f9; padding: 12px 24px; font-size: 11px; color: #64748b; border-top: 1px solid #e2e8f0;">
+      अभियांत्रिकी सल्लागार सूचना: केवळ निर्णय समर्थन प्रणाली. ही प्रमाणित प्रत्यक्ष तपासणीची जागा घेत नाही.
+    </div>
+  </div>
+</body>
+</html>

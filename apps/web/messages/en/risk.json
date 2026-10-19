@@ -1,0 +1,26 @@
+{
+  "matrix_title": "Standard Risk Classification Matrix",
+  "matrix_subtitle": "Derived from Structural Vulnerability Index (SVI) & Live Hazard Multipliers",
+  "tiers": {
+    "good": {
+      "name": "Good",
+      "range": "Score: 0 – 29",
+      "desc": "Structure sound. Routine preventive maintenance. No immediate hazard."
+    },
+    "watch": {
+      "name": "Watch",
+      "range": "Score: 30 – 54",
+      "desc": "Early signs of distress or ageing. Scheduled inspection required."
+    },
+    "warning": {
+      "name": "Warning",
+      "range": "Score: 55 – 74",
+      "desc": "Significant defect or live hazard spike. Restrict heavy traffic & prepare diversion."
+    },
+    "critical": {
+      "name": "Critical",
+      "range": "Score: 75 – 100",
+      "desc": "Severe defect or critical flag triggered. Close bridge immediately, dispatch inspection team."
+    }
+  }
+}

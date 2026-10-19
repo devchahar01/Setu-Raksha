@@ -1,0 +1,19 @@
+{
+  "app_name": "Setu Raksha",
+  "app_tagline": "National Bridge Infrastructure Safety & Intelligence Grid",
+  "ministry": "Public Works Department & Disaster Management Authority",
+  "simulated_badge": "SIMULATED MODE (TEST GRID)",
+  "language": "Language",
+  "nav": {
+    "bridges": "Bridge Registry (L1)",
+    "audits": "Monthly Audits (L5)",
+    "telemetry": "Live Sensors (L3)",
+    "risk": "Risk & Remediation (L6)",
+    "public": "Citizen Transparency (L7)"
+  },
+  "footer": {
+    "advisory_title": "Engineering Advisory Notice",
+    "advisory_text": "Setu Raksha provides predictive decision support to assist civil authorities and engineers in prioritizing inspection, traffic restrictions, and preventative maintenance. It never replaces detailed structural analysis, physical non-destructive testing (NDT), or a certified civil engineer's professional judgment. All sensor feeds, stream readings, and starter bridge records are SIMULATED for demonstration.",
+    "copyright": "© 2026 Setu Raksha Platform. Army Institute of Technology Pune."
+  }
+}

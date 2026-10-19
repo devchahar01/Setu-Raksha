@@ -1,0 +1,1 @@
+[सेतु रक्षा] चेतावनी: {{ bridge_code }} ({{ bridge_name }}) {{ tier }} स्तर पर पहुँचा। कार्रवाई: {{ action }}। विवरण: {{ deep_link }}
