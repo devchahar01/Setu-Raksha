@@ -51,3 +51,5 @@ Thumbs.db
 data/
 minio_data/
 pgdata/
+*.db
+*.sqlite3

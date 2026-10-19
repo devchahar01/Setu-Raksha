@@ -17,10 +17,8 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
-    # Database
-    DATABASE_URL: str = (
-        "postgresql+asyncpg://setu_user:setu_secure_password_123@localhost:5432/setu_raksha"
-    )
+    # Database (defaults to local SQLite for rapid dev without docker, overridden by PostgreSQL in production)
+    DATABASE_URL: str = "sqlite+aiosqlite:///./setu_raksha.db"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
