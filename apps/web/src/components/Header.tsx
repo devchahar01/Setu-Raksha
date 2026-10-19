@@ -64,6 +64,9 @@ export const Header: React.FC = () => {
           <Link href="/risk" className="hover:text-teal-300 transition-colors">
             Risk & Remediation (L6)
           </Link>
+          <Link href="/triage" className="hover:text-teal-300 transition-colors">
+            Triage Console (L4)
+          </Link>
           <Link href="/public" className="hover:text-teal-300 transition-colors">
             Citizen Transparency (L7)
           </Link>
