@@ -1,4 +1,3 @@
-import pytest
 from app.core.i18n import calculate_sms_segments
 
 
@@ -22,7 +21,7 @@ def test_sms_segmentation_devanagari_unicode() -> None:
 
 def test_sms_segmentation_exceeding_3_segments() -> None:
     """Test long Devanagari message exceeding 3 segments generates warning flag."""
-    long_devanagari_msg = "सेतु रक्षा अवसंरचना सुरक्षा सूचना: " * 15 # > 210 chars
+    long_devanagari_msg = "सेतु रक्षा अवसंरचना सुरक्षा सूचना: " * 15  # > 210 chars
     res = calculate_sms_segments(long_devanagari_msg)
     assert res["is_unicode"] is True
     assert res["segments"] > 3

@@ -1,6 +1,6 @@
 import logging
 import math
-from typing import Optional
+
 from fastapi import Request
 
 logger = logging.getLogger("setu.i18n")
@@ -9,7 +9,7 @@ SUPPORTED_LOCALES = ["en", "hi", "mr"]
 DEFAULT_LOCALE = "en"
 
 
-def get_request_locale(request: Request, user_locale: Optional[str] = None) -> str:
+def get_request_locale(request: Request, user_locale: str | None = None) -> str:
     """
     Determine locale from user preference, then Accept-Language header, defaulting to 'en'.
     """
@@ -38,17 +38,11 @@ def calculate_sms_segments(text: str) -> dict[str, int | bool]:
     length = len(text)
 
     if not is_unicode:
-        # GSM-7
-        if length <= 160:
-            segments = 1
-        else:
-            segments = math.ceil(length / 153)
+        # GSM-7 (160 characters per single segment, 153 for concatenated)
+        segments = 1 if length <= 160 else math.ceil(length / 153)
     else:
-        # UCS-2 (Devanagari)
-        if length <= 70:
-            segments = 1
-        else:
-            segments = math.ceil(length / 67)
+        # UCS-2 (70 characters per single segment, 67 for concatenated)
+        segments = 1 if length <= 70 else math.ceil(length / 67)
 
     if segments > 3:
         logger.warning(

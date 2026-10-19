@@ -58,9 +58,7 @@ class ForbiddenException(AppException):
 
 class BadRequestException(AppException):
     def __init__(self, code: str = "BAD_REQUEST", params: dict[str, Any] | None = None):
-        super().__init__(
-            code=code, message="Bad request", status_code=status.HTTP_400_BAD_REQUEST, params=params
-        )
+        super().__init__(code=code, message="Bad request", status_code=status.HTTP_400_BAD_REQUEST, params=params)
 
 
 async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:
@@ -79,9 +77,7 @@ async def app_exception_handler(request: Request, exc: AppException) -> JSONResp
     )
 
 
-async def validation_exception_handler(
-    request: Request, exc: RequestValidationError
-) -> JSONResponse:
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     request_id = getattr(request.state, "request_id", "unknown")
     # Simplify validation errors into field -> issue mapping without exposing raw internals
     errors_summary = []
@@ -89,9 +85,7 @@ async def validation_exception_handler(
         field = ".".join(str(loc) for loc in err.get("loc", []))
         errors_summary.append({"field": field, "type": err.get("type", "invalid")})
 
-    logger.warning(
-        f"Validation error on {request.method} {request.url.path}", extra={"request_id": request_id}
-    )
+    logger.warning(f"Validation error on {request.method} {request.url.path}", extra={"request_id": request_id})
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={

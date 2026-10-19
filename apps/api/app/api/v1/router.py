@@ -1,4 +1,4 @@
-from app.api.v1.endpoints import auth, bridges, construction, health, public
+from app.api.v1.endpoints import audits, auth, bridges, construction, health, public
 from fastapi import APIRouter
 
 api_router = APIRouter()
@@ -14,6 +14,9 @@ api_router.include_router(bridges.router)
 
 # Construction & Quality Audits (L2)
 api_router.include_router(construction.router)
+
+# Field Audits & Evidence (L4/L5)
+api_router.include_router(audits.router)
 
 # Public Transparency Portal (L7)
 api_router.include_router(public.router)

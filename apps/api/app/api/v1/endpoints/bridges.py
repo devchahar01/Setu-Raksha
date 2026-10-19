@@ -21,9 +21,7 @@ router = APIRouter(prefix="/bridges", tags=["Bridge Registry (L1)"])
 async def list_bridges(
     district: str | None = Query(None, description="Filter by district"),
     river: str | None = Query(None, description="Filter by river basin"),
-    tier: str | None = Query(
-        None, description="Filter by risk tier (GOOD, WATCH, WARNING, CRITICAL)"
-    ),
+    tier: str | None = Query(None, description="Filter by risk tier (GOOD, WATCH, WARNING, CRITICAL)"),
     search: str | None = Query(None, description="Full-text name or code search"),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
@@ -68,9 +66,7 @@ async def list_bridges(
 async def create_bridge(
     bridge_in: BridgeCreate,
     request: Request,
-    current_user: User = Depends(
-        require_roles(UserRole.DIVISION_ENGINEER.value, UserRole.SYSTEM_ADMIN.value)
-    ),
+    current_user: User = Depends(require_roles(UserRole.DIVISION_ENGINEER.value, UserRole.SYSTEM_ADMIN.value)),
     db: AsyncSession = Depends(get_db),
 ) -> BridgeOut:
     """Create a new bridge record with L1 design metadata."""
@@ -102,9 +98,7 @@ async def get_bridge(
     db: AsyncSession = Depends(get_db),
 ) -> BridgeOut:
     """Retrieve bridge details with jurisdiction access check."""
-    result = await db.execute(
-        select(Bridge).where(Bridge.id == bridge_id, Bridge.is_deleted == False)
-    )
+    result = await db.execute(select(Bridge).where(Bridge.id == bridge_id, Bridge.is_deleted == False))
     bridge = result.scalar_one_or_none()
     if not bridge:
         raise NotFoundException(code="BRIDGE_NOT_FOUND", params={"bridge_id": bridge_id})
@@ -125,15 +119,11 @@ async def update_bridge(
     bridge_id: str,
     bridge_update: BridgeUpdate,
     request: Request,
-    current_user: User = Depends(
-        require_roles(UserRole.DIVISION_ENGINEER.value, UserRole.SYSTEM_ADMIN.value)
-    ),
+    current_user: User = Depends(require_roles(UserRole.DIVISION_ENGINEER.value, UserRole.SYSTEM_ADMIN.value)),
     db: AsyncSession = Depends(get_db),
 ) -> BridgeOut:
     """Update bridge metadata with audit logging."""
-    result = await db.execute(
-        select(Bridge).where(Bridge.id == bridge_id, Bridge.is_deleted == False)
-    )
+    result = await db.execute(select(Bridge).where(Bridge.id == bridge_id, Bridge.is_deleted == False))
     bridge = result.scalar_one_or_none()
     if not bridge:
         raise NotFoundException(code="BRIDGE_NOT_FOUND", params={"bridge_id": bridge_id})
@@ -169,15 +159,11 @@ async def assign_officer(
     bridge_id: str,
     assignment_in: AssignmentCreate,
     request: Request,
-    current_user: User = Depends(
-        require_roles(UserRole.DIVISION_ENGINEER.value, UserRole.SYSTEM_ADMIN.value)
-    ),
+    current_user: User = Depends(require_roles(UserRole.DIVISION_ENGINEER.value, UserRole.SYSTEM_ADMIN.value)),
     db: AsyncSession = Depends(get_db),
 ) -> AssignmentOut:
     """Assign an officer to a bridge."""
-    result = await db.execute(
-        select(Bridge).where(Bridge.id == bridge_id, Bridge.is_deleted == False)
-    )
+    result = await db.execute(select(Bridge).where(Bridge.id == bridge_id, Bridge.is_deleted == False))
     bridge = result.scalar_one_or_none()
     if not bridge:
         raise NotFoundException(code="BRIDGE_NOT_FOUND")

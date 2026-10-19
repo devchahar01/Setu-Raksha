@@ -26,9 +26,7 @@ async def login(
     Authenticate user via email and argon2id password hash.
     Sets secure httpOnly cookie and returns access token.
     """
-    result = await db.execute(
-        select(User).where(User.email == login_data.email, User.is_deleted == False)
-    )
+    result = await db.execute(select(User).where(User.email == login_data.email, User.is_deleted == False))
     user = result.scalar_one_or_none()
 
     if not user or not verify_password(login_data.password, user.password_hash):

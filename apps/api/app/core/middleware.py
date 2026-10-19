@@ -25,8 +25,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         response.headers["X-Process-Time-Ms"] = str(process_time_ms)
 
         logger.info(
-            f"{request.method} {request.url.path} "
-            f"status={response.status_code} duration={process_time_ms}ms",
+            f"{request.method} {request.url.path} status={response.status_code} duration={process_time_ms}ms",
             extra={"request_id": request_id},
         )
 

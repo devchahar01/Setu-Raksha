@@ -20,9 +20,7 @@ from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter(
-    prefix="/bridges/{bridge_id}/construction", tags=["Construction & Quality Audits (L2)"]
-)
+router = APIRouter(prefix="/bridges/{bridge_id}/construction", tags=["Construction & Quality Audits (L2)"])
 
 
 @router.get("", response_model=BridgeConstructionHistoryOut)
@@ -32,23 +30,17 @@ async def get_construction_history(
     db: AsyncSession = Depends(get_db),
 ) -> BridgeConstructionHistoryOut:
     """Retrieve full L2 quality evidence and construction history."""
-    b_res = await db.execute(
-        select(Bridge).where(Bridge.id == bridge_id, Bridge.is_deleted == False)
-    )
+    b_res = await db.execute(select(Bridge).where(Bridge.id == bridge_id, Bridge.is_deleted == False))
     if not b_res.scalar_one_or_none():
         raise NotFoundException(code="BRIDGE_NOT_FOUND")
 
-    rec_res = await db.execute(
-        select(ConstructionRecord).where(ConstructionRecord.bridge_id == bridge_id)
-    )
+    rec_res = await db.execute(select(ConstructionRecord).where(ConstructionRecord.bridge_id == bridge_id))
     mat_res = await db.execute(select(MaterialLog).where(MaterialLog.bridge_id == bridge_id))
     load_res = await db.execute(select(LoadTest).where(LoadTest.bridge_id == bridge_id))
 
     return BridgeConstructionHistoryOut(
         bridge_id=bridge_id,
-        construction_records=[
-            ConstructionRecordOut.model_validate(r) for r in rec_res.scalars().all()
-        ],
+        construction_records=[ConstructionRecordOut.model_validate(r) for r in rec_res.scalars().all()],
         material_logs=[MaterialLogOut.model_validate(m) for m in mat_res.scalars().all()],
         load_tests=[LoadTestOut.model_validate(lt) for lt in load_res.scalars().all()],
     )
@@ -59,9 +51,7 @@ async def add_material_log(
     bridge_id: str,
     material_in: MaterialLogCreate,
     request: Request,
-    current_user: User = Depends(
-        require_roles(UserRole.DIVISION_ENGINEER.value, UserRole.SYSTEM_ADMIN.value)
-    ),
+    current_user: User = Depends(require_roles(UserRole.DIVISION_ENGINEER.value, UserRole.SYSTEM_ADMIN.value)),
     db: AsyncSession = Depends(get_db),
 ) -> MaterialLogOut:
     """Add concrete/steel material test log with pass/fail validation against minimums."""
@@ -98,9 +88,7 @@ async def add_load_test(
     bridge_id: str,
     test_in: LoadTestCreate,
     request: Request,
-    current_user: User = Depends(
-        require_roles(UserRole.DIVISION_ENGINEER.value, UserRole.SYSTEM_ADMIN.value)
-    ),
+    current_user: User = Depends(require_roles(UserRole.DIVISION_ENGINEER.value, UserRole.SYSTEM_ADMIN.value)),
     db: AsyncSession = Depends(get_db),
 ) -> LoadTestOut:
     """Add initial or periodic load-test record."""

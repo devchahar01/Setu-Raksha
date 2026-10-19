@@ -1,4 +1,5 @@
 from app.db.base import Base, TimeStampedModel
+from app.db.models.audit import Audit, AuditFactor, EvidenceFile
 from app.db.models.audit_log import AuditLog
 from app.db.models.bridge import Bridge, BridgeAssignment
 from app.db.models.construction import ConstructionRecord, Contractor, LoadTest, MaterialLog
@@ -18,5 +19,8 @@ __all__ = [
     "ConstructionRecord",
     "MaterialLog",
     "LoadTest",
+    "Audit",
+    "AuditFactor",
+    "EvidenceFile",
     "AuditLog",
 ]

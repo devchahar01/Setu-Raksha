@@ -16,12 +16,8 @@ class Organization(TimeStampedModel):
     __tablename__ = "organizations"
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    type: Mapped[str] = mapped_column(
-        String(20), nullable=False, default=JurisdictionType.DISTRICT.value
-    )
-    parent_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("organizations.id"), nullable=True
-    )
+    type: Mapped[str] = mapped_column(String(20), nullable=False, default=JurisdictionType.DISTRICT.value)
+    parent_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("organizations.id"), nullable=True)
 
     parent: Mapped[Optional["Organization"]] = relationship(
         "Organization", remote_side="Organization.id", back_populates="children"

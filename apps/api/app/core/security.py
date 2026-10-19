@@ -27,9 +27,7 @@ def create_access_token(
     expires_delta: timedelta | None = None,
 ) -> str:
     """Generate signed JWT access token."""
-    expire = datetime.now(UTC) + (
-        expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
+    expire = datetime.now(UTC) + (expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode: dict[str, Any] = {
         "sub": subject,
         "role": role,
@@ -42,9 +40,7 @@ def create_access_token(
 
 def create_refresh_token(subject: str, expires_delta: timedelta | None = None) -> str:
     """Generate signed JWT refresh token."""
-    expire = datetime.now(UTC) + (
-        expires_delta or timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    )
+    expire = datetime.now(UTC) + (expires_delta or timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS))
     to_encode: dict[str, Any] = {
         "sub": subject,
         "exp": expire,

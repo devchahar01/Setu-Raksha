@@ -38,15 +38,9 @@ async def seed_database() -> None:
         await session.flush()
 
         # 2. Divisions
-        div_pune = Organization(
-            name="Pune Division (Desh & Western Ghats)", type="DIVISION", parent_id=mh_state.id
-        )
-        div_konkan = Organization(
-            name="Konkan Coastal Division", type="DIVISION", parent_id=mh_state.id
-        )
-        div_nashik = Organization(
-            name="Nashik Godavari Basin Division", type="DIVISION", parent_id=mh_state.id
-        )
+        div_pune = Organization(name="Pune Division (Desh & Western Ghats)", type="DIVISION", parent_id=mh_state.id)
+        div_konkan = Organization(name="Konkan Coastal Division", type="DIVISION", parent_id=mh_state.id)
+        div_nashik = Organization(name="Nashik Godavari Basin Division", type="DIVISION", parent_id=mh_state.id)
         session.add_all([div_pune, div_konkan, div_nashik])
         await session.flush()
 

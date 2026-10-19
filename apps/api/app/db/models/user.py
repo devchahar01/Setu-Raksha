@@ -20,12 +20,8 @@ class User(TimeStampedModel):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String(150), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[str] = mapped_column(
-        String(30), nullable=False, default=UserRole.PROJECT_OFFICER.value
-    )
-    jurisdiction_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("organizations.id"), nullable=True
-    )
+    role: Mapped[str] = mapped_column(String(30), nullable=False, default=UserRole.PROJECT_OFFICER.value)
+    jurisdiction_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("organizations.id"), nullable=True)
     locale: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
     channels: Mapped[str] = mapped_column(String(100), default="email,in_app", nullable=False)
     quiet_hours: Mapped[str | None] = mapped_column(String(50), nullable=True)

@@ -22,9 +22,7 @@ class Bridge(TimeStampedModel):
     design_life_y: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     irc_class: Mapped[str] = mapped_column(String(50), default="Class 70R", nullable=False)
     seismic_zone: Mapped[str] = mapped_column(String(20), default="Zone III", nullable=False)
-    foundation_type: Mapped[str] = mapped_column(
-        String(100), default="Well Foundation", nullable=False
-    )
+    foundation_type: Mapped[str] = mapped_column(String(100), default="Well Foundation", nullable=False)
     foundation_depth_m: Mapped[float] = mapped_column(Float, nullable=False)
     design_hfl_m: Mapped[float] = mapped_column(Float, nullable=False)
     design_scour_m: Mapped[float] = mapped_column(Float, nullable=False)
@@ -32,13 +30,9 @@ class Bridge(TimeStampedModel):
     last_audit_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     public_visibility: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_synthetic: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    jurisdiction_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("organizations.id"), nullable=True
-    )
+    jurisdiction_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("organizations.id"), nullable=True)
 
-    assignments: Mapped[list["BridgeAssignment"]] = relationship(
-        "BridgeAssignment", back_populates="bridge"
-    )
+    assignments: Mapped[list["BridgeAssignment"]] = relationship("BridgeAssignment", back_populates="bridge")
 
 
 class BridgeAssignment(TimeStampedModel):

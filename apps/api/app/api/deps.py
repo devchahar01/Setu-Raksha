@@ -34,9 +34,7 @@ async def get_current_user(
         token = access_token
 
     if not token:
-        raise UnauthorizedException(
-            code="AUTH_REQUIRED", params={"message": "Authentication required"}
-        )
+        raise UnauthorizedException(code="AUTH_REQUIRED", params={"message": "Authentication required"})
 
     payload = decode_token(token)
     user_id = payload.get("sub")
@@ -58,10 +56,7 @@ def require_roles(*allowed_roles: str) -> Callable[..., User]:
     """Dependency factory enforcing Role-Based Access Control."""
 
     async def role_checker(current_user: User = Depends(get_current_user)) -> User:
-        if (
-            current_user.role not in allowed_roles
-            and current_user.role != UserRole.SYSTEM_ADMIN.value
-        ):
+        if current_user.role not in allowed_roles and current_user.role != UserRole.SYSTEM_ADMIN.value:
             raise ForbiddenException(
                 code="ROLE_UNAUTHORIZED",
                 params={"user_role": current_user.role, "required_roles": list(allowed_roles)},

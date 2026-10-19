@@ -16,12 +16,8 @@ class AuditLog(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     actor_id: Mapped[str | None] = mapped_column(String(36), index=True, nullable=True)
-    action: Mapped[str] = mapped_column(
-        String(50), nullable=False
-    )  # CREATE, UPDATE, DELETE, LOGIN, APPROVE
-    entity: Mapped[str] = mapped_column(
-        String(50), index=True, nullable=False
-    )  # Bridge, Audit, Assignment, User
+    action: Mapped[str] = mapped_column(String(50), nullable=False)  # CREATE, UPDATE, DELETE, LOGIN, APPROVE
+    entity: Mapped[str] = mapped_column(String(50), index=True, nullable=False)  # Bridge, Audit, Assignment, User
     entity_id: Mapped[str | None] = mapped_column(String(36), index=True, nullable=True)
     before_state: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON snapshot
     after_state: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON snapshot
