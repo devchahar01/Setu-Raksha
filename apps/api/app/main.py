@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from app.api.v1.endpoints import health
 from app.api.v1.router import api_router
 from app.core.config import settings
@@ -10,6 +11,9 @@ from app.core.errors import (
 )
 from app.core.log_config import setup_logging
 from app.core.middleware import RequestContextMiddleware
+from app.db.base import Base
+from app.db.session import engine
+import app.db.models  # noqa: F401 - ensure all models are registered
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +22,15 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 # Initialize structured logging
 setup_logging(level="DEBUG" if settings.DEBUG else "INFO")
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    await engine.dispose()
+
+
 app = FastAPI(
     title=settings.APP_NAME,
     description="Backend API for the National Bridge Infrastructure Safety & Intelligence Grid",
@@ -25,6 +38,7 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url=f"{settings.API_V1_STR}/docs",
     redoc_url=f"{settings.API_V1_STR}/redoc",
+    lifespan=lifespan,
 )
 
 # Request context & tracing middleware

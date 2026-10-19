@@ -33,5 +33,6 @@ warn_return_any = false
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["apps/api/tests"]
-pythonpath = ["apps/api"]
+pythonpath = ["apps/api", "."]
+asyncio_mode = "auto"
 addopts = "-v --tb=short"
