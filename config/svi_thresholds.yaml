@@ -1,0 +1,25 @@
+# SVI & Risk Calculation Thresholds (Configurable)
+# Civil engineering baseline parameters according to IRC / MoRTH guidelines.
+# Thresholds are labelled 'example' and must be verified by certified bridge engineers.
+
+weights:
+  G_S: 0.25 # Structural Condition
+  G_H: 0.25 # Hydraulic & Scour
+  G_E: 0.15 # Seismic & Geo-technical
+  G_L: 0.10 # Traffic Loading
+  G_A: 0.25 # Age, Deterioration History & Environment
+
+tiers:
+  good: [0, 30]
+  watch: [30, 55]
+  warning: [55, 75]
+  critical: [75, 100]
+
+critical_flags:
+  scour_depth_ratio: 1.0 # Measured / Design scour >= 1.0
+  foundation_exposure_m: 1.5 # Exposure >= 1.5m
+  hfl_margin_m: 0.5 # Water level margin <= 0.5m to Design HFL
+  pier_tilt_deg: 1.0 # Tilt >= 1.0 deg
+  seat_width_ratio: 1.0 # Provided / Required < 1.0
+  bearing_displacement_mm: 25.0 # Bearing displacement >= 25mm
+  crack_width_mm: 2.0 # Crack width >= 2.0mm

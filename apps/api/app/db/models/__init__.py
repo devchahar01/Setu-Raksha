@@ -4,6 +4,7 @@ from app.db.models.audit_log import AuditLog
 from app.db.models.bridge import Bridge, BridgeAssignment
 from app.db.models.construction import ConstructionRecord, Contractor, LoadTest, MaterialLog
 from app.db.models.organization import JurisdictionType, Organization
+from app.db.models.risk import BridgeRiskAssessment
 from app.db.models.telemetry import Sensor, TelemetryReading
 from app.db.models.user import User, UserRole
 
@@ -26,4 +27,5 @@ __all__ = [
     "AuditLog",
     "Sensor",
     "TelemetryReading",
+    "BridgeRiskAssessment",
 ]
