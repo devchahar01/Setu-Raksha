@@ -1,4 +1,4 @@
-from app.api.v1.endpoints import audits, auth, bridges, construction, health, public, risk, telemetry
+from app.api.v1.endpoints import audits, auth, bridges, construction, health, notifications, public, risk, telemetry
 from fastapi import APIRouter
 
 api_router = APIRouter()
@@ -23,6 +23,9 @@ api_router.include_router(telemetry.router)
 
 # AI Predictive Risk & Remediation Engine (L6)
 api_router.include_router(risk.router)
+
+# Notification Engine & Scheduler (L4)
+api_router.include_router(notifications.router)
 
 # Public Transparency Portal (L7)
 api_router.include_router(public.router)
