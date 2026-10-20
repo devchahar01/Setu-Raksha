@@ -53,3 +53,4 @@ minio_data/
 pgdata/
 *.db
 *.sqlite3
+*.tsbuildinfo
