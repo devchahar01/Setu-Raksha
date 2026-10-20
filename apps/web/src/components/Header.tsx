@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Shield,
-  Activity,
   Layers,
   FileCheck,
   Cpu,
@@ -14,7 +13,7 @@ import {
   Globe,
   Radio,
   Clock,
-  Terminal,
+  CheckCircle2,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 
@@ -47,41 +46,43 @@ export const Header: React.FC = () => {
     { code: "mr", label: "मराठी" },
   ];
 
+  // Complete, properly ordered L1 through L7 Lifecycle Navigation
   const navLinks = [
-    { href: "/bridges", label: "Registry (L1)", icon: <Layers className="w-3.5 h-3.5" /> },
-    { href: "/audits", label: "Audits (L5)", icon: <FileCheck className="w-3.5 h-3.5" /> },
-    { href: "/telemetry", label: "Live IoT (L3)", icon: <Radio className="w-3.5 h-3.5" /> },
-    { href: "/risk", label: "Risk & SVI (L6)", icon: <Cpu className="w-3.5 h-3.5" /> },
-    { href: "/triage", label: "Triage (L4)", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
-    { href: "/public", label: "Transparency (L7)", icon: <Eye className="w-3.5 h-3.5" /> },
+    { href: "/bridges", label: "L1 Registry", icon: <Layers className="w-3.5 h-3.5" /> },
+    { href: "/bridges?view=quality", label: "L2 Quality", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
+    { href: "/telemetry", label: "L3 Live IoT", icon: <Radio className="w-3.5 h-3.5" /> },
+    { href: "/triage", label: "L4 Triage", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
+    { href: "/audits", label: "L5 Audits", icon: <FileCheck className="w-3.5 h-3.5" /> },
+    { href: "/risk", label: "L6 Risk (SVI)", icon: <Cpu className="w-3.5 h-3.5" /> },
+    { href: "/public", label: "L7 Transparency", icon: <Eye className="w-3.5 h-3.5" /> },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-[#060A12]/95 backdrop-blur-md text-slate-100 border-b border-slate-800">
-      {/* Top Institutional Bar */}
-      <div className="bg-[#03070E] py-1 px-4 sm:px-6 lg:px-8 border-b border-slate-800/80 flex items-center justify-between text-[11px] font-mono text-slate-400">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md text-slate-800 border-b border-slate-200 shadow-xs">
+      {/* Top Institutional Information Bar */}
+      <div className="bg-slate-100 py-1.5 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 flex items-center justify-between text-xs font-mono text-slate-600">
         <div className="flex items-center gap-3">
-          <span className="font-semibold text-slate-200 tracking-wider">
-            GOVT OF MAHARASHTRA • PWD & SDMA
+          <span className="font-semibold text-slate-800 tracking-wide">
+            GOVERNMENT OF MAHARASHTRA • PWD & SDMA
           </span>
-          <span className="text-slate-700 hidden sm:inline">|</span>
-          <span className="hidden sm:inline text-slate-400">
+          <span className="text-slate-300 hidden sm:inline">|</span>
+          <span className="hidden sm:inline text-slate-600">
             IRC:SP:35 • IS 1893:2016 COMPLIANT
           </span>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-1.5 text-teal-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
-            <span>SYSTEM: NOMINAL (14ms)</span>
+          <div className="hidden md:flex items-center gap-1.5 text-emerald-700 font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>SYSTEM: NOMINAL (12ms)</span>
           </div>
 
-          <div className="flex items-center gap-1 text-slate-300">
-            <Clock className="w-3 h-3 text-slate-500" />
+          <div className="flex items-center gap-1.5 text-slate-700 font-medium">
+            <Clock className="w-3.5 h-3.5 text-slate-500" />
             <span>{istTime || "12:00:00"} IST</span>
           </div>
 
-          <span className="text-[10px] bg-slate-900 px-2 py-0.5 rounded text-teal-300 border border-slate-800">
+          <span className="text-[11px] bg-sky-100 text-sky-800 px-2 py-0.5 rounded border border-sky-200 font-semibold">
             source=simulated
           </span>
         </div>
@@ -91,34 +92,34 @@ export const Header: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 group-hover:bg-teal-500/20 transition-colors">
+          <div className="w-8 h-8 rounded-lg bg-sky-600 flex items-center justify-center text-white shadow-xs group-hover:bg-sky-500 transition-colors">
             <Shield className="w-4 h-4" />
           </div>
           <div>
-            <div className="font-extrabold text-sm tracking-wider text-white flex items-center gap-1.5">
+            <div className="font-extrabold text-sm tracking-wider text-slate-900 flex items-center gap-1.5">
               SETU RAKSHA
-              <span className="text-[10px] font-mono text-teal-400 px-1.5 py-0.2 bg-teal-950/60 border border-teal-800/60 rounded">
+              <span className="text-[10px] font-mono text-sky-700 px-1.5 py-0.2 bg-sky-100 border border-sky-200 rounded font-bold">
                 v1.0
               </span>
             </div>
-            <div className="text-[10px] text-slate-400 tracking-tight hidden sm:block">
-              National Bridge Safety & Intelligence Grid
+            <div className="text-[10px] text-slate-500 tracking-tight hidden sm:block">
+              National Bridge Safety & Intelligence System
             </div>
           </div>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center space-x-1 text-xs font-medium text-slate-300">
+        {/* Desktop Navigation with Complete L1–L7 Ordering */}
+        <nav className="hidden lg:flex items-center space-x-1 text-xs font-semibold text-slate-600">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
-                key={link.href}
+                key={link.label}
                 href={link.href}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
                   isActive
-                    ? "bg-slate-800/90 text-teal-300 border border-slate-700 shadow-sm"
-                    : "hover:text-white hover:bg-slate-800/40"
+                    ? "bg-sky-50 text-sky-800 border border-sky-200 shadow-xs"
+                    : "hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
                 {link.icon}
@@ -130,17 +131,17 @@ export const Header: React.FC = () => {
 
         {/* Trilingual Selector */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-xs font-mono">
-            <Globe className="w-3.5 h-3.5 text-slate-400 ml-1.5 mr-1" />
+          <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-semibold">
+            <Globe className="w-3.5 h-3.5 text-slate-500 ml-1.5 mr-1" />
             {languages.map((lang) => (
               <button
                 key={lang.code}
                 onClick={() => setLocale(lang.code)}
                 aria-pressed={activeLocale === lang.code}
-                className={`px-2 py-1 rounded text-xs font-semibold transition-all ${
+                className={`px-2 py-1 rounded text-xs transition-all ${
                   activeLocale === lang.code
-                    ? "bg-teal-600 text-white shadow-sm"
-                    : "text-slate-400 hover:text-slate-200"
+                    ? "bg-sky-600 text-white shadow-xs font-bold"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 {lang.label}

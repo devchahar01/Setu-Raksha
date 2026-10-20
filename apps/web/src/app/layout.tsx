@@ -23,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable}`}>
-      <body className="min-h-screen flex flex-col font-sans bg-[#060A12] text-slate-100 selection:bg-teal-500 selection:text-white">
+      <body className="min-h-screen flex flex-col font-sans bg-slate-50 text-slate-900 selection:bg-sky-600 selection:text-white">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>

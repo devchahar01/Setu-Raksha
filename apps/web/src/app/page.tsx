@@ -25,7 +25,6 @@ import {
   Zap,
 } from "lucide-react";
 import { BridgeHero3D } from "@/components/BridgeHero3D";
-import { RiskTierBadge } from "@/components/RiskTierBadge";
 import { useAppStore } from "@/lib/store";
 import { formatNumber } from "@/lib/formatters";
 
@@ -34,21 +33,21 @@ const I18N_HOME = {
     heroSection: "Overview",
     statBridges: "Bridges Monitored",
     statBridgesSub: "5 Maharashtra Basins",
-    statSensors: "IoT Sensor Feeds",
+    statSensors: "Active IoT Sensors",
     statSensorsSub: "Ultrasonic, Tilt, Accel",
-    statLeadTime: "Mean Lead Time",
+    statLeadTime: "Average Warning Lead Time",
     statLeadTimeSub: "Advance Disaster Warning",
-    statTarget: "Disaster Reduction",
-    statTargetSub: "Synthetic Evaluation Study",
+    statTarget: "Disaster Risk Prevention",
+    statTargetSub: "Synthetic Benchmark Study",
 
     pipelineTitle: "SEVEN-STAGE LIFECYCLE DATA PIPELINE",
-    pipelineSub: "Institutional data architecture from pre-construction design to public transparency",
-    
-    basinTitle: "MAHARASHTRA STRATEGIC RIVER BASINS",
-    basinSub: "Continuous hydrological and geotechnical surveillance across 5 critical river basins",
+    pipelineSub: "Institutional digital architecture from pre-construction design to public transparency",
 
-    quickAccessTitle: "COMMAND & OPERATIONAL HUBS",
-    quickAccessSub: "Direct access to field audit wizards, live sensor telemetry, and engineer triage",
+    basinTitle: "STRATEGIC RIVER BASINS",
+    basinSub: "Continuous hydrological and geotechnical surveillance across 5 critical river basins in Maharashtra",
+
+    quickAccessTitle: "OPERATIONAL COMMAND HUBS",
+    quickAccessSub: "Direct access to field audit wizards, live sensor telemetry, and engineer triage consoles",
 
     disclaimerTitle: "STATUTORY CIVIL ENGINEERING ADVISORY",
     disclaimerText:
@@ -113,7 +112,8 @@ const BASIN_METRICS = [
     status: "Good (0–29 DRI)",
     waterLevel: "538.4m MSL",
     flow: "Safe (1.2m below HFL)",
-    color: "border-teal-500/40 bg-teal-500/5",
+    color: "border-emerald-300 bg-emerald-50/60 text-emerald-900",
+    badge: "bg-emerald-100 text-emerald-800 border-emerald-200",
   },
   {
     id: "bhima",
@@ -123,7 +123,8 @@ const BASIN_METRICS = [
     status: "Watch (30–54 DRI)",
     waterLevel: "462.1m MSL",
     flow: "Elevated Scour Vigilance",
-    color: "border-amber-500/40 bg-amber-500/5",
+    color: "border-amber-300 bg-amber-50/60 text-amber-900",
+    badge: "bg-amber-100 text-amber-800 border-amber-200",
   },
   {
     id: "krishna",
@@ -133,7 +134,8 @@ const BASIN_METRICS = [
     status: "Good (0–29 DRI)",
     waterLevel: "554.8m MSL",
     flow: "Normal Controlled Flow",
-    color: "border-teal-500/40 bg-teal-500/5",
+    color: "border-emerald-300 bg-emerald-50/60 text-emerald-900",
+    badge: "bg-emerald-100 text-emerald-800 border-emerald-200",
   },
   {
     id: "godavari",
@@ -143,7 +145,8 @@ const BASIN_METRICS = [
     status: "Warning (55–74 DRI)",
     waterLevel: "565.3m MSL",
     flow: "Active Monitored Discharge",
-    color: "border-orange-500/40 bg-orange-500/5",
+    color: "border-orange-300 bg-orange-50/60 text-orange-900",
+    badge: "bg-orange-100 text-orange-800 border-orange-200",
   },
   {
     id: "konkan",
@@ -153,7 +156,8 @@ const BASIN_METRICS = [
     status: "Critical (75–100 DRI)",
     waterLevel: "Tidal Surge High",
     flow: "Chloride Exposure Accelerated",
-    color: "border-rose-500/40 bg-rose-500/5",
+    color: "border-rose-300 bg-rose-50/60 text-rose-900",
+    badge: "bg-rose-100 text-rose-800 border-rose-200",
   },
 ];
 
@@ -163,46 +167,47 @@ export default function Home() {
 
   const [selectedBasin, setSelectedBasin] = useState<string>("mula-mutha");
 
+  // Complete, sequential L1 through L7 Lifecycle
   const lifecycles = [
     {
       code: "L1",
       title: "Pre-construction & Design Registry",
       titleHi: "पूर्व-निर्माण एवं डिजाइन रजिस्ट्री",
       titleMr: "बांधकामपूर्व व डिझाइन नोंदवही",
-      desc: "IRC loading class (70R, Class AA), IS 1893 seismic zoning, foundation depth, and design scour limits.",
+      desc: "IRC loading standards (70R, Class AA), IS 1893 seismic zoning, foundation depth, and design scour thresholds.",
       tag: "IRC Standards",
       href: "/bridges",
-      icon: <Layers className="w-5 h-5 text-teal-400" />,
+      icon: <Layers className="w-5 h-5 text-sky-600" />,
     },
     {
       code: "L2",
-      title: "Construction & Quality Audits",
+      title: "Construction & Quality Testing",
       titleHi: "निर्माण एवं गुणवत्ता परीक्षण",
       titleMr: "बांधकाम व गुणवत्ता परीक्षण",
-      desc: "Concrete cube compressive strength logs, contractor defect liability tracking, and initial proof-load tests.",
-      tag: "Material Logs",
-      href: "/bridges",
-      icon: <Database className="w-5 h-5 text-teal-400" />,
+      desc: "Concrete cube compressive strength logs, contractor defect liability tracking, and initial proof-load verification.",
+      tag: "Quality Logs",
+      href: "/bridges?view=quality",
+      icon: <Database className="w-5 h-5 text-sky-600" />,
     },
     {
       code: "L3",
       title: "Live Monitoring & Telemetry Cockpit",
       titleHi: "लाइव निगरानी एवं टेलीमेट्री",
       titleMr: "थेट देखरेख व सेन्सर कॉकपिट",
-      desc: "Ultrasonic river stage, biaxial pier inclinometer tilt (1.0° threshold), 3-axis deck vibration accelerometers.",
-      tag: "50Hz IoT Stream",
+      desc: "Ultrasonic river stage, biaxial pier inclinometer tilt (1.0° threshold), and 3-axis deck vibration accelerometers.",
+      tag: "50Hz Stream",
       href: "/telemetry",
-      icon: <Radio className="w-5 h-5 text-teal-400" />,
+      icon: <Radio className="w-5 h-5 text-sky-600" />,
     },
     {
       code: "L4",
       title: "Routine Audit Scheduler & Escalation",
       titleHi: "मासिक ऑडिट शेड्यूलर एवं एस्केलेशन",
       titleMr: "नियमित ऑडिट शेड्यूलर व एस्केलेशन",
-      desc: "Automated scan at T-7 days, T-2 days, and overdue escalation to Division Engineers with multi-channel dispatch.",
-      tag: "Celery Scheduler",
+      desc: "Automated scan at T-7 days, T-2 days, and overdue escalation to Division Engineers with emergency action dispatch.",
+      tag: "Audit Matrix",
       href: "/triage",
-      icon: <Clock className="w-5 h-5 text-teal-400" />,
+      icon: <Clock className="w-5 h-5 text-sky-600" />,
     },
     {
       code: "L5",
@@ -210,19 +215,19 @@ export default function Home() {
       titleHi: "२६-घटक मासिक फील्ड ऑडिट",
       titleMr: "२६-घटक मासिक तपासणी",
       desc: "Digital inspection wizard capturing Structural, Hydraulic, Seismic, Load, and Age factors with immutable locking.",
-      tag: "Appendix A Wizard",
+      tag: "Field Wizard",
       href: "/audits",
-      icon: <FileCheck className="w-5 h-5 text-teal-400" />,
+      icon: <FileCheck className="w-5 h-5 text-sky-600" />,
     },
     {
       code: "L6",
       title: "AI Predictive Risk & Remediations",
       titleHi: "एआई भविष्यसूचक जोखिम एवं उपचार",
       titleMr: "एआई जोखीम व उपाययोजना",
-      desc: "Piecewise-linear SVI scoring, Dynamic Risk Index (DRI), Markov-chain RUL models, and 11-rule Prescriptive Catalogue.",
-      tag: "Appendix D Engine",
+      desc: "Piecewise-linear SVI scoring, Dynamic Risk Index (DRI), Markov-chain degradation, and 11-rule Prescriptive Catalogue.",
+      tag: "Risk Engine",
       href: "/risk",
-      icon: <Cpu className="w-5 h-5 text-teal-400" />,
+      icon: <Cpu className="w-5 h-5 text-sky-600" />,
     },
     {
       code: "L7",
@@ -230,69 +235,69 @@ export default function Home() {
       titleHi: "सार्वजनिक नागरिक पारदर्शिता पोर्टल",
       titleMr: "नागरिक पारदर्शकता पोर्टल",
       desc: "Citizen view of bridge age, certified health tiers, and open audit history with privacy-preserving redaction.",
-      tag: "Citizen Open Grid",
+      tag: "Open Access",
       href: "/public",
-      icon: <Eye className="w-5 h-5 text-teal-400" />,
+      icon: <Eye className="w-5 h-5 text-sky-600" />,
     },
   ];
 
   return (
-    <div className="w-full bg-[#060A12] text-slate-100">
-      {/* 1. CINEMATIC 3D INTRODUCTORY SEQUENCE */}
+    <div className="w-full bg-slate-50 text-slate-800">
+      {/* 1. CINEMATIC 3D DAYLIGHT BRIDGE WITH INDIAN VEHICLES */}
       <BridgeHero3D />
 
       {/* 2. MAIN OPERATIONS & INTELLIGENCE GRID */}
-      <div id="operations-grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
+      <div id="operations-grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
         {/* Live National Metric Wall */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800 backdrop-blur-md">
-            <div className="text-[11px] font-mono uppercase text-slate-400 tracking-wider mb-1">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+            <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
               {t.statBridges}
             </div>
-            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-white mb-1">
+            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 mb-1">
               {formatNumber(60, activeLocale, useDevanagariDigits)}
             </div>
-            <div className="text-xs text-teal-400 font-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+            <div className="text-xs text-emerald-700 font-semibold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
               {t.statBridgesSub}
             </div>
           </div>
 
-          <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800 backdrop-blur-md">
-            <div className="text-[11px] font-mono uppercase text-slate-400 tracking-wider mb-1">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+            <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
               {t.statSensors}
             </div>
-            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-white mb-1">
+            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 mb-1">
               {formatNumber(240, activeLocale, useDevanagariDigits)}
             </div>
-            <div className="text-xs text-sky-400 font-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+            <div className="text-xs text-sky-700 font-semibold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
               {t.statSensorsSub}
             </div>
           </div>
 
-          <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800 backdrop-blur-md">
-            <div className="text-[11px] font-mono uppercase text-slate-400 tracking-wider mb-1">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+            <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
               {t.statLeadTime}
             </div>
-            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-white mb-1">
+            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 mb-1">
               {formatNumber(6.63, activeLocale, useDevanagariDigits)} hrs
             </div>
-            <div className="text-xs text-emerald-400 font-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <div className="text-xs text-emerald-700 font-semibold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
               {t.statLeadTimeSub}
             </div>
           </div>
 
-          <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800 backdrop-blur-md">
-            <div className="text-[11px] font-mono uppercase text-slate-400 tracking-wider mb-1">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+            <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
               {t.statTarget}
             </div>
-            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-white mb-1">
+            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 mb-1">
               99.0%
             </div>
-            <div className="text-xs text-indigo-400 font-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+            <div className="text-xs text-indigo-700 font-semibold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
               {t.statTargetSub}
             </div>
           </div>
@@ -300,19 +305,19 @@ export default function Home() {
 
         {/* 3. L1–L7 STRUCTURED DATA PIPELINE */}
         <div>
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 pb-4 border-b border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
             <div>
-              <div className="text-xs font-mono text-teal-400 uppercase tracking-widest mb-1 font-bold">
+              <div className="text-xs font-mono text-sky-700 uppercase tracking-widest mb-1 font-bold">
                 CORE SYSTEM ARCHITECTURE
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 {t.pipelineTitle}
               </h2>
-              <p className="text-sm text-slate-400 mt-1">{t.pipelineSub}</p>
+              <p className="text-sm text-slate-600 mt-1">{t.pipelineSub}</p>
             </div>
             <div className="flex items-center gap-2 text-xs font-mono text-slate-500">
-              <span className="px-2 py-1 bg-slate-900 rounded border border-slate-800">MoRTH Grid</span>
-              <span className="px-2 py-1 bg-slate-900 rounded border border-slate-800">IRC:SP:35</span>
+              <span className="px-2.5 py-1 bg-slate-100 rounded-lg border border-slate-200 font-medium">MoRTH Standard</span>
+              <span className="px-2.5 py-1 bg-slate-100 rounded-lg border border-slate-200 font-medium">IRC:SP:35</span>
             </div>
           </div>
 
@@ -324,31 +329,31 @@ export default function Home() {
                 <Link
                   key={item.code}
                   href={item.href}
-                  className="group bg-slate-950/70 hover:bg-slate-900/90 p-6 rounded-2xl border border-slate-800 hover:border-teal-500/50 transition-all shadow-sm hover:shadow-xl hover:shadow-teal-500/5 flex flex-col justify-between"
+                  className="group bg-white hover:bg-sky-50/50 p-6 rounded-2xl border border-slate-200/90 hover:border-sky-300 transition-all shadow-xs hover:shadow-md flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <div className="w-9 h-9 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center group-hover:scale-105 transition-transform">
                           {item.icon}
                         </div>
-                        <span className="font-mono text-xs font-extrabold text-teal-400 bg-teal-950/60 px-2 py-0.5 rounded border border-teal-800/60">
+                        <span className="font-mono text-xs font-extrabold text-sky-800 bg-sky-100 px-2.5 py-1 rounded-md border border-sky-200">
                           {item.code}
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                      <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                         {item.tag}
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-slate-100 text-sm mb-2 group-hover:text-teal-300 transition-colors">
+                    <h3 className="font-bold text-slate-900 text-sm mb-2 group-hover:text-sky-700 transition-colors">
                       {localizedTitle}
                     </h3>
-                    <p className="text-xs text-slate-400 leading-relaxed font-sans">{item.desc}</p>
+                    <p className="text-xs text-slate-600 leading-relaxed">{item.desc}</p>
                   </div>
 
-                  <div className="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400 group-hover:text-teal-400">
-                    <span className="font-medium text-[11px]">Inspect Module</span>
+                  <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 group-hover:text-sky-700">
+                    <span className="font-semibold text-xs">Open Module</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>
@@ -357,21 +362,21 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 4. MAHARASHTRA STRATEGIC RIVER BASINS SPOTLIGHT */}
+        {/* 4. STRATEGIC RIVER BASINS SPOTLIGHT */}
         <div>
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 pb-4 border-b border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
             <div>
-              <div className="text-xs font-mono text-teal-400 uppercase tracking-widest mb-1 font-bold">
-                REGIONAL JURISDICTION COVERAGE
+              <div className="text-xs font-mono text-sky-700 uppercase tracking-widest mb-1 font-bold">
+                REGIONAL SURVEILLANCE COVERAGE
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 {t.basinTitle}
               </h2>
-              <p className="text-sm text-slate-400 mt-1">{t.basinSub}</p>
+              <p className="text-sm text-slate-600 mt-1">{t.basinSub}</p>
             </div>
             <Link
               href="/bridges"
-              className="text-xs text-teal-400 hover:text-teal-300 font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+              className="text-xs text-sky-700 hover:text-sky-800 font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto bg-sky-50 px-3 py-1.5 rounded-lg border border-sky-200"
             >
               Open Interactive Basin GIS Map <ExternalLink className="w-3.5 h-3.5" />
             </Link>
@@ -384,154 +389,156 @@ export default function Home() {
                 onClick={() => setSelectedBasin(basin.id)}
                 className={`p-5 rounded-2xl border transition-all cursor-pointer ${
                   selectedBasin === basin.id
-                    ? `${basin.color} shadow-lg ring-1 ring-teal-500/40`
-                    : "bg-slate-900/30 border-slate-800/80 hover:border-slate-700"
+                    ? `${basin.color} shadow-sm ring-2 ring-sky-500/30`
+                    : "bg-white border-slate-200 hover:border-slate-300"
                 }`}
               >
-                <div className="text-xs font-mono text-slate-400 mb-1">
+                <div className="text-xs font-semibold text-slate-500 mb-1">
                   {formatNumber(basin.bridges, activeLocale, useDevanagariDigits)} Bridges
                 </div>
-                <h4 className="font-bold text-white text-sm mb-1">{basin.name}</h4>
-                <div className="text-[11px] text-slate-400 mb-3">{basin.nameLocal}</div>
+                <h4 className="font-bold text-slate-900 text-sm mb-1">{basin.name}</h4>
+                <div className="text-xs text-slate-500 mb-3">{basin.nameLocal}</div>
 
-                <div className="space-y-1.5 text-xs border-t border-slate-800/60 pt-3">
-                  <div className="text-[11px] font-mono text-teal-300">{basin.status}</div>
-                  <div className="text-[10px] text-slate-400">{basin.waterLevel}</div>
-                  <div className="text-[10px] text-slate-500">{basin.flow}</div>
+                <div className="space-y-1.5 text-xs border-t border-slate-200/80 pt-3">
+                  <div className={`text-xs font-bold inline-block px-2 py-0.5 rounded border ${basin.badge}`}>
+                    {basin.status}
+                  </div>
+                  <div className="text-xs font-medium text-slate-700">{basin.waterLevel}</div>
+                  <div className="text-xs text-slate-500">{basin.flow}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 5. DIRECT COMMAND ACTION DECK */}
+        {/* 5. OPERATIONAL COMMAND HUBS */}
         <div>
           <div className="mb-6">
-            <div className="text-xs font-mono text-teal-400 uppercase tracking-widest mb-1 font-bold">
-              OPERATIONAL WORKFLOWS
+            <div className="text-xs font-mono text-sky-700 uppercase tracking-widest mb-1 font-bold">
+              DIRECT ACCESS
             </div>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
               {t.quickAccessTitle}
             </h2>
-            <p className="text-xs text-slate-400 mt-1">{t.quickAccessSub}</p>
+            <p className="text-xs text-slate-600 mt-1">{t.quickAccessSub}</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link
               href="/bridges"
-              className="p-5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between group transition-all"
+              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400">
+                <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600">
                   <Layers className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-white group-hover:text-teal-300">
+                  <div className="font-bold text-sm text-slate-900 group-hover:text-sky-700">
                     Bridge Registry & GIS Map
                   </div>
-                  <div className="text-xs text-slate-400">5 Basins • Color Coded Markers</div>
+                  <div className="text-xs text-slate-500">5 Basins • Color Coded Markers</div>
                 </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-teal-400 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-sky-600 group-hover:translate-x-1 transition-all" />
             </Link>
 
             <Link
               href="/telemetry"
-              className="p-5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between group transition-all"
+              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600">
                   <Radio className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-white group-hover:text-sky-300">
+                  <div className="font-bold text-sm text-slate-900 group-hover:text-sky-700">
                     Live Telemetry Sensors Cockpit
                   </div>
-                  <div className="text-xs text-slate-400">Water Stage • Pier Tilt • Vibration</div>
+                  <div className="text-xs text-slate-500">Water Stage • Pier Tilt • Vibration</div>
                 </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-sky-400 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-sky-600 group-hover:translate-x-1 transition-all" />
             </Link>
 
             <Link
               href="/audits"
-              className="p-5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between group transition-all"
+              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
                   <FileCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-white group-hover:text-emerald-300">
+                  <div className="font-bold text-sm text-slate-900 group-hover:text-emerald-700">
                     26-Factor Field Audit Wizard
                   </div>
-                  <div className="text-xs text-slate-400">Immutable Cryptographic Locking</div>
+                  <div className="text-xs text-slate-500">Immutable Cryptographic Locking</div>
                 </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
             </Link>
 
             <Link
               href="/risk"
-              className="p-5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between group transition-all"
+              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
                   <Cpu className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-white group-hover:text-indigo-300">
+                  <div className="font-bold text-sm text-slate-900 group-hover:text-indigo-700">
                     AI SVI, DRI & Remediation
                   </div>
-                  <div className="text-xs text-slate-400">11 Certified Trilingual Rules</div>
+                  <div className="text-xs text-slate-500">11 Certified Trilingual Rules</div>
                 </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
             </Link>
 
             <Link
               href="/triage"
-              className="p-5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between group transition-all"
+              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600">
                   <AlertTriangle className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-white group-hover:text-rose-300">
+                  <div className="font-bold text-sm text-slate-900 group-hover:text-rose-700">
                     Alert & Triage Console
                   </div>
-                  <div className="text-xs text-slate-400">Emergency Actions: CLOSE-01</div>
+                  <div className="text-xs text-slate-500">Emergency Actions: CLOSE-01</div>
                 </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-rose-400 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-rose-600 group-hover:translate-x-1 transition-all" />
             </Link>
 
             <Link
               href="/public"
-              className="p-5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between group transition-all"
+              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
                   <Eye className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-white group-hover:text-purple-300">
+                  <div className="font-bold text-sm text-slate-900 group-hover:text-purple-700">
                     Public Citizen Transparency
                   </div>
-                  <div className="text-xs text-slate-400">Redacted Open Intelligence</div>
+                  <div className="text-xs text-slate-500">Redacted Open Intelligence</div>
                 </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
             </Link>
           </div>
         </div>
 
         {/* 6. MANDATORY STATUTORY CIVIL ENGINEERING NOTICE */}
-        <div className="p-6 rounded-2xl bg-amber-500/5 border border-amber-500/20 text-xs text-amber-200/90 leading-relaxed flex items-start gap-3">
-          <Shield className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+        <div className="p-5 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-900 leading-relaxed flex items-start gap-3">
+          <Shield className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div>
-            <span className="font-bold uppercase tracking-wider text-amber-300 mr-2">
+            <span className="font-bold uppercase tracking-wider text-amber-950 mr-2">
               {t.disclaimerTitle}:
             </span>
             {t.disclaimerText}
