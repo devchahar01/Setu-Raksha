@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import * as THREE from "three";
 import {
   ArrowDown,
@@ -12,8 +12,9 @@ import {
   Compass,
   Sun,
   Sunset,
+  CloudRain,
   Moon,
-  Navigation,
+  RotateCcw,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 
@@ -22,6 +23,8 @@ interface CitizenEthos {
   roleLocal: string;
   tagline: string;
 }
+
+type AtmosphereMode = "auto" | "daylight" | "sunset" | "monsoon" | "dusk";
 
 const CITIZEN_CALLOUTS: Record<"en" | "hi" | "mr", CitizenEthos[]> = {
   en: [
@@ -112,33 +115,51 @@ const HERO_TEXT = {
     dept: "GOVERNMENT OF MAHARASHTRA • PUBLIC WORKS DEPARTMENT",
     title: "SETU RAKSHA",
     subtitle: "National Bridge Infrastructure Safety & Intelligence Grid",
-    desc: "Photorealistic structural digital twin: scroll down to rotate panoramic angles of the bridge, transition the sun from bright midday to golden sunset, and watch live Indian traffic.",
-    scrollHint: "Scroll Down to Rotate Views & Vary Sun",
-    liveTrafficBadge: "HOWRAH & HOOGHLY RIVER TWIN • REALISTIC DYNAMICS",
+    desc: "Photorealistic structural digital twin: observe authentic Rabindra Setu landscapes across daylight, golden sunset, monsoon, and twilight with live Indian traffic and dynamic solar lighting.",
+    scrollHint: "Scroll to Orbit & Vary Sun",
+    liveTrafficBadge: "HOWRAH ARCHITECTURAL TWIN • HOOGHLY BASIN",
+    modeDay: "Daylight",
+    modeSunset: "Golden Sunset",
+    modeMonsoon: "Monsoon",
+    modeDusk: "Twilight",
+    modeAuto: "Scroll Arc",
     solarNoon: "Midday Sun",
     solarGolden: "Golden Hour Sunset",
+    solarMonsoon: "Monsoon Amber",
     solarDusk: "Twilight Dusk",
   },
   hi: {
     dept: "महाराष्ट्र शासन • सार्वजनिक बांधकाम विभाग",
     title: "सेतु रक्षा",
     subtitle: "राष्ट्रीय पुल अवसंरचना सुरक्षा एवं इंटेलिजेंस ग्रिड",
-    desc: "यथार्थवादी संरचनात्मक डिजिटल ट्विन: कोण बदलने के लिए नीचे स्क्रॉल करें, दोपहर से स्वर्णिम सूर्यास्त तक धूप की तीव्रता बदलें और वाहनों की लाइव गति देखें।",
-    scrollHint: "दृश्य घुमाने और सूर्य चक्र देखने के लिए स्क्रॉल करें",
-    liveTrafficBadge: "हावड़ा एवं हुगली नदी ट्विन • यथार्थवादी गतिशीलता",
-    solarNoon: "दोपहर की धूप",
+    desc: "यथार्थवादी संरचनात्मक डिजिटल ट्विन: दोपहर के सूर्य, स्वर्णिम सूर्यास्त, मान्सून और गोधूलि वेला में वास्तविक हावड़ा सेतु परिदृश्य और भारतीय वाहनों की लाइव गतिशीलता देखें।",
+    scrollHint: "वातावरण बदलने व दृश्य घुमाने के लिए स्क्रॉल करें",
+    liveTrafficBadge: "हावड़ा स्थापत्य ट्विन • हुगली बेसिन",
+    modeDay: "दोपहर की धूप",
+    modeSunset: "स्वर्णिम सूर्यास्त",
+    modeMonsoon: "मान्सून मेघ",
+    modeDusk: "गोधूलि वेला",
+    modeAuto: "स्क्रोल चक्र",
+    solarNoon: "दोपहर का सूर्य",
     solarGolden: "स्वर्णिम सूर्यास्त",
+    solarMonsoon: "मान्सून प्रकाश",
     solarDusk: "गोधूलि संध्या",
   },
   mr: {
     dept: "महाराष्ट्र शासन • सार्वजनिक बांधकाम विभाग",
     title: "सेतू रक्षा",
     subtitle: "राष्ट्रीय पूल पायाभूत सुविधा सुरक्षा व गुप्तचर यंत्रणा",
-    desc: "वास्तववादी संरचनात्मक डिजिटल ट्विन: खाली स्क्रोल करून पुलाचे विहंगम दृश्य फिरवा, दुपारच्या उन्हापासून सोनेरी सूर्यास्तापर्यंतचा प्रकाश आणि थेट वाहतूक पहा.",
-    scrollHint: "दृश्य फिरवण्यासाठी व सूर्यप्रकाश बदलण्यासाठी स्क्रोल करा",
-    liveTrafficBadge: "हावडा व हुगळी नदी ट्विन • वास्तववादी गतिशीलता",
+    desc: "वास्तववादी संरचनात्मक डिजिटल ट्विन: दुपारचे ऊन, सोनेरी सूर्यास्त, मान्सून मेघ आणि गोधूलि वेळेतील प्रत्यक्ष हावडा पूल आणि भारतीय वाहनांची थेट हालचाल पहा.",
+    scrollHint: "वातावरण बदलण्यासाठी व दृश्य फिरवण्यासाठी स्क्रोल करा",
+    liveTrafficBadge: "हावडा स्थापत्य ट्विन • हुगळी खोरे",
+    modeDay: "दुपारचे ऊन",
+    modeSunset: "सोनेरी सूर्यास्त",
+    modeMonsoon: "मान्सून संध्या",
+    modeDusk: "गोधूलि वेला",
+    modeAuto: "स्क्रोल चक्र",
     solarNoon: "दुपारचे ऊन",
     solarGolden: "सोनेरी सूर्यास्त",
+    solarMonsoon: "मान्सून प्रकाश",
     solarDusk: "संध्याकाळ",
   },
 };
@@ -151,20 +172,26 @@ export const BridgeHero3D: React.FC = () => {
 
   const [activeCalloutIdx, setActiveCalloutIdx] = useState<number>(0);
   const [scrollProgress, setScrollProgress] = useState<number>(0);
+  const [atmosphereMode, setAtmosphereMode] = useState<AtmosphereMode>("auto");
   const scrollTargetRef = useRef<number>(0);
+  const modeRef = useRef<AtmosphereMode>("auto");
 
-  // Trigger subtle tactile haptic
+  useEffect(() => {
+    modeRef.current = atmosphereMode;
+  }, [atmosphereMode]);
+
+  // Tactile haptic feedback
   const triggerHaptic = (ms: number = 15) => {
     if (typeof window !== "undefined" && "vibrate" in navigator) {
       try {
         navigator.vibrate(ms);
       } catch {
-        // unsupported hardware
+        // unsupported
       }
     }
   };
 
-  // Cycle callouts
+  // Cycle citizen callouts
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveCalloutIdx((prev) => (prev + 1) % callouts.length);
@@ -185,7 +212,7 @@ export const BridgeHero3D: React.FC = () => {
       const milestone = Math.floor(progress * 5);
       if (milestone !== lastMilestone) {
         lastMilestone = milestone;
-        triggerHaptic(12);
+        triggerHaptic(10);
       }
     };
 
@@ -202,21 +229,50 @@ export const BridgeHero3D: React.FC = () => {
     }
   };
 
-  // THREE.JS REALISTIC BRIDGE LANDSCAPE + DYNAMIC SOLAR ARC & SCROLL-DRIVEN CAMERA ROTATION
+  // Compute opacities for the 4 photorealistic landscape background layers
+  const opacities = useMemo(() => {
+    if (atmosphereMode === "daylight") return { day: 1, sunset: 0, monsoon: 0, dusk: 0 };
+    if (atmosphereMode === "sunset") return { day: 0, sunset: 1, monsoon: 0, dusk: 0 };
+    if (atmosphereMode === "monsoon") return { day: 0, sunset: 0, monsoon: 1, dusk: 0 };
+    if (atmosphereMode === "dusk") return { day: 0, sunset: 0, monsoon: 0, dusk: 1 };
+
+    // Auto scroll-linked crossfade
+    const p = scrollProgress;
+    let day = 0, sunset = 0, monsoon = 0, dusk = 0;
+
+    if (p < 0.26) {
+      const t = p / 0.26;
+      day = 1 - t;
+      sunset = t;
+    } else if (p < 0.56) {
+      const t = (p - 0.26) / 0.3;
+      sunset = 1 - t;
+      monsoon = t;
+    } else if (p < 0.82) {
+      const t = (p - 0.56) / 0.26;
+      monsoon = 1 - t;
+      dusk = t;
+    } else {
+      dusk = 1;
+    }
+    return { day, sunset, monsoon, dusk };
+  }, [atmosphereMode, scrollProgress]);
+
+  // THREE.JS 3D BRIDGE, VEHICLES, BIRDS, WATER & DYNAMIC SOLAR ARC
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    // 1. Scene, Camera, WebGL Renderer
+    // 1. WebGL Renderer with Alpha Transparency (Composited over high-res landscape photos)
     const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(
-      40,
+      42,
       window.innerWidth / window.innerHeight,
       0.1,
-      1200
+      1000
     );
-    camera.position.set(-25, 14, 68);
+    camera.position.set(-20, 15, 62);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -231,41 +287,10 @@ export const BridgeHero3D: React.FC = () => {
     renderer.toneMappingExposure = 1.15;
     container.appendChild(renderer.domElement);
 
-    // Root Group
     const rootGroup = new THREE.Group();
     scene.add(rootGroup);
 
-    // 2. PHOTOREALISTIC LANDSCAPE BACKDROP MESH (LOAD USER'S GIVEN IMAGE)
-    const textureLoader = new THREE.TextureLoader();
-    const landscapeTexture = textureLoader.load(
-      "/images/bridge_landscape.jpg",
-      () => {
-        renderer.render(scene, camera);
-      }
-    );
-    landscapeTexture.colorSpace = THREE.SRGBColorSpace;
-
-    // Curved Panoramic Sky Backdrop Plane
-    const backdropGeo = new THREE.CylinderGeometry(
-      260,
-      260,
-      130,
-      48,
-      1,
-      true,
-      Math.PI * 0.45,
-      Math.PI * 1.1
-    );
-    const backdropMat = new THREE.MeshBasicMaterial({
-      map: landscapeTexture,
-      side: THREE.BackSide,
-      depthWrite: false,
-    });
-    const backdrop = new THREE.Mesh(backdropGeo, backdropMat);
-    backdrop.position.set(0, 35, -40);
-    scene.add(backdrop);
-
-    // 3. DYNAMIC SUNLIGHT & ATMOSPHERIC LIGHTING SETUP
+    // 2. DYNAMIC SOLAR LIGHTING SETUP
     const sunLight = new THREE.DirectionalLight(0xfffaed, 2.8);
     sunLight.position.set(60, 80, 50);
     sunLight.castShadow = true;
@@ -276,22 +301,24 @@ export const BridgeHero3D: React.FC = () => {
 
     // Visible Glowing Sun Disc
     const sunMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(5.0, 32, 32),
+      new THREE.SphereGeometry(4.2, 32, 32),
       new THREE.MeshBasicMaterial({ color: 0xfffaed })
     );
-    sunMesh.position.set(130, 150, 70);
+    sunMesh.position.set(120, 140, 70);
     scene.add(sunMesh);
 
     // Soft Ambient Daylight
-    const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0xb0bec5, 1.4);
+    const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0xb0bec5, 1.3);
     scene.add(hemiLight);
 
-    // 4. REFLECTIVE RIVER WATER SURFACE (CALM SHIMMER MIRRORING BRIDGE & SUN)
+    // 3. REFLECTIVE WATER SURFACE & COUNTRY BOAT (HOOGHLY RIVER)
     const riverGeo = new THREE.PlaneGeometry(360, 240, 64, 48);
     const riverMat = new THREE.MeshStandardMaterial({
       color: 0x0284c7,
-      roughness: 0.12,
-      metalness: 0.88,
+      roughness: 0.15,
+      metalness: 0.85,
+      transparent: true,
+      opacity: 0.75,
     });
     const river = new THREE.Mesh(riverGeo, riverMat);
     river.rotation.x = -Math.PI / 2;
@@ -299,11 +326,11 @@ export const BridgeHero3D: React.FC = () => {
     river.receiveShadow = true;
     scene.add(river);
 
-    // Traditional Wooden Country Boat on River (just like in the photo!)
+    // Traditional Wooden Country Boat on River (from the photograph)
     const boatGroup = new THREE.Group();
     const boatHull = new THREE.Mesh(
-      new THREE.ConeGeometry(1.4, 6.0, 5),
-      new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 0.9 })
+      new THREE.ConeGeometry(1.3, 5.5, 5),
+      new THREE.MeshStandardMaterial({ color: 0x2e1d10, roughness: 0.9 })
     );
     boatHull.rotation.z = Math.PI / 2;
     boatHull.rotation.y = Math.PI / 2;
@@ -311,7 +338,6 @@ export const BridgeHero3D: React.FC = () => {
     boatHull.position.y = -5.6;
     boatGroup.add(boatHull);
 
-    // Boat cargo bags
     const boatCargo = new THREE.Mesh(
       new THREE.BoxGeometry(0.8, 0.5, 1.2),
       new THREE.MeshStandardMaterial({ color: 0xd7ccc8 })
@@ -319,199 +345,234 @@ export const BridgeHero3D: React.FC = () => {
     boatCargo.position.set(0, -5.3, 0);
     boatGroup.add(boatCargo);
 
-    boatGroup.position.set(-6, 0, 18);
+    boatGroup.position.set(-8, 0, 18);
     scene.add(boatGroup);
 
-    // 5. ICONIC CANTILEVER STEEL TRUSS BRIDGE ARCHITECTURE (MATCHING USER'S PHOTO)
+    // 4. FLOCK OF FLYING BIRDS (MATCHING THE TWILIGHT SILHOUETTE PHOTO)
+    const birds: { group: THREE.Group; leftWing: THREE.Mesh; rightWing: THREE.Mesh; speed: number; phase: number }[] = [];
+    const birdGeo = new THREE.BufferGeometry();
+    const birdVertices = new Float32Array([
+      0, 0, 0,
+      1.2, 0.2, -0.6,
+      0, 0, -0.4,
+    ]);
+    birdGeo.setAttribute("position", new THREE.BufferAttribute(birdVertices, 3));
+    birdGeo.computeVertexNormals();
+
+    const birdMat = new THREE.MeshBasicMaterial({ color: 0x1e293b, side: THREE.DoubleSide });
+
+    for (let b = 0; b < 5; b++) {
+      const bGroup = new THREE.Group();
+      const lWing = new THREE.Mesh(birdGeo, birdMat);
+      const rWing = new THREE.Mesh(birdGeo, birdMat);
+      rWing.scale.x = -1;
+
+      bGroup.add(lWing);
+      bGroup.add(rWing);
+
+      bGroup.position.set(
+        -30 + b * 12 + Math.random() * 6,
+        18 + Math.random() * 8,
+        -10 + Math.random() * 15
+      );
+      bGroup.scale.set(0.65, 0.65, 0.65);
+      scene.add(bGroup);
+
+      birds.push({
+        group: bGroup,
+        leftWing: lWing,
+        rightWing: rWing,
+        speed: 0.08 + Math.random() * 0.04,
+        phase: b * 1.3,
+      });
+    }
+
+    // 5. CANTILEVER STEEL TRUSS BRIDGE ARCHITECTURE (MATCHING USER'S PHOTOS)
     const bridgeStructure = new THREE.Group();
     rootGroup.add(bridgeStructure);
 
     const steelMat = new THREE.MeshStandardMaterial({
-      color: 0xd1d5db, // Clean steel truss in daylight
-      roughness: 0.4,
-      metalness: 0.8,
+      color: 0xcfd4dc,
+      roughness: 0.38,
+      metalness: 0.78,
     });
 
-    const rustSteelMat = new THREE.MeshStandardMaterial({
-      color: 0x9ca3af,
-      roughness: 0.6,
-      metalness: 0.7,
-    });
-
-    // Main Cantilever Steel Tower Pylons
-    const pylonHeight = 36;
+    // Main Cantilever Concrete Foundation Piers at Waterline
     const towerX = [-36, 36];
-
     towerX.forEach((posX) => {
-      // Massive Concrete Foundation Pier at Waterline
-      const pierMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.85 });
-      const pier = new THREE.Mesh(new THREE.BoxGeometry(8, 12, 14), pierMat);
+      const pierMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.85 });
+      const pier = new THREE.Mesh(new THREE.BoxGeometry(7, 12, 13), pierMat);
       pier.position.set(posX, -3, 0);
       bridgeStructure.add(pier);
 
-      // Steel Main Towers: 4 vertical/diagonal truss columns
-      [-5.2, 5.2].forEach((zSide) => {
-        // Front column
-        const col1 = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.8, 1.2, pylonHeight, 8),
-          steelMat
-        );
-        col1.position.set(posX - 1.5, pylonHeight / 2 - 3, zSide);
-        col1.castShadow = true;
-        bridgeStructure.add(col1);
+      // Steel Main Towers
+      [-5.2, 5.2].forEach((posZ) => {
+        const colGeo = new THREE.CylinderGeometry(0.85, 1.25, 34, 8);
+        const col = new THREE.Mesh(colGeo, steelMat);
+        col.position.set(posX, 14, posZ);
+        col.castShadow = true;
+        bridgeStructure.add(col);
 
-        // Rear diagonal column
-        const col2 = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.8, 1.2, pylonHeight, 8),
-          steelMat
-        );
-        col2.position.set(posX + 1.5, pylonHeight / 2 - 3, zSide);
-        col2.castShadow = true;
-        bridgeStructure.add(col2);
-
-        // Diagonal Cross-braces along tower
-        for (let b = 0; b < 4; b++) {
-          const bY = 4 + b * 7;
-          const brace = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.25, 0.25, 5.0, 6),
-            steelMat
-          );
-          brace.position.set(posX, bY, zSide);
-          brace.rotation.z = b % 2 === 0 ? 0.6 : -0.6;
-          bridgeStructure.add(brace);
-        }
+        // Top cap pinnacle
+        const cap = new THREE.Mesh(new THREE.ConeGeometry(1.2, 2.5, 6), steelMat);
+        cap.position.set(posX, 32, posZ);
+        bridgeStructure.add(cap);
       });
 
-      // Top Transverse Arch Portal Beam
-      const topBeam = new THREE.Mesh(new THREE.BoxGeometry(4, 2.2, 13), steelMat);
-      topBeam.position.set(posX, pylonHeight - 3, 0);
-      topBeam.castShadow = true;
-      bridgeStructure.add(topBeam);
+      // Transverse sway portals
+      [8, 16, 24, 30].forEach((beamY) => {
+        const portal = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 10.4), steelMat);
+        portal.position.set(posX, beamY, 0);
+        bridgeStructure.add(portal);
+      });
     });
 
-    // Upper Sweeping Cantilever Truss Chords (Parabolic Steel Arch Curve)
-    const numTrussSegments = 16;
-    const bridgeSpan = 96;
-    const segmentWidth = bridgeSpan / numTrussSegments;
+    // Cantilever Parabolic Top Chord Truss Curves
+    const trussSegments = 24;
+    const deckLength = 120;
+    const segmentWidth = deckLength / trussSegments;
 
-    [-5.2, 5.2].forEach((zSide) => {
-      for (let s = 0; s < numTrussSegments; s++) {
-        const segX = -bridgeSpan / 2 + s * segmentWidth + segmentWidth / 2;
-        // Parabolic arch curve: higher at the towers (-36, 36) and dipping gently in center
-        const distFromCenter = Math.abs(segX);
-        const trussTopY = 8 + Math.pow(distFromCenter / 36, 1.4) * 22;
+    [-5.2, 5.2].forEach((zPos) => {
+      const topChordCurve = (x: number) => {
+        const norm = Math.abs(x) / 60;
+        if (norm < 0.6) {
+          const t = Math.abs(x) / 36;
+          return 31 - Math.pow(Math.abs(t - 1), 1.8) * 16;
+        } else {
+          const t = (norm - 0.6) / 0.4;
+          return 31 - t * 20;
+        }
+      };
 
-        // Top chord segment
-        const chordGeo = new THREE.BoxGeometry(segmentWidth + 0.4, 0.7, 0.7);
-        const chord = new THREE.Mesh(chordGeo, steelMat);
-        chord.position.set(segX, trussTopY, zSide);
-        bridgeStructure.add(chord);
+      for (let i = 0; i < trussSegments; i++) {
+        const x1 = -deckLength / 2 + i * segmentWidth;
+        const x2 = x1 + segmentWidth;
+        const y1 = topChordCurve(x1);
+        const y2 = topChordCurve(x2);
 
-        // Vertical suspension hanger rods connecting top chord to road deck
-        const hangerHeight = Math.max(1, trussTopY - 1.2);
-        const hangerGeo = new THREE.CylinderGeometry(0.12, 0.12, hangerHeight, 6);
-        const hanger = new THREE.Mesh(hangerGeo, steelMat);
-        hanger.position.set(segX, trussTopY - hangerHeight / 2, zSide);
-        bridgeStructure.add(hanger);
+        // Top Chord Beam
+        const chordVec = new THREE.Vector3(x2 - x1, y2 - y1, 0);
+        const chordLen = chordVec.length();
+        const chordMesh = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.42, 0.42, chordLen, 6),
+          steelMat
+        );
+        chordMesh.position.set((x1 + x2) / 2, (y1 + y2) / 2, zPos);
+        chordMesh.quaternion.setFromUnitVectors(
+          new THREE.Vector3(0, 1, 0),
+          chordVec.clone().normalize()
+        );
+        chordMesh.castShadow = true;
+        bridgeStructure.add(chordMesh);
 
-        // Diagonal truss lattice cross-ties
-        const diagGeo = new THREE.CylinderGeometry(0.16, 0.16, hangerHeight * 1.2, 6);
-        const diag = new THREE.Mesh(diagGeo, rustSteelMat);
-        diag.position.set(segX, trussTopY - hangerHeight / 2, zSide);
-        diag.rotation.z = s % 2 === 0 ? 0.4 : -0.4;
-        bridgeStructure.add(diag);
+        // Vertical suspension hanger rods
+        const vertHeight = y1 - 0.8;
+        if (vertHeight > 1.0) {
+          const vertHanger = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.18, 0.18, vertHeight, 6),
+            steelMat
+          );
+          vertHanger.position.set(x1, 0.8 + vertHeight / 2, zPos);
+          bridgeStructure.add(vertHanger);
+        }
+
+        // Diagonal cross bracing
+        if (i % 2 === 0) {
+          const diagVec = new THREE.Vector3(x2 - x1, y2 - 0.8, 0);
+          const diagLen = diagVec.length();
+          const diagMesh = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.22, 0.22, diagLen, 6),
+            steelMat
+          );
+          diagMesh.position.set((x1 + x2) / 2, (0.8 + y2) / 2, zPos);
+          diagMesh.quaternion.setFromUnitVectors(
+            new THREE.Vector3(0, 1, 0),
+            diagVec.clone().normalize()
+          );
+          bridgeStructure.add(diagMesh);
+        }
       }
     });
 
-    // 6. ROADWAY DECK (ASPHALT WITH REALISTIC ROADWAY LANES & CRASH BARRIERS)
-    const deckLength = 110;
-    const deckWidth = 11;
-    const deckGeo = new THREE.BoxGeometry(deckLength, 1.4, deckWidth);
+    // Roadway Deck & Safety Barriers
+    const deckGeo = new THREE.BoxGeometry(deckLength, 1.2, 11);
     const deckMat = new THREE.MeshStandardMaterial({
-      color: 0x1e293b,
-      roughness: 0.75,
-      metalness: 0.1,
+      color: 0x334155, // Asphalt highway
+      roughness: 0.82,
+      metalness: 0.15,
     });
     const deck = new THREE.Mesh(deckGeo, deckMat);
-    deck.position.set(0, 0.2, 0);
+    deck.position.set(0, 0.6, 0);
     deck.receiveShadow = true;
     deck.castShadow = true;
     bridgeStructure.add(deck);
 
-    // Double Center Yellow Lines
-    const yGeo = new THREE.PlaneGeometry(deckLength, 0.24);
-    const yMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
-    const yLine1 = new THREE.Mesh(yGeo, yMat);
-    yLine1.rotation.x = -Math.PI / 2;
-    yLine1.position.set(0, 0.92, -0.2);
-    bridgeStructure.add(yLine1);
+    // Highway median & lane markings
+    [-1.8, 1.8].forEach((zM) => {
+      const lineMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(deckLength - 4, 0.16),
+        new THREE.MeshBasicMaterial({ color: 0xfacc15 })
+      );
+      lineMesh.rotation.x = -Math.PI / 2;
+      lineMesh.position.set(0, 1.21, zM);
+      bridgeStructure.add(lineMesh);
+    });
 
-    const yLine2 = new THREE.Mesh(yGeo, yMat);
-    yLine2.rotation.x = -Math.PI / 2;
-    yLine2.position.set(0, 0.92, 0.2);
-    bridgeStructure.add(yLine2);
-
-    // Concrete Crash Barriers (Jersey Barriers) along deck sides
-    const barrierMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.4 });
-    const bNorth = new THREE.Mesh(new THREE.BoxGeometry(deckLength, 1.1, 0.45), barrierMat);
-    bNorth.position.set(0, 1.3, -5.3);
-    bridgeStructure.add(bNorth);
-
-    const bSouth = new THREE.Mesh(new THREE.BoxGeometry(deckLength, 1.1, 0.45), barrierMat);
-    bSouth.position.set(0, 1.3, 5.3);
-    bridgeStructure.add(bSouth);
-
-    // 7. REAL INDIAN VEHICLES (AUTO-RICKSHAW, TRUCK, TRACTOR, SCOOTY, CAR)
-    interface VehicleItem {
+    // 6. DETAILED INDIAN VEHICLES IN DUAL LANES
+    const vehicles: {
       group: THREE.Group;
       speed: number;
       laneZ: number;
-      direction: 1 | -1;
+      direction: number;
       wheels: THREE.Mesh[];
       headlights: THREE.Mesh[];
-    }
-    const vehicles: VehicleItem[] = [];
+    }[] = [];
 
-    // Factory: Auto-Rickshaw
-    const makeAuto = (): { group: THREE.Group; wheels: THREE.Mesh[]; headlights: THREE.Mesh[] } => {
+    // Auto-rickshaw
+    const makeAuto = () => {
       const g = new THREE.Group();
       const wheels: THREE.Mesh[] = [];
       const headlights: THREE.Mesh[] = [];
 
       const body = new THREE.Mesh(
-        new THREE.BoxGeometry(2.4, 0.7, 1.4),
-        new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.3 })
+        new THREE.BoxGeometry(1.8, 0.9, 1.1),
+        new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.4 })
       );
-      body.position.y = 0.55;
+      body.position.y = 0.65;
       g.add(body);
 
-      const roof = new THREE.Mesh(
-        new THREE.BoxGeometry(2.2, 0.24, 1.42),
-        new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 })
+      const hood = new THREE.Mesh(
+        new THREE.BoxGeometry(1.7, 0.7, 1.12),
+        new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.3 })
       );
-      roof.position.set(-0.05, 1.6, 0);
+      hood.position.set(-0.05, 1.35, 0);
+      g.add(hood);
+
+      const roof = new THREE.Mesh(
+        new THREE.BoxGeometry(1.6, 0.12, 1.15),
+        new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.7 })
+      );
+      roof.position.set(-0.05, 1.75, 0);
       g.add(roof);
 
       const hl = new THREE.Mesh(
-        new THREE.SphereGeometry(0.14, 8, 8),
+        new THREE.SphereGeometry(0.12, 8, 8),
         new THREE.MeshBasicMaterial({ color: 0xfef08a })
       );
-      hl.position.set(1.22, 0.65, 0);
+      hl.position.set(0.92, 0.7, 0);
       g.add(hl);
       headlights.push(hl);
 
-      const wMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
-      const wGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.16, 12);
+      const wGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.12, 12);
       wGeo.rotateZ(Math.PI / 2);
-
-      const fw = new THREE.Mesh(wGeo, wMat);
-      fw.position.set(0.95, 0.24, 0);
+      const fw = new THREE.Mesh(wGeo, new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+      fw.position.set(0.75, 0.24, 0);
       g.add(fw);
       wheels.push(fw);
 
-      [-0.65, 0.65].forEach((zW) => {
-        const rw = new THREE.Mesh(wGeo, wMat);
-        rw.position.set(-0.75, 0.24, zW);
+      [-0.45, 0.45].forEach((zW) => {
+        const rw = new THREE.Mesh(wGeo, new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+        rw.position.set(-0.6, 0.24, zW);
         g.add(rw);
         wheels.push(rw);
       });
@@ -519,58 +580,42 @@ export const BridgeHero3D: React.FC = () => {
       return { group: g, wheels, headlights };
     };
 
-    // Factory: Heavy Indian Truck (Tata / Ashok Leyland Lorry)
-    const makeTruck = (cabCol: number, cargoCol: number): { group: THREE.Group; wheels: THREE.Mesh[]; headlights: THREE.Mesh[] } => {
+    // Indian Heavy Goods Truck (Tata / Ashok Leyland)
+    const makeTruck = (cabColor: number, freightColor: number) => {
       const g = new THREE.Group();
       const wheels: THREE.Mesh[] = [];
       const headlights: THREE.Mesh[] = [];
 
-      const cab = new THREE.Mesh(
-        new THREE.BoxGeometry(2.2, 1.8, 2.2),
-        new THREE.MeshStandardMaterial({ color: cabCol, roughness: 0.3 })
+      const cabin = new THREE.Mesh(
+        new THREE.BoxGeometry(2.0, 1.8, 1.6),
+        new THREE.MeshStandardMaterial({ color: cabColor, roughness: 0.35 })
       );
-      cab.position.set(2.4, 1.35, 0);
-      g.add(cab);
+      cabin.position.set(2.2, 1.25, 0);
+      g.add(cabin);
 
-      const cargo = new THREE.Mesh(
-        new THREE.BoxGeometry(4.8, 1.7, 2.25),
-        new THREE.MeshStandardMaterial({ color: cargoCol, roughness: 0.5 })
+      const container = new THREE.Mesh(
+        new THREE.BoxGeometry(4.2, 2.1, 1.7),
+        new THREE.MeshStandardMaterial({ color: freightColor, roughness: 0.5 })
       );
-      cargo.position.set(-1.1, 1.35, 0);
-      g.add(cargo);
+      container.position.set(-0.9, 1.45, 0);
+      g.add(container);
 
-      const tarp = new THREE.Mesh(
-        new THREE.BoxGeometry(4.4, 0.7, 2.1),
-        new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.7 })
-      );
-      tarp.position.set(-1.1, 2.45, 0);
-      g.add(tarp);
-
-      [-0.8, 0.8].forEach((zL) => {
+      [-0.6, 0.6].forEach((zL) => {
         const hl = new THREE.Mesh(
           new THREE.SphereGeometry(0.14, 8, 8),
           new THREE.MeshBasicMaterial({ color: 0xfef08a })
         );
-        hl.position.set(3.5, 0.7, zL);
+        hl.position.set(3.22, 0.65, zL);
         g.add(hl);
         headlights.push(hl);
       });
 
-      const wMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
-      const wGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.28, 14);
+      const wGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.26, 14);
       wGeo.rotateZ(Math.PI / 2);
-
-      [-1.0, 1.0].forEach((zW) => {
-        const w = new THREE.Mesh(wGeo, wMat);
-        w.position.set(2.4, 0.42, zW);
-        g.add(w);
-        wheels.push(w);
-      });
-
-      [-1.8, -0.6].forEach((xP) => {
-        [-1.05, 1.05].forEach((zW) => {
-          const w = new THREE.Mesh(wGeo, wMat);
-          w.position.set(xP, 0.42, zW);
+      [2.2, -0.4, -2.2].forEach((xW) => {
+        [-0.8, 0.8].forEach((zW) => {
+          const w = new THREE.Mesh(wGeo, new THREE.MeshStandardMaterial({ color: 0x0f172a }));
+          w.position.set(xW, 0.42, zW);
           g.add(w);
           wheels.push(w);
         });
@@ -579,37 +624,44 @@ export const BridgeHero3D: React.FC = () => {
       return { group: g, wheels, headlights };
     };
 
-    // Factory: Farm Tractor
-    const makeTractor = (): { group: THREE.Group; wheels: THREE.Mesh[]; headlights: THREE.Mesh[] } => {
+    // Indian Farm Tractor
+    const makeTractor = () => {
       const g = new THREE.Group();
       const wheels: THREE.Mesh[] = [];
       const headlights: THREE.Mesh[] = [];
 
-      const hood = new THREE.Mesh(
-        new THREE.BoxGeometry(2.0, 0.85, 1.1),
-        new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.35 })
+      const body = new THREE.Mesh(
+        new THREE.BoxGeometry(2.4, 0.8, 1.1),
+        new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.3 })
       );
-      hood.position.set(0.6, 1.0, 0);
+      body.position.set(0.3, 0.8, 0);
+      g.add(body);
+
+      const hood = new THREE.Mesh(
+        new THREE.BoxGeometry(1.6, 0.7, 0.8),
+        new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.3 })
+      );
+      hood.position.set(0.7, 1.25, 0);
       g.add(hood);
 
       const exhaust = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.06, 0.06, 1.2),
-        new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8 })
+        new THREE.CylinderGeometry(0.06, 0.06, 1.2, 8),
+        new THREE.MeshStandardMaterial({ color: 0x334155 })
       );
-      exhaust.position.set(1.2, 1.8, 0.4);
+      exhaust.position.set(1.2, 1.9, 0.35);
       g.add(exhaust);
 
       const hl = new THREE.Mesh(
         new THREE.SphereGeometry(0.12, 8, 8),
         new THREE.MeshBasicMaterial({ color: 0xfef08a })
       );
-      hl.position.set(1.65, 0.95, 0);
+      hl.position.set(1.55, 0.95, 0);
       g.add(hl);
       headlights.push(hl);
 
-      const rwGeo = new THREE.CylinderGeometry(0.74, 0.74, 0.4, 16);
+      const rwGeo = new THREE.CylinderGeometry(0.74, 0.74, 0.38, 16);
       rwGeo.rotateZ(Math.PI / 2);
-      [-0.75, 0.75].forEach((zW) => {
+      [-0.72, 0.72].forEach((zW) => {
         const rw = new THREE.Mesh(rwGeo, new THREE.MeshStandardMaterial({ color: 0x1e293b }));
         rw.position.set(-0.55, 0.74, zW);
         g.add(rw);
@@ -618,7 +670,7 @@ export const BridgeHero3D: React.FC = () => {
 
       const fwGeo = new THREE.CylinderGeometry(0.36, 0.36, 0.22, 14);
       fwGeo.rotateZ(Math.PI / 2);
-      [-0.6, 0.6].forEach((zW) => {
+      [-0.58, 0.58].forEach((zW) => {
         const fw = new THREE.Mesh(fwGeo, new THREE.MeshStandardMaterial({ color: 0x1e293b }));
         fw.position.set(1.25, 0.36, zW);
         g.add(fw);
@@ -628,8 +680,8 @@ export const BridgeHero3D: React.FC = () => {
       return { group: g, wheels, headlights };
     };
 
-    // Factory: Scooty
-    const makeScooty = (col: number): { group: THREE.Group; wheels: THREE.Mesh[]; headlights: THREE.Mesh[] } => {
+    // Scooty with commuter rider
+    const makeScooty = (col: number) => {
       const g = new THREE.Group();
       const wheels: THREE.Mesh[] = [];
       const headlights: THREE.Mesh[] = [];
@@ -675,8 +727,8 @@ export const BridgeHero3D: React.FC = () => {
       return { group: g, wheels, headlights };
     };
 
-    // Factory: Sedan Car
-    const makeCar = (col: number): { group: THREE.Group; wheels: THREE.Mesh[]; headlights: THREE.Mesh[] } => {
+    // Sedan Car
+    const makeCar = (col: number) => {
       const g = new THREE.Group();
       const wheels: THREE.Mesh[] = [];
       const headlights: THREE.Mesh[] = [];
@@ -719,8 +771,8 @@ export const BridgeHero3D: React.FC = () => {
       return { group: g, wheels, headlights };
     };
 
-    // Spawn Indian Vehicles in Dual Lanes
-    // Eastbound (direction = 1)
+    // Spawn vehicles in dual lanes
+    // Lane 1 (Eastbound)
     const auto1 = makeAuto();
     auto1.group.position.set(-45, 0.9, -2.4);
     bridgeStructure.add(auto1.group);
@@ -741,7 +793,7 @@ export const BridgeHero3D: React.FC = () => {
     bridgeStructure.add(scooty1.group);
     vehicles.push({ group: scooty1.group, speed: 0.20, laneZ: -3.8, direction: 1, wheels: scooty1.wheels, headlights: scooty1.headlights });
 
-    // Westbound (direction = -1)
+    // Lane 2 (Westbound)
     const tractor1 = makeTractor();
     tractor1.group.rotation.y = Math.PI;
     tractor1.group.position.set(45, 0.9, 2.4);
@@ -766,7 +818,7 @@ export const BridgeHero3D: React.FC = () => {
     bridgeStructure.add(scooty2.group);
     vehicles.push({ group: scooty2.group, speed: 0.19, laneZ: 3.8, direction: -1, wheels: scooty2.wheels, headlights: scooty2.headlights });
 
-    // 8. ANIMATION LOOP & SCROLL-DRIVEN CAMERA ROTATION + DYNAMIC SUN
+    // 7. ANIMATION LOOP WITH DYNAMIC SOLAR ARC & SCROLL PERSPECTIVE
     let animationFrameId: number;
     const clock = new THREE.Clock();
     let currentScroll = 0;
@@ -775,8 +827,19 @@ export const BridgeHero3D: React.FC = () => {
       animationFrameId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      // Smooth damping interpolation
-      currentScroll += (scrollTargetRef.current - currentScroll) * 0.05;
+      // Smooth scroll lerping
+      const targetProgress =
+        modeRef.current === "daylight"
+          ? 0.05
+          : modeRef.current === "sunset"
+          ? 0.42
+          : modeRef.current === "monsoon"
+          ? 0.70
+          : modeRef.current === "dusk"
+          ? 0.95
+          : scrollTargetRef.current;
+
+      currentScroll += (targetProgress - currentScroll) * 0.05;
 
       // Animate Vehicles
       vehicles.forEach((veh) => {
@@ -792,44 +855,62 @@ export const BridgeHero3D: React.FC = () => {
         }
       });
 
-      // River Water Ripples and gentle boat rocking
+      // Animate Birds (wing flapping and flight trajectory)
+      birds.forEach((bird) => {
+        const flap = Math.sin(elapsedTime * 6 + bird.phase) * 0.42;
+        bird.leftWing.rotation.z = flap;
+        bird.rightWing.rotation.z = -flap;
+        bird.group.position.x += bird.speed;
+        bird.group.position.y += Math.sin(elapsedTime * 1.5 + bird.phase) * 0.02;
+
+        if (bird.group.position.x > 80) {
+          bird.group.position.x = -80;
+        }
+      });
+
+      // Water Ripples & Country Boat Rocking
       river.position.y = -6 + Math.sin(elapsedTime * 1.3) * 0.08;
       boatGroup.position.y = Math.sin(elapsedTime * 1.5) * 0.12;
       boatGroup.rotation.z = Math.sin(elapsedTime * 1.2) * 0.04;
 
-      // DYNAMIC SUN & SOLAR INTENSITY VARYING BASED ON SCROLL
-      // Top: High Noon Sun
-      // Mid: Golden Sunset Sun with fiery warm glow
-      // Bottom: Twilight Horizon Sun
-      const sunAngle = (1 - currentScroll) * Math.PI * 0.48 + 0.18;
+      // Dynamic Solar Arc Lighting calculation
+      const sunAngle = (1 - currentScroll) * Math.PI * 0.48 + 0.15;
       const sunDist = 150;
       const sunX = Math.cos(sunAngle) * sunDist;
-      const sunY = Math.max(10, Math.sin(sunAngle) * sunDist);
+      const sunY = Math.max(8, Math.sin(sunAngle) * sunDist);
       const sunZ = 50 + Math.sin(currentScroll * Math.PI) * 40;
 
       sunLight.position.set(sunX, sunY, sunZ);
       sunMesh.position.set(sunX, sunY, sunZ - 20);
 
-      if (currentScroll < 0.5) {
-        // Noon to Golden Hour
-        const t = currentScroll * 2;
+      if (currentScroll < 0.4) {
+        // Daylight to Sunset
+        const t = currentScroll / 0.4;
         sunLight.color.setRGB(1.0, 0.98 - t * 0.25, 0.9 - t * 0.55);
         sunMesh.material.color.setRGB(1.0, 0.95 - t * 0.3, 0.82 - t * 0.55);
-        sunLight.intensity = 2.8 + t * 0.7; // Golden hour intense warm bloom
+        sunLight.intensity = 2.8 + t * 0.8;
         riverMat.color.setRGB(0.01 + t * 0.14, 0.52 - t * 0.16, 0.78 - t * 0.35);
         hemiLight.color.setRGB(1.0, 1.0 - t * 0.12, 1.0 - t * 0.28);
+      } else if (currentScroll < 0.75) {
+        // Sunset to Monsoon
+        const t = (currentScroll - 0.4) / 0.35;
+        sunLight.color.setRGB(1.0 - t * 0.15, 0.73 - t * 0.25, 0.35 - t * 0.15);
+        sunMesh.material.color.setRGB(1.0 - t * 0.15, 0.65 - t * 0.25, 0.27 - t * 0.1);
+        sunLight.intensity = 3.6 - t * 1.6;
+        riverMat.color.setRGB(0.15 + t * 0.05, 0.36 - t * 0.12, 0.43 - t * 0.18);
+        hemiLight.color.setRGB(0.88 - t * 0.2, 0.88 - t * 0.25, 0.72 - t * 0.15);
       } else {
-        // Golden Hour to Dusk Twilight
-        const t = (currentScroll - 0.5) * 2;
-        sunLight.color.setRGB(1.0 - t * 0.35, 0.72 - t * 0.45, 0.35 + t * 0.2);
-        sunMesh.material.color.setRGB(1.0 - t * 0.3, 0.65 - t * 0.4, 0.25 + t * 0.15);
-        sunLight.intensity = 3.5 - t * 2.2;
-        riverMat.color.setRGB(0.15 - t * 0.1, 0.36 - t * 0.28, 0.43 - t * 0.25);
-        hemiLight.color.setRGB(0.88 - t * 0.4, 0.88 - t * 0.5, 0.72 + t * 0.1);
+        // Monsoon to Twilight Dusk
+        const t = (currentScroll - 0.75) / 0.25;
+        sunLight.color.setRGB(0.85 - t * 0.5, 0.48 - t * 0.3, 0.2 + t * 0.5);
+        sunMesh.material.color.setRGB(0.85 - t * 0.4, 0.4 - t * 0.25, 0.17 + t * 0.4);
+        sunLight.intensity = 2.0 - t * 1.2;
+        riverMat.color.setRGB(0.2 - t * 0.12, 0.24 - t * 0.15, 0.25 + t * 0.05);
+        hemiLight.color.setRGB(0.68 - t * 0.35, 0.63 - t * 0.35, 0.57 + t * 0.15);
       }
 
       // Vehicles headlights brighten as dusk falls
-      const headlightIntensity = Math.min(1.0, Math.max(0.2, currentScroll * 1.5));
+      const headlightIntensity = Math.min(1.0, Math.max(0.2, currentScroll * 1.4));
       vehicles.forEach((veh) => {
         veh.headlights.forEach((h) => {
           (h.material as THREE.MeshBasicMaterial).color.setRGB(
@@ -840,22 +921,19 @@ export const BridgeHero3D: React.FC = () => {
         });
       });
 
-      // SCROLL-DRIVEN CAMERA ORBIT (ROTATES VIEWS OF THE BRIDGE BEAUTIFULLY)
-      // View 1 (Top): Panoramic side vista showing bridge spanning river
-      // View 2 (Mid): Swoop down to roadway level with traffic
-      // View 3 (Deep): Low-angle looking up at the cantilever truss and sunset sky
-      const orbitAngle = -0.35 + currentScroll * Math.PI * 0.85;
-      const camRadius = 72 - currentScroll * 16;
+      // Scroll-driven camera orbit
+      const orbitAngle = -0.32 + currentScroll * Math.PI * 0.80;
+      const camRadius = 66 - currentScroll * 14;
       const targetCamX = Math.sin(orbitAngle) * camRadius;
       const targetCamZ = Math.cos(orbitAngle) * camRadius;
-      const targetCamY = 16 - Math.sin(currentScroll * Math.PI) * 10;
+      const targetCamY = 14 - Math.sin(currentScroll * Math.PI) * 8;
 
       camera.position.x += (targetCamX - camera.position.x) * 0.05;
       camera.position.y += (targetCamY - camera.position.y) * 0.05;
       camera.position.z += (targetCamZ - camera.position.z) * 0.05;
 
-      const lookX = Math.sin(currentScroll * Math.PI) * 10;
-      const lookY = 4 - currentScroll * 2;
+      const lookX = Math.sin(currentScroll * Math.PI) * 8;
+      const lookY = 3.5 - currentScroll * 1.5;
       camera.lookAt(lookX, lookY, 0);
 
       renderer.render(scene, camera);
@@ -882,38 +960,88 @@ export const BridgeHero3D: React.FC = () => {
 
   const activeCallout = callouts[activeCalloutIdx];
 
+  // Current Solar Status label
   const solarStatus =
-    scrollProgress < 0.35
+    atmosphereMode === "daylight" || (atmosphereMode === "auto" && scrollProgress < 0.28)
       ? text.solarNoon
-      : scrollProgress < 0.7
+      : atmosphereMode === "sunset" || (atmosphereMode === "auto" && scrollProgress < 0.58)
       ? text.solarGolden
+      : atmosphereMode === "monsoon" || (atmosphereMode === "auto" && scrollProgress < 0.82)
+      ? text.solarMonsoon
       : text.solarDusk;
 
   const SolarIcon =
-    scrollProgress < 0.35 ? Sun : scrollProgress < 0.7 ? Sunset : Moon;
+    atmosphereMode === "daylight" || (atmosphereMode === "auto" && scrollProgress < 0.28)
+      ? Sun
+      : atmosphereMode === "sunset" || (atmosphereMode === "auto" && scrollProgress < 0.58)
+      ? Sunset
+      : atmosphereMode === "monsoon" || (atmosphereMode === "auto" && scrollProgress < 0.82)
+      ? CloudRain
+      : Moon;
 
   return (
     <>
-      {/* 1. FIXED PERSISTENT 3D BACKGROUND CANVAS */}
-      <div
-        ref={containerRef}
-        className="fixed inset-0 w-full h-full z-0 pointer-events-none overflow-hidden transition-opacity duration-300"
-        style={{
-          background:
-            scrollProgress < 0.4
-              ? "linear-gradient(to bottom, #0284c7 0%, #38bdf8 30%, #bae6fd 60%, #e0f2fe 100%)"
-              : scrollProgress < 0.75
-              ? "linear-gradient(to bottom, #d97706 0%, #f59e0b 30%, #fdba74 60%, #fed7aa 100%)"
-              : "linear-gradient(to bottom, #1e1b4b 0%, #312e81 35%, #4338ca 70%, #1e1b4b 100%)",
-        }}
-      />
+      {/* 1. FIXED PERSISTENT PHOTOREALISTIC BACKGROUND LAYERS (YOUR REAL BRIDGE LANDSCAPES) */}
+      <div className="fixed inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+        {/* Landscape Layer 1: Daylight (Clear Blue Sky) */}
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-in-out scale-105"
+          style={{
+            backgroundImage: "url('/images/bridge_daylight.jpg')",
+            opacity: opacities.day,
+          }}
+        />
+
+        {/* Landscape Layer 2: Golden Sunset (Warm Amber Sun & Water Glow) */}
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-in-out scale-105"
+          style={{
+            backgroundImage: "url('/images/bridge_sunset.jpg')",
+            opacity: opacities.sunset,
+          }}
+        />
+
+        {/* Landscape Layer 3: Monsoon Dusk (Dramatic Clouds with Sun Breakthrough) */}
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-in-out scale-105"
+          style={{
+            backgroundImage: "url('/images/bridge_monsoon.jpg')",
+            opacity: opacities.monsoon,
+          }}
+        />
+
+        {/* Landscape Layer 4: Twilight Silhouette (Moody Dusk with Flying Bird) */}
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-in-out scale-105"
+          style={{
+            backgroundImage: "url('/images/bridge_dusk.jpg')",
+            opacity: opacities.dusk,
+          }}
+        />
+
+        {/* Atmospheric Vignette & Soft Gradient Tint */}
+        <div
+          className="absolute inset-0 pointer-events-none transition-all duration-700"
+          style={{
+            background:
+              scrollProgress < 0.35
+                ? "linear-gradient(to bottom, rgba(2, 132, 199, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(2, 132, 199, 0.25) 100%)"
+                : scrollProgress < 0.7
+                ? "linear-gradient(to bottom, rgba(217, 119, 6, 0.22) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(217, 119, 6, 0.35) 100%)"
+                : "linear-gradient(to bottom, rgba(30, 27, 75, 0.4) 0%, rgba(15, 23, 42, 0.15) 50%, rgba(30, 27, 75, 0.5) 100%)",
+          }}
+        />
+
+        {/* WebGL 3D Bridge Canvas Overlay */}
+        <div ref={containerRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+      </div>
 
       {/* 2. INITIAL HERO VIEWPORT OVERLAY (TOP OF PAGE) */}
       <div className="relative min-h-[92vh] w-full flex flex-col justify-between p-6 sm:p-12 pointer-events-none">
-        {/* Top HUD Telemetry Bar */}
+        {/* Top HUD Telemetry Bar with Atmospheric Controls */}
         <div className="flex flex-wrap items-center justify-between gap-3 pointer-events-none text-xs">
           {/* Live Bridge Landscape Status */}
-          <div className="flex items-center gap-2.5 bg-white/85 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/80 shadow-sm pointer-events-auto">
+          <div className="flex items-center gap-2.5 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/80 shadow-sm pointer-events-auto">
             <span className="flex items-center gap-1.5 font-bold text-sky-800">
               <Radio className="w-3.5 h-3.5 text-sky-600 animate-pulse" />
               {text.liveTrafficBadge}
@@ -925,33 +1053,122 @@ export const BridgeHero3D: React.FC = () => {
             </span>
           </div>
 
-          {/* Dynamic Scroll Solar Progress Pill */}
-          <div className="bg-white/85 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/80 shadow-sm pointer-events-auto flex items-center gap-2 text-xs font-mono">
-            <span className="text-slate-500">Solar Arc:</span>
-            <div className="w-24 bg-slate-200 rounded-full h-1.5 overflow-hidden">
+          {/* Interactive Atmospheric Mode Selector */}
+          <div className="bg-white/90 backdrop-blur-md p-1 rounded-xl border border-white/80 shadow-sm pointer-events-auto flex items-center gap-1">
+            <button
+              onClick={() => {
+                triggerHaptic(12);
+                setAtmosphereMode("daylight");
+              }}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                atmosphereMode === "daylight"
+                  ? "bg-sky-500 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              <Sun className="w-3 h-3" />
+              <span>{text.modeDay}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                triggerHaptic(12);
+                setAtmosphereMode("sunset");
+              }}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                atmosphereMode === "sunset"
+                  ? "bg-amber-500 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              <Sunset className="w-3 h-3" />
+              <span>{text.modeSunset}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                triggerHaptic(12);
+                setAtmosphereMode("monsoon");
+              }}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                atmosphereMode === "monsoon"
+                  ? "bg-orange-600 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              <CloudRain className="w-3 h-3" />
+              <span>{text.modeMonsoon}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                triggerHaptic(12);
+                setAtmosphereMode("dusk");
+              }}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                atmosphereMode === "dusk"
+                  ? "bg-indigo-700 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              <Moon className="w-3 h-3" />
+              <span>{text.modeDusk}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                triggerHaptic(12);
+                setAtmosphereMode("auto");
+              }}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                atmosphereMode === "auto"
+                  ? "bg-slate-800 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-100"
+              }`}
+              title="Automatically transition atmosphere on scroll"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>{text.modeAuto}</span>
+            </button>
+          </div>
+
+          {/* Dynamic Solar Arc Progress Pill */}
+          <div className="bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/80 shadow-sm pointer-events-auto flex items-center gap-2 text-xs font-mono">
+            <span className="text-slate-500">Solar Elevation:</span>
+            <div className="w-20 bg-slate-200 rounded-full h-1.5 overflow-hidden">
               <div
                 className="bg-gradient-to-r from-amber-400 via-orange-500 to-indigo-600 h-full transition-all duration-75"
                 style={{ width: `${Math.round(scrollProgress * 100)}%` }}
               />
             </div>
-            <span className="font-bold text-slate-800">{Math.round((1 - scrollProgress) * 75)}°</span>
+            <span className="font-bold text-slate-800">
+              {atmosphereMode === "daylight"
+                ? "75°"
+                : atmosphereMode === "sunset"
+                ? "32°"
+                : atmosphereMode === "monsoon"
+                ? "18°"
+                : atmosphereMode === "dusk"
+                ? "6°"
+                : `${Math.round((1 - scrollProgress) * 75)}°`}
+            </span>
           </div>
         </div>
 
-        {/* Center Institutional Headline (Positioned with clean layout so bridge remains visible) */}
+        {/* Center Institutional Headline */}
         <div className="max-w-2xl pt-8 pointer-events-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 border border-white/80 text-sky-800 text-xs font-semibold shadow-xs mb-3 backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/95 border border-white/80 text-sky-800 text-xs font-semibold shadow-xs mb-3 backdrop-blur-md">
             <Shield className="w-3.5 h-3.5 text-sky-600" />
             <span>{text.dept}</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight leading-none drop-shadow-xs">
+          <h1 className="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight leading-none drop-shadow-sm">
             {text.title}
           </h1>
-          <p className="text-lg sm:text-2xl font-bold text-sky-900 mt-2">
+          <p className="text-lg sm:text-2xl font-bold text-sky-900 mt-2 drop-shadow-xs">
             {text.subtitle}
           </p>
-          <p className="mt-2 text-sm sm:text-base text-slate-700 font-medium leading-relaxed max-w-xl bg-white/80 backdrop-blur-md p-3.5 rounded-2xl border border-white/80 shadow-sm">
+          <p className="mt-2 text-sm sm:text-base text-slate-800 font-medium leading-relaxed max-w-xl bg-white/85 backdrop-blur-md p-3.5 rounded-2xl border border-white/80 shadow-sm">
             {text.desc}
           </p>
         </div>
