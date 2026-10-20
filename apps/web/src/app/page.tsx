@@ -242,15 +242,15 @@ export default function Home() {
   ];
 
   return (
-    <div className="w-full bg-slate-50 text-slate-800">
+    <div className="relative w-full text-slate-800 overflow-x-hidden">
       {/* 1. CINEMATIC 3D DAYLIGHT BRIDGE WITH INDIAN VEHICLES */}
       <BridgeHero3D />
 
-      {/* 2. MAIN OPERATIONS & INTELLIGENCE GRID */}
-      <div id="operations-grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+      {/* 2. MAIN OPERATIONS & INTELLIGENCE GRID FLOATING OVER PERSISTENT 3D CANVAS */}
+      <div id="operations-grid" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
         {/* Live National Metric Wall */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div className="bg-white/85 backdrop-blur-md p-5 rounded-2xl border border-white/80 shadow-md hover:shadow-lg transition-all">
             <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
               {t.statBridges}
             </div>
@@ -263,7 +263,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div className="bg-white/85 backdrop-blur-md p-5 rounded-2xl border border-white/80 shadow-md hover:shadow-lg transition-all">
             <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
               {t.statSensors}
             </div>
@@ -276,7 +276,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div className="bg-white/85 backdrop-blur-md p-5 rounded-2xl border border-white/80 shadow-md hover:shadow-lg transition-all">
             <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
               {t.statLeadTime}
             </div>
@@ -289,7 +289,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div className="bg-white/85 backdrop-blur-md p-5 rounded-2xl border border-white/80 shadow-md hover:shadow-lg transition-all">
             <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
               {t.statTarget}
             </div>
@@ -329,7 +329,7 @@ export default function Home() {
                 <Link
                   key={item.code}
                   href={item.href}
-                  className="group bg-white hover:bg-sky-50/50 p-6 rounded-2xl border border-slate-200/90 hover:border-sky-300 transition-all shadow-xs hover:shadow-md flex flex-col justify-between"
+                  className="group bg-white/85 backdrop-blur-md hover:bg-white/95 p-6 rounded-2xl border border-white/80 hover:border-sky-300 transition-all shadow-md hover:shadow-xl flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">
@@ -376,7 +376,7 @@ export default function Home() {
             </div>
             <Link
               href="/bridges"
-              className="text-xs text-sky-700 hover:text-sky-800 font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto bg-sky-50 px-3 py-1.5 rounded-lg border border-sky-200"
+              className="text-xs text-sky-700 hover:text-sky-800 font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-sky-200 shadow-xs"
             >
               Open Interactive Basin GIS Map <ExternalLink className="w-3.5 h-3.5" />
             </Link>
@@ -387,10 +387,10 @@ export default function Home() {
               <div
                 key={basin.id}
                 onClick={() => setSelectedBasin(basin.id)}
-                className={`p-5 rounded-2xl border transition-all cursor-pointer ${
+                className={`p-5 rounded-2xl border transition-all cursor-pointer backdrop-blur-md ${
                   selectedBasin === basin.id
-                    ? `${basin.color} shadow-sm ring-2 ring-sky-500/30`
-                    : "bg-white border-slate-200 hover:border-slate-300"
+                    ? `${basin.color} shadow-md ring-2 ring-sky-500/40`
+                    : "bg-white/85 border-white/80 hover:border-slate-300 shadow-xs"
                 }`}
               >
                 <div className="text-xs font-semibold text-slate-500 mb-1">
@@ -426,7 +426,7 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link
               href="/bridges"
-              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
+              className="p-5 bg-white/85 backdrop-blur-md hover:bg-white/95 border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600">
@@ -444,7 +444,7 @@ export default function Home() {
 
             <Link
               href="/telemetry"
-              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
+              className="p-5 bg-white/85 backdrop-blur-md hover:bg-white/95 border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600">
@@ -462,7 +462,7 @@ export default function Home() {
 
             <Link
               href="/audits"
-              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
+              className="p-5 bg-white/85 backdrop-blur-md hover:bg-white/95 border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
@@ -480,7 +480,7 @@ export default function Home() {
 
             <Link
               href="/risk"
-              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
+              className="p-5 bg-white/85 backdrop-blur-md hover:bg-white/95 border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
@@ -498,7 +498,7 @@ export default function Home() {
 
             <Link
               href="/triage"
-              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
+              className="p-5 bg-white/85 backdrop-blur-md hover:bg-white/95 border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600">
@@ -516,7 +516,7 @@ export default function Home() {
 
             <Link
               href="/public"
-              className="p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between group transition-all shadow-xs"
+              className="p-5 bg-white/85 backdrop-blur-md hover:bg-white/95 border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
@@ -535,7 +535,7 @@ export default function Home() {
         </div>
 
         {/* 6. MANDATORY STATUTORY CIVIL ENGINEERING NOTICE */}
-        <div className="p-5 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-900 leading-relaxed flex items-start gap-3">
+        <div className="p-5 rounded-2xl bg-amber-50/90 backdrop-blur-md border border-amber-200/90 shadow-sm text-xs text-amber-900 leading-relaxed flex items-start gap-3">
           <Shield className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div>
             <span className="font-bold uppercase tracking-wider text-amber-950 mr-2">

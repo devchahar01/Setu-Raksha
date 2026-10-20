@@ -3,7 +3,7 @@ import { AlertTriangle, Info, ShieldCheck } from "lucide-react";
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-slate-100 text-slate-700 border-t border-slate-200 mt-auto">
+    <footer className="relative z-10 bg-slate-100/90 backdrop-blur-md text-slate-700 border-t border-slate-200 mt-auto">
       {/* Mandatory Statutory Advisory Banner */}
       <div className="bg-amber-50/90 border-b border-amber-200/80 py-3 px-4">
         <div className="max-w-7xl mx-auto flex items-start sm:items-center gap-3 text-xs sm:text-sm text-amber-900">

@@ -8,11 +8,12 @@ import {
   Layers,
   Radio,
   Sparkles,
-  Volume2,
   Shield,
-  Truck,
-  Car,
   Compass,
+  Sun,
+  Sunset,
+  Moon,
+  Navigation,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 
@@ -110,38 +111,35 @@ const HERO_TEXT = {
   en: {
     dept: "GOVERNMENT OF MAHARASHTRA • PUBLIC WORKS DEPARTMENT",
     title: "SETU RAKSHA",
-    subtitle: "National Bridge Safety & Intelligence System",
-    desc: "Real-time structural health monitoring, flood scour early warnings, and predictive maintenance protecting India's vital transport arteries.",
-    viewDeck: "Deck Traffic View",
-    viewAerial: "Aerial River Vista",
-    viewPiers: "Pier Scour View",
-    scrollHint: "Scroll to Explore Operations Grid",
-    liveTrafficBadge: "LIVE SIMULATION • INDIAN TRAFFIC IN TRANSIT",
-    bridgesMonitored: "60 Strategic Bridges Monitored",
+    subtitle: "Bandra-Worli Sea Link Digital Structural Twin",
+    desc: "Experience real-time structural intelligence: scroll down to rotate cinematic angles of the Sea Link, transition the sun from bright noon to golden hour, and observe live Indian traffic.",
+    scrollHint: "Scroll Down to Rotate Views & Shift Sun",
+    liveTrafficBadge: "BANDRA-WORLI SEA LINK • DYNAMIC SOLAR ARC",
+    solarNoon: "Midday Sun",
+    solarGolden: "Golden Hour Sunset",
+    solarDusk: "Twilight Dusk",
   },
   hi: {
     dept: "महाराष्ट्र शासन • सार्वजनिक बांधकाम विभाग",
     title: "सेतु रक्षा",
-    subtitle: "राष्ट्रीय पुल सुरक्षा एवं इंटेलिजेंस प्रणाली",
-    desc: "भारत की प्रमुख नदी घाटियों में पुलों के संरचनात्मक स्वास्थ्य, कटाव और बाढ़ सुरक्षा की निरंतर निगरानी प्रणाली।",
-    viewDeck: "डेक ट्रैफिक दृश्य",
-    viewAerial: "विहंगम नदी दृश्य",
-    viewPiers: "पिलर व जल स्तर",
-    scrollHint: "संचालन ग्रिड देखने के लिए नीचे स्क्रॉल करें",
-    liveTrafficBadge: "लाइव सिमुलेशन • सक्रिय भारतीय वाहन यातायात",
-    bridgesMonitored: "६० सामरिक पुलों की निरंतर निगरानी",
+    subtitle: "बांद्रा-वर्ली सी लिंक डिजिटल ट्विन",
+    desc: "वास्तविक समय संरचनात्मक इंटेलिजेंस: नीचे स्क्रॉल करके सी लिंक के कोण बदलें, दोपहर से सूर्यास्त तक धूप की तीव्रता देखें और वाहनों का आवागमन देखें।",
+    scrollHint: "कोण बदलने एवं सूर्य प्रकाश देखने के लिए नीचे स्क्रॉल करें",
+    liveTrafficBadge: "बांद्रा-वर्ली सी लिंक • गतिशील सूर्य चक्र",
+    solarNoon: "दोपहर की धूप",
+    solarGolden: "स्वर्ण सूर्यास्त",
+    solarDusk: "गोधूलि संध्या",
   },
   mr: {
     dept: "महाराष्ट्र शासन • सार्वजनिक बांधकाम विभाग",
     title: "सेतू रक्षा",
-    subtitle: "राष्ट्रीय पूल सुरक्षा व गुप्तचर यंत्रणा",
-    desc: "महाराष्ट्रातील प्रमुख नदी खोऱ्यांमधील सर्व पुलांच्या संरचनात्मक आरोग्याची, गाद पातळीची आणि पूर सुरक्षेची थेट देखरेख.",
-    viewDeck: "डेक वाहतूक दृश्य",
-    viewAerial: "विहंगम दृश्य",
-    viewPiers: "पाया व गाद पातळी",
-    scrollHint: "संचालन दालन पाहण्यासाठी खाली स्क्रोल करा",
-    liveTrafficBadge: "थेट सिमुलेशन • सक्रिय भारतीय वाहने",
-    bridgesMonitored: "६० महत्त्वाच्या पुलांची थेट देखरेख",
+    subtitle: "वांद्रे-वरळी सी लिंक डिजिटल संरचनात्मक ट्विन",
+    desc: "थेट संरचनात्मक देखरेख: खाली स्क्रोल करून सी लिंकचे विहंगम कोन फिरवा, दुपारच्या उन्हापासून सोनेरी सूर्यास्तापर्यंतचा प्रकाश आणि थेट वाहतूक पहा.",
+    scrollHint: "कोन फिरवण्यासाठी व सूर्यप्रकाश बदलण्यासाठी खाली स्क्रोल करा",
+    liveTrafficBadge: "वांद्रे-वरळी सी लिंक • गतिशील सूर्य चक्र",
+    solarNoon: "दुपारचे ऊन",
+    solarGolden: "सोनेरी सूर्यास्त",
+    solarDusk: "संध्याकाळ",
   },
 };
 
@@ -152,49 +150,51 @@ export const BridgeHero3D: React.FC = () => {
   const callouts = CITIZEN_CALLOUTS[activeLocale] || CITIZEN_CALLOUTS.en;
 
   const [activeCalloutIdx, setActiveCalloutIdx] = useState<number>(0);
-  const [cameraMode, setCameraMode] = useState<"aerial" | "deck" | "piers">("aerial");
   const [scrollProgress, setScrollProgress] = useState<number>(0);
+  const scrollTargetRef = useRef<number>(0);
 
-  // Trigger light haptic pulse if available
+  // Trigger subtle haptic pulse
   const triggerHaptic = (ms: number = 15) => {
     if (typeof window !== "undefined" && "vibrate" in navigator) {
       try {
         navigator.vibrate(ms);
       } catch {
-        // Ignore haptic errors on unsupported hardware
+        // unsupported hardware
       }
     }
   };
 
-  // Cycle callouts every 4 seconds
+  // Cycle callouts
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveCalloutIdx((prev) => (prev + 1) % callouts.length);
-    }, 4000);
+    }, 4500);
     return () => clearInterval(interval);
   }, [callouts.length]);
 
-  // Track scroll position for dynamic 3D camera transitions and haptics
+  // Track scroll position across the entire page for 3D camera rotation and dynamic sun
   useEffect(() => {
-    let lastHapticSection = 0;
+    let lastMilestone = 0;
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      const progress = Math.min(scrollY / 700, 1);
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const progress = Math.min(Math.max(scrollY / maxScroll, 0), 1);
+      scrollTargetRef.current = progress;
       setScrollProgress(progress);
 
-      // Trigger subtle haptic milestone when crossing into operations grid
-      const currentSection = Math.floor(scrollY / 450);
-      if (currentSection !== lastHapticSection) {
-        lastHapticSection = currentSection;
-        triggerHaptic(10);
+      const milestone = Math.floor(progress * 5);
+      if (milestone !== lastMilestone) {
+        lastMilestone = milestone;
+        triggerHaptic(12);
       }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToDashboard = () => {
+  const scrollToOperations = () => {
     triggerHaptic(20);
     const target = document.getElementById("operations-grid");
     if (target) {
@@ -202,674 +202,566 @@ export const BridgeHero3D: React.FC = () => {
     }
   };
 
-  // THREE.JS REALISTIC DAYLIGHT SCENE WITH INDIAN VEHICLES
+  // THREE.JS BANDRA-WORLI SEA LINK SCENE WITH CINEMATIC SCROLL ROTATION & DYNAMIC SUN
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     // 1. Scene, Camera, Renderer
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xdbeafe); // Crisp sky blue
-    scene.fog = new THREE.FogExp2(0xdbeafe, 0.007);
 
     const camera = new THREE.PerspectiveCamera(
       42,
-      container.clientWidth / container.clientHeight,
+      window.innerWidth / window.innerHeight,
       0.1,
-      1000
+      1400
     );
-    camera.position.set(0, 22, 60);
+    camera.position.set(-35, 28, 70);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
+      alpha: true,
       powerPreference: "high-performance",
     });
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.1;
     container.appendChild(renderer.domElement);
 
-    // Main bridge container group
+    // Root Group for the Bridge
     const bridgeGroup = new THREE.Group();
     scene.add(bridgeGroup);
 
-    // 2. Realistic Daylight Lighting
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xcfd8dc, 1.3);
-    scene.add(hemiLight);
-
-    const sunLight = new THREE.DirectionalLight(0xfffaed, 2.6);
-    sunLight.position.set(45, 75, 35);
+    // 2. DYNAMIC SUNLIGHT & SKY LIGHTING SETUP
+    const sunLight = new THREE.DirectionalLight(0xfffaed, 2.8);
+    sunLight.position.set(50, 75, 40);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 2048;
     sunLight.shadow.mapSize.height = 2048;
-    sunLight.shadow.camera.near = 10;
-    sunLight.shadow.camera.far = 200;
-    const shadowD = 60;
-    sunLight.shadow.camera.left = -shadowD;
-    sunLight.shadow.camera.right = shadowD;
-    sunLight.shadow.camera.top = shadowD;
-    sunLight.shadow.camera.bottom = -shadowD;
-    sunLight.shadow.bias = -0.0005;
+    sunLight.shadow.bias = -0.0004;
     scene.add(sunLight);
 
-    // Secondary soft fill light
-    const fillLight = new THREE.DirectionalLight(0xbae6fd, 0.8);
-    fillLight.position.set(-40, 30, -30);
-    scene.add(fillLight);
+    // Glowing Sun Mesh in the Sky
+    const sunMeshGeo = new THREE.SphereGeometry(4.5, 32, 32);
+    const sunMeshMat = new THREE.MeshBasicMaterial({ color: 0xfffaed });
+    const sunMesh = new THREE.Mesh(sunMeshGeo, sunMeshMat);
+    sunMesh.position.set(120, 140, 80);
+    scene.add(sunMesh);
 
-    // 3. Realistic River Surface & Wave Animation
-    const waterGeo = new THREE.PlaneGeometry(260, 160, 64, 48);
-    const waterMat = new THREE.MeshStandardMaterial({
-      color: 0x0284c7, // Vibrant river blue
+    // Hemisphere Ambient Lighting
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xcfd8dc, 1.4);
+    scene.add(hemiLight);
+
+    // Ocean Water Plane (Mahim Bay / Arabian Sea)
+    const oceanGeo = new THREE.PlaneGeometry(500, 380, 64, 48);
+    const oceanMat = new THREE.MeshStandardMaterial({
+      color: 0x0284c7, // Shifts from turquoise to sunset deep sea
       roughness: 0.15,
-      metalness: 0.8,
+      metalness: 0.85,
     });
-    const water = new THREE.Mesh(waterGeo, waterMat);
-    water.rotation.x = -Math.PI / 2;
-    water.position.y = -10;
-    water.receiveShadow = true;
-    scene.add(water);
+    const ocean = new THREE.Mesh(oceanGeo, oceanMat);
+    ocean.rotation.x = -Math.PI / 2;
+    ocean.position.y = -8;
+    ocean.receiveShadow = true;
+    scene.add(ocean);
 
-    // 4. Riverbanks & Gorge Terrain (Lush Greenery & Stone Abutments)
-    const bankGeo = new THREE.BoxGeometry(50, 24, 160);
-    const bankMat = new THREE.MeshStandardMaterial({
-      color: 0x15803d, // Lush green hillside
-      roughness: 0.85,
+    // 3. MUMBAI SKYLINE SILHOUETTES (WORLI & BANDRA COASTLINE)
+    const skylineGroup = new THREE.Group();
+    const buildingMat = new THREE.MeshStandardMaterial({
+      color: 0x94a3b8,
+      roughness: 0.8,
+      metalness: 0.2,
+    });
+    // Create random high-rises along the distant horizon
+    for (let i = 0; i < 28; i++) {
+      const bHeight = 16 + Math.sin(i * 3) * 14 + (i % 5) * 8;
+      const bWidth = 4 + (i % 3) * 2;
+      const bDepth = 4 + (i % 2) * 3;
+      const bGeo = new THREE.BoxGeometry(bWidth, bHeight, bDepth);
+      const bMesh = new THREE.Mesh(bGeo, buildingMat);
+      bMesh.position.set(-140 + i * 10, bHeight / 2 - 8, -120 + Math.sin(i) * 15);
+      skylineGroup.add(bMesh);
+    }
+    scene.add(skylineGroup);
+
+    // 4. BANDRA-WORLI SEA LINK ARCHITECTURE: ICONIC DIAMOND PYLONS
+    // Cream/off-white architectural concrete material
+    const concreteMat = new THREE.MeshStandardMaterial({
+      color: 0xf8fafc,
+      roughness: 0.35,
       metalness: 0.1,
     });
-    const leftBank = new THREE.Mesh(bankGeo, bankMat);
-    leftBank.position.set(-78, -4, 0);
-    leftBank.receiveShadow = true;
-    scene.add(leftBank);
 
-    const rightBank = new THREE.Mesh(bankGeo, bankMat);
-    rightBank.position.set(78, -4, 0);
-    rightBank.receiveShadow = true;
-    scene.add(rightBank);
+    // Pylon Twin Diamond Towers
+    const pylonHeight = 44;
+    const towerXPositions = [-24, 24];
 
-    // Rocky abutment walls
-    const abutmentMat = new THREE.MeshStandardMaterial({
-      color: 0x64748b, // Grey stone
-      roughness: 0.9,
-    });
-    const leftAbutment = new THREE.Mesh(new THREE.BoxGeometry(8, 14, 18), abutmentMat);
-    leftAbutment.position.set(-51, -1, 0);
-    scene.add(leftAbutment);
+    towerXPositions.forEach((posX) => {
+      // 1. Lower Inverted V Legs rising from submerged pier
+      const lowerLegGeo = new THREE.CylinderGeometry(1.2, 2.2, 18, 8);
+      // North Lower Leg
+      const legNorthLower = new THREE.Mesh(lowerLegGeo, concreteMat);
+      legNorthLower.position.set(posX, 1, -6);
+      legNorthLower.rotation.x = 0.22;
+      legNorthLower.castShadow = true;
+      bridgeGroup.add(legNorthLower);
 
-    const rightAbutment = new THREE.Mesh(new THREE.BoxGeometry(8, 14, 18), abutmentMat);
-    rightAbutment.position.set(51, -1, 0);
-    scene.add(rightAbutment);
+      // South Lower Leg
+      const legSouthLower = new THREE.Mesh(lowerLegGeo, concreteMat);
+      legSouthLower.position.set(posX, 1, 6);
+      legSouthLower.rotation.x = -0.22;
+      legSouthLower.castShadow = true;
+      bridgeGroup.add(legSouthLower);
 
-    // 5. Realistic Bridge Roadway Deck (Asphalt, Markings & Crash Barriers)
-    const deckLength = 104;
-    const deckWidth = 11;
-    const deckGeo = new THREE.BoxGeometry(deckLength, 1.8, deckWidth);
-    const deckMat = new THREE.MeshStandardMaterial({
-      color: 0x1e293b, // Dark asphalt
-      roughness: 0.7,
-      metalness: 0.15,
-    });
-    const deck = new THREE.Mesh(deckGeo, deckMat);
-    deck.position.set(0, 0, 0);
-    deck.receiveShadow = true;
-    deck.castShadow = true;
-    bridgeGroup.add(deck);
+      // 2. Central Structural Pier Junction Beam
+      const midBeam = new THREE.Mesh(new THREE.BoxGeometry(2.4, 2.0, 13), concreteMat);
+      midBeam.position.set(posX, 10, 0);
+      midBeam.castShadow = true;
+      bridgeGroup.add(midBeam);
 
-    // Center Double Yellow Lines
-    const yellowLineGeo = new THREE.PlaneGeometry(deckLength, 0.22);
-    const yellowLineMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
-    const yellowLine1 = new THREE.Mesh(yellowLineGeo, yellowLineMat);
-    yellowLine1.rotation.x = -Math.PI / 2;
-    yellowLine1.position.set(0, 0.92, -0.18);
-    bridgeGroup.add(yellowLine1);
+      // 3. Upper Converging Diamond Legs (Rising to Apex)
+      const upperLegGeo = new THREE.CylinderGeometry(0.9, 1.4, 28, 8);
+      // North Upper Leg
+      const legNorthUpper = new THREE.Mesh(upperLegGeo, concreteMat);
+      legNorthUpper.position.set(posX, 24, -3.2);
+      legNorthUpper.rotation.x = -0.18;
+      legNorthUpper.castShadow = true;
+      bridgeGroup.add(legNorthUpper);
 
-    const yellowLine2 = new THREE.Mesh(yellowLineGeo, yellowLineMat);
-    yellowLine2.rotation.x = -Math.PI / 2;
-    yellowLine2.position.set(0, 0.92, 0.18);
-    bridgeGroup.add(yellowLine2);
+      // South Upper Leg
+      const legSouthUpper = new THREE.Mesh(upperLegGeo, concreteMat);
+      legSouthUpper.position.set(posX, 24, 3.2);
+      legSouthUpper.rotation.x = 0.18;
+      legSouthUpper.castShadow = true;
+      bridgeGroup.add(legSouthUpper);
 
-    // White Outer Edge Lines
-    const whiteLineGeo = new THREE.PlaneGeometry(deckLength, 0.18);
-    const whiteLineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const whiteLineLeft = new THREE.Mesh(whiteLineGeo, whiteLineMat);
-    whiteLineLeft.rotation.x = -Math.PI / 2;
-    whiteLineLeft.position.set(0, 0.92, -4.6);
-    bridgeGroup.add(whiteLineLeft);
+      // 4. Tower Apex Cap
+      const apex = new THREE.Mesh(new THREE.BoxGeometry(2.2, 3.2, 2.8), concreteMat);
+      apex.position.set(posX, 38, 0);
+      apex.castShadow = true;
+      bridgeGroup.add(apex);
 
-    const whiteLineRight = new THREE.Mesh(whiteLineGeo, whiteLineMat);
-    whiteLineRight.rotation.x = -Math.PI / 2;
-    whiteLineRight.position.set(0, 0.92, 4.6);
-    bridgeGroup.add(whiteLineRight);
-
-    // Concrete Crash Barriers (Jersey Barriers) & Steel Railings
-    const barrierGeo = new THREE.BoxGeometry(deckLength, 1.1, 0.45);
-    const barrierMat = new THREE.MeshStandardMaterial({
-      color: 0xe2e8f0, // Clean light concrete
-      roughness: 0.5,
-    });
-    const barrierNorth = new THREE.Mesh(barrierGeo, barrierMat);
-    barrierNorth.position.set(0, 1.2, -5.2);
-    bridgeGroup.add(barrierNorth);
-
-    const barrierSouth = new THREE.Mesh(barrierGeo, barrierMat);
-    barrierSouth.position.set(0, 1.2, 5.2);
-    bridgeGroup.add(barrierSouth);
-
-    // Steel Safety Railing Handrails
-    const handrailGeo = new THREE.CylinderGeometry(0.08, 0.08, deckLength, 8);
-    const handrailMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.85 });
-    const handrailNorth = new THREE.Mesh(handrailGeo, handrailMat);
-    handrailNorth.rotation.z = Math.PI / 2;
-    handrailNorth.position.set(0, 1.85, -5.2);
-    bridgeGroup.add(handrailNorth);
-
-    const handrailSouth = new THREE.Mesh(handrailGeo, handrailMat);
-    handrailSouth.rotation.z = Math.PI / 2;
-    handrailSouth.position.set(0, 1.85, 5.2);
-    bridgeGroup.add(handrailSouth);
-
-    // 6. Realistic Reinforced Concrete H-Pylons & Stay-Cables
-    const pylonHeight = 36;
-    const pylonMat = new THREE.MeshStandardMaterial({
-      color: 0xf1f5f9, // Crisp architectural white/light grey concrete
-      roughness: 0.4,
-      metalness: 0.1,
-    });
-    const cableMat = new THREE.LineBasicMaterial({
-      color: 0xcfd8dc, // Steel cables in daylight
-      transparent: true,
-      opacity: 0.85,
-    });
-
-    const pylonXPositions = [-26, 26];
-
-    pylonXPositions.forEach((posX) => {
-      // Left leg
-      const legNorth = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.9, 1.7, pylonHeight, 8),
-        pylonMat
-      );
-      legNorth.position.set(posX, pylonHeight / 2 - 8, -5);
-      legNorth.rotation.z = posX < 0 ? -0.05 : 0.05;
-      legNorth.castShadow = true;
-      bridgeGroup.add(legNorth);
-
-      // Right leg
-      const legSouth = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.9, 1.7, pylonHeight, 8),
-        pylonMat
-      );
-      legSouth.position.set(posX, pylonHeight / 2 - 8, 5);
-      legSouth.rotation.z = posX < 0 ? -0.05 : 0.05;
-      legSouth.castShadow = true;
-      bridgeGroup.add(legSouth);
-
-      // Horizontal Crossbeam
-      const crossBeam = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.8, 11), pylonMat);
-      crossBeam.position.set(posX, 14, 0);
-      crossBeam.castShadow = true;
-      bridgeGroup.add(crossBeam);
-
-      // Aviation Obstruction Warning Beacon Light
+      // Red Aviation Obstruction Beacon
       const beacon = new THREE.Mesh(
         new THREE.SphereGeometry(0.4, 16, 16),
         new THREE.MeshBasicMaterial({ color: 0xef4444 })
       );
-      beacon.position.set(posX, pylonHeight - 7.5, 0);
+      beacon.position.set(posX, 40, 0);
       bridgeGroup.add(beacon);
 
-      // Massive Underwater Pier Foundation
-      const pierFoundation = new THREE.Mesh(
-        new THREE.CylinderGeometry(4.2, 4.6, 12, 16),
-        abutmentMat
+      // Submerged Foundation Pier
+      const pier = new THREE.Mesh(
+        new THREE.CylinderGeometry(5.0, 5.5, 14, 16),
+        new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.8 })
       );
-      pierFoundation.position.set(posX, -6, 0);
-      bridgeGroup.add(pierFoundation);
+      pier.position.set(posX, -6, 0);
+      bridgeGroup.add(pier);
 
-      // Scour Sensor Status Light on Pier
-      const scourSensor = new THREE.Mesh(
-        new THREE.SphereGeometry(0.3, 8, 8),
-        new THREE.MeshBasicMaterial({ color: 0x10b981 })
-      );
-      scourSensor.position.set(posX, -2.5, 4.6);
-      bridgeGroup.add(scourSensor);
+      // 5. Bandra-Worli Harp Stay-Cables Array
+      const cableMat = new THREE.LineBasicMaterial({
+        color: 0xfef08a, // Golden-tinted cables reflecting the sun
+        transparent: true,
+        opacity: 0.75,
+      });
 
-      // Stay Cables Fan Array
-      const topCableY = pylonHeight - 10;
-      const cableCount = 8;
-      for (let i = 0; i < cableCount; i++) {
-        const cableY = topCableY - i * 1.5;
-        const deckOffset = (i + 1) * 3.4;
+      const numCables = 9;
+      for (let i = 0; i < numCables; i++) {
+        const topY = 36 - i * 1.6;
+        const deckOffset = (i + 1) * 3.6;
 
         [-1, 1].forEach((dir) => {
-          const cableDeckX = posX + dir * deckOffset;
-          if (Math.abs(cableDeckX) <= deckLength / 2) {
-            [-4.8, 4.8].forEach((zSide) => {
+          const cableX = posX + dir * deckOffset;
+          if (Math.abs(cableX) <= 56) {
+            [-5.5, 5.5].forEach((zPos) => {
               const points = [
-                new THREE.Vector3(posX, cableY, zSide * 0.4),
-                new THREE.Vector3(cableDeckX, 0.9, zSide),
+                new THREE.Vector3(posX, topY, zPos * 0.25),
+                new THREE.Vector3(cableX, 1.2, zPos),
               ];
               const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
-              const cableLine = new THREE.Line(lineGeo, cableMat);
-              bridgeGroup.add(cableLine);
+              const cable = new THREE.Line(lineGeo, cableMat);
+              bridgeGroup.add(cable);
             });
           }
         });
       }
     });
 
-    // 7. REAL INDIAN VEHICLE 3D MODELS (AUTO, TRUCK, TRACTOR, SCOOTY, CAR)
+    // 5. CURVED ROADWAY DECK (BANDRA-WORLI SWEEPING VIADUCT)
+    const deckLength = 120;
+    const deckWidth = 12;
+    const deckGeo = new THREE.BoxGeometry(deckLength, 1.8, deckWidth);
+    const deckMat = new THREE.MeshStandardMaterial({
+      color: 0x1e293b, // Asphalt
+      roughness: 0.7,
+      metalness: 0.1,
+    });
+    const deck = new THREE.Mesh(deckGeo, deckMat);
+    deck.position.set(0, 0.2, 0);
+    deck.receiveShadow = true;
+    deck.castShadow = true;
+    bridgeGroup.add(deck);
+
+    // Double Center Yellow Lines
+    const yellowGeo = new THREE.PlaneGeometry(deckLength, 0.25);
+    const yellowMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+    const yLine1 = new THREE.Mesh(yellowGeo, yellowMat);
+    yLine1.rotation.x = -Math.PI / 2;
+    yLine1.position.set(0, 1.12, -0.2);
+    bridgeGroup.add(yLine1);
+
+    const yLine2 = new THREE.Mesh(yellowGeo, yellowMat);
+    yLine2.rotation.x = -Math.PI / 2;
+    yLine2.position.set(0, 1.12, 0.2);
+    bridgeGroup.add(yLine2);
+
+    // Concrete Crash Barriers (Jersey Barriers) & Steel Railings
+    const barrierMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.4 });
+    const barrierNorth = new THREE.Mesh(new THREE.BoxGeometry(deckLength, 1.1, 0.45), barrierMat);
+    barrierNorth.position.set(0, 1.4, -5.8);
+    bridgeGroup.add(barrierNorth);
+
+    const barrierSouth = new THREE.Mesh(new THREE.BoxGeometry(deckLength, 1.1, 0.45), barrierMat);
+    barrierSouth.position.set(0, 1.4, 5.8);
+    bridgeGroup.add(barrierSouth);
+
+    // Viaduct Intermediate Support Piers across the bay
+    [-52, 0, 52].forEach((xP) => {
+      const vPier = new THREE.Mesh(
+        new THREE.CylinderGeometry(2.5, 2.8, 12, 12),
+        concreteMat
+      );
+      vPier.position.set(xP, -4.5, 0);
+      bridgeGroup.add(vPier);
+    });
+
+    // 6. REAL INDIAN VEHICLES (AUTO-RICKSHAW, TRUCK, TRACTOR, SCOOTY, CAR)
     interface VehicleItem {
       group: THREE.Group;
       speed: number;
       laneZ: number;
       direction: 1 | -1;
       wheels: THREE.Mesh[];
+      headlights: THREE.Mesh[];
     }
-
     const vehicles: VehicleItem[] = [];
 
-    // Factory A: Authentic Indian Auto-Rickshaw
-    const createAutoRickshaw = (): { group: THREE.Group; wheels: THREE.Mesh[] } => {
-      const auto = new THREE.Group();
+    // Factory: Auto-Rickshaw
+    const makeAuto = (): { group: THREE.Group; wheels: THREE.Mesh[]; headlights: THREE.Mesh[] } => {
+      const g = new THREE.Group();
       const wheels: THREE.Mesh[] = [];
+      const headlights: THREE.Mesh[] = [];
 
-      // Lower Metal Body (Signature Emerald Green)
-      const bodyMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.3 });
-      const lowerBody = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.7, 1.4), bodyMat);
-      lowerBody.position.y = 0.5;
-      auto.add(lowerBody);
+      const body = new THREE.Mesh(
+        new THREE.BoxGeometry(2.4, 0.7, 1.4),
+        new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.3 })
+      );
+      body.position.y = 0.55;
+      g.add(body);
 
-      // Yellow Curved Roof Canopy
-      const roofMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 });
-      const roof = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.25, 1.45), roofMat);
-      roof.position.set(-0.05, 1.55, 0);
-      auto.add(roof);
+      const roof = new THREE.Mesh(
+        new THREE.BoxGeometry(2.2, 0.24, 1.42),
+        new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 })
+      );
+      roof.position.set(-0.05, 1.6, 0);
+      g.add(roof);
 
-      // Slanted windshield & frame
-      const windowMat = new THREE.MeshStandardMaterial({
-        color: 0x0284c7,
-        roughness: 0.1,
-        transparent: true,
-        opacity: 0.7,
-      });
-      const windshield = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.75), windowMat);
-      windshield.rotation.y = Math.PI / 2;
-      windshield.rotation.z = -0.3;
-      windshield.position.set(1.05, 1.15, 0);
-      auto.add(windshield);
-
-      // Canopy Pillars (Black steel rods)
-      const rodMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
-      [-0.6, 0.6].forEach((zP) => {
-        const rearPillar = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.8), rodMat);
-        rearPillar.position.set(-1.0, 1.15, zP);
-        auto.add(rearPillar);
-
-        const frontPillar = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.8), rodMat);
-        frontPillar.position.set(0.9, 1.15, zP);
-        auto.add(frontPillar);
-      });
-
-      // Front chrome headlight
-      const light = new THREE.Mesh(
-        new THREE.SphereGeometry(0.12, 8, 8),
+      // Headlight
+      const hl = new THREE.Mesh(
+        new THREE.SphereGeometry(0.14, 8, 8),
         new THREE.MeshBasicMaterial({ color: 0xfef08a })
       );
-      light.position.set(1.22, 0.65, 0);
-      auto.add(light);
+      hl.position.set(1.22, 0.65, 0);
+      g.add(hl);
+      headlights.push(hl);
 
-      // Wheels (1 front, 2 rear)
-      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 });
-      const wheelGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.16, 12);
-      wheelGeo.rotateZ(Math.PI / 2);
+      // Wheels
+      const wMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
+      const wGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.16, 12);
+      wGeo.rotateZ(Math.PI / 2);
 
-      const frontWheel = new THREE.Mesh(wheelGeo, wheelMat);
-      frontWheel.position.set(0.95, 0.24, 0);
-      auto.add(frontWheel);
-      wheels.push(frontWheel);
+      const fw = new THREE.Mesh(wGeo, wMat);
+      fw.position.set(0.95, 0.24, 0);
+      g.add(fw);
+      wheels.push(fw);
 
       [-0.65, 0.65].forEach((zW) => {
-        const rearWheel = new THREE.Mesh(wheelGeo, wheelMat);
-        rearWheel.position.set(-0.75, 0.24, zW);
-        auto.add(rearWheel);
-        wheels.push(rearWheel);
+        const rw = new THREE.Mesh(wGeo, wMat);
+        rw.position.set(-0.75, 0.24, zW);
+        g.add(rw);
+        wheels.push(rw);
       });
 
-      return { group: auto, wheels };
+      return { group: g, wheels, headlights };
     };
 
-    // Factory B: Indian Heavy Cargo Truck (Tata / Ashok Leyland Lorry)
-    const createIndianTruck = (cabColor: number, cargoColor: number): { group: THREE.Group; wheels: THREE.Mesh[] } => {
-      const truck = new THREE.Group();
+    // Factory: Heavy Indian Truck
+    const makeTruck = (cabCol: number, cargoCol: number): { group: THREE.Group; wheels: THREE.Mesh[]; headlights: THREE.Mesh[] } => {
+      const g = new THREE.Group();
       const wheels: THREE.Mesh[] = [];
+      const headlights: THREE.Mesh[] = [];
 
-      // Front Driver Cab (High-visibility Saffron or Orange)
-      const cabMat = new THREE.MeshStandardMaterial({ color: cabColor, roughness: 0.3 });
-      const cab = new THREE.Mesh(new THREE.BoxGeometry(2.1, 1.8, 2.2), cabMat);
-      cab.position.set(2.4, 1.3, 0);
-      truck.add(cab);
-
-      // Chrome Front Grille & Bumper
-      const chromeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 });
-      const bumper = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.4, 2.3), chromeMat);
-      bumper.position.set(3.45, 0.45, 0);
-      truck.add(bumper);
-
-      // Windshield & Sun Visor
-      const visor = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 2.22), cabMat);
-      visor.position.set(3.2, 2.15, 0);
-      truck.add(visor);
-
-      const windshield = new THREE.Mesh(
-        new THREE.PlaneGeometry(1.9, 0.7),
-        new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.65 })
+      const cab = new THREE.Mesh(
+        new THREE.BoxGeometry(2.2, 1.8, 2.2),
+        new THREE.MeshStandardMaterial({ color: cabCol, roughness: 0.3 })
       );
-      windshield.rotation.y = Math.PI / 2;
-      windshield.position.set(3.46, 1.6, 0);
-      truck.add(windshield);
+      cab.position.set(2.4, 1.35, 0);
+      g.add(cab);
 
-      // Rear Cargo Body / Carrier Bed
-      const cargoMat = new THREE.MeshStandardMaterial({ color: cargoColor, roughness: 0.5 });
-      const cargoBody = new THREE.Mesh(new THREE.BoxGeometry(4.8, 1.7, 2.25), cargoMat);
-      cargoBody.position.set(-1.1, 1.35, 0);
-      truck.add(cargoBody);
+      const cargo = new THREE.Mesh(
+        new THREE.BoxGeometry(4.8, 1.7, 2.25),
+        new THREE.MeshStandardMaterial({ color: cargoCol, roughness: 0.5 })
+      );
+      cargo.position.set(-1.1, 1.35, 0);
+      g.add(cargo);
 
-      // Covered Tarpaulin Goods Load
-      const tarpMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.7 });
-      const tarp = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.7, 2.1), tarpMat);
+      const tarp = new THREE.Mesh(
+        new THREE.BoxGeometry(4.4, 0.7, 2.1),
+        new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.7 })
+      );
       tarp.position.set(-1.1, 2.45, 0);
-      truck.add(tarp);
+      g.add(tarp);
 
-      // Headlights
       [-0.8, 0.8].forEach((zL) => {
         const hl = new THREE.Mesh(
           new THREE.SphereGeometry(0.14, 8, 8),
           new THREE.MeshBasicMaterial({ color: 0xfef08a })
         );
-        hl.position.set(3.48, 0.7, zL);
-        truck.add(hl);
+        hl.position.set(3.5, 0.7, zL);
+        g.add(hl);
+        headlights.push(hl);
       });
 
-      // 6 Wheels (2 front, 4 dual rear)
-      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.85 });
-      const wheelGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.28, 14);
-      wheelGeo.rotateZ(Math.PI / 2);
+      const wMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
+      const wGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.28, 14);
+      wGeo.rotateZ(Math.PI / 2);
 
-      // Front axle
       [-1.0, 1.0].forEach((zW) => {
-        const w = new THREE.Mesh(wheelGeo, wheelMat);
+        const w = new THREE.Mesh(wGeo, wMat);
         w.position.set(2.4, 0.42, zW);
-        truck.add(w);
+        g.add(w);
         wheels.push(w);
       });
-
-      // Dual rear axles
-      [-1.8, -0.6].forEach((xPos) => {
+      [-1.8, -0.6].forEach((xP) => {
         [-1.05, 1.05].forEach((zW) => {
-          const w = new THREE.Mesh(wheelGeo, wheelMat);
-          w.position.set(xPos, 0.42, zW);
-          truck.add(w);
+          const w = new THREE.Mesh(wGeo, wMat);
+          w.position.set(xP, 0.42, zW);
+          g.add(w);
           wheels.push(w);
         });
       });
 
-      return { group: truck, wheels };
+      return { group: g, wheels, headlights };
     };
 
-    // Factory C: Indian Farm Tractor (Mahindra / Swaraj)
-    const createTractor = (): { group: THREE.Group; wheels: THREE.Mesh[] } => {
-      const tractor = new THREE.Group();
+    // Factory: Farm Tractor
+    const makeTractor = (): { group: THREE.Group; wheels: THREE.Mesh[]; headlights: THREE.Mesh[] } => {
+      const g = new THREE.Group();
       const wheels: THREE.Mesh[] = [];
+      const headlights: THREE.Mesh[] = [];
 
-      // Classic Red Engine Hood
-      const hoodMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.35 });
-      const hood = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.85, 1.1), hoodMat);
-      hood.position.set(0.6, 0.95, 0);
-      tractor.add(hood);
-
-      // Front Grille
-      const grille = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.9, 0.65),
-        new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8 })
+      const hood = new THREE.Mesh(
+        new THREE.BoxGeometry(2.0, 0.85, 1.1),
+        new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.35 })
       );
-      grille.rotation.y = Math.PI / 2;
-      grille.position.set(1.61, 0.95, 0);
-      tractor.add(grille);
+      hood.position.set(0.6, 1.0, 0);
+      g.add(hood);
 
-      // Vertical Exhaust Stack Chimney
-      const exhaustMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9 });
-      const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.1), exhaustMat);
-      exhaust.position.set(1.2, 1.7, 0.4);
-      tractor.add(exhaust);
-
-      // Driver Seat & Steering Wheel
-      const seat = new THREE.Mesh(
-        new THREE.BoxGeometry(0.6, 0.4, 0.65),
-        new THREE.MeshStandardMaterial({ color: 0x1e293b })
+      const exhaust = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.06, 0.06, 1.2),
+        new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8 })
       );
-      seat.position.set(-0.4, 1.25, 0);
-      tractor.add(seat);
+      exhaust.position.set(1.2, 1.8, 0.4);
+      g.add(exhaust);
 
-      const steering = new THREE.Mesh(
-        new THREE.TorusGeometry(0.2, 0.03, 8, 16),
-        new THREE.MeshStandardMaterial({ color: 0x0f172a })
+      const hl = new THREE.Mesh(
+        new THREE.SphereGeometry(0.12, 8, 8),
+        new THREE.MeshBasicMaterial({ color: 0xfef08a })
       );
-      steering.rotation.y = Math.PI / 2;
-      steering.rotation.x = -0.5;
-      steering.position.set(0.1, 1.5, 0);
-      tractor.add(steering);
+      hl.position.set(1.65, 0.95, 0);
+      g.add(hl);
+      headlights.push(hl);
 
-      // Big Oversized Rear Tires
-      const rearWheelGeo = new THREE.CylinderGeometry(0.72, 0.72, 0.4, 16);
-      rearWheelGeo.rotateZ(Math.PI / 2);
-      const tireMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 });
-
+      const rwGeo = new THREE.CylinderGeometry(0.74, 0.74, 0.4, 16);
+      rwGeo.rotateZ(Math.PI / 2);
       [-0.75, 0.75].forEach((zW) => {
-        const rw = new THREE.Mesh(rearWheelGeo, tireMat);
-        rw.position.set(-0.55, 0.72, zW);
-        tractor.add(rw);
+        const rw = new THREE.Mesh(rwGeo, new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+        rw.position.set(-0.55, 0.74, zW);
+        g.add(rw);
         wheels.push(rw);
       });
 
-      // Smaller Front Steering Tires
-      const frontWheelGeo = new THREE.CylinderGeometry(0.36, 0.36, 0.22, 14);
-      frontWheelGeo.rotateZ(Math.PI / 2);
+      const fwGeo = new THREE.CylinderGeometry(0.36, 0.36, 0.22, 14);
+      fwGeo.rotateZ(Math.PI / 2);
       [-0.6, 0.6].forEach((zW) => {
-        const fw = new THREE.Mesh(frontWheelGeo, tireMat);
+        const fw = new THREE.Mesh(fwGeo, new THREE.MeshStandardMaterial({ color: 0x1e293b }));
         fw.position.set(1.25, 0.36, zW);
-        tractor.add(fw);
+        g.add(fw);
         wheels.push(fw);
       });
 
-      return { group: tractor, wheels };
+      return { group: g, wheels, headlights };
     };
 
-    // Factory D: Two-Wheeler / Scooty / Bike
-    const createScooty = (color: number): { group: THREE.Group; wheels: THREE.Mesh[] } => {
-      const bike = new THREE.Group();
+    // Factory: Scooty / Two-Wheeler
+    const makeScooty = (col: number): { group: THREE.Group; wheels: THREE.Mesh[]; headlights: THREE.Mesh[] } => {
+      const g = new THREE.Group();
       const wheels: THREE.Mesh[] = [];
+      const headlights: THREE.Mesh[] = [];
 
-      const bodyMat = new THREE.MeshStandardMaterial({ color, roughness: 0.3 });
-      const chassis = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.4, 0.35), bodyMat);
-      chassis.position.set(0, 0.48, 0);
-      bike.add(chassis);
-
-      // Handlebar & Headlight
-      const bar = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.03, 0.03, 0.65),
-        new THREE.MeshStandardMaterial({ color: 0x0f172a })
+      const chassis = new THREE.Mesh(
+        new THREE.BoxGeometry(1.3, 0.4, 0.35),
+        new THREE.MeshStandardMaterial({ color: col, roughness: 0.3 })
       );
-      bar.rotation.x = Math.PI / 2;
-      bar.position.set(0.48, 0.85, 0);
-      bike.add(bar);
+      chassis.position.set(0, 0.5, 0);
+      g.add(chassis);
 
-      const headlight = new THREE.Mesh(
+      const rider = new THREE.Mesh(
+        new THREE.BoxGeometry(0.35, 0.5, 0.3),
+        new THREE.MeshStandardMaterial({ color: 0x334155 })
+      );
+      rider.position.set(-0.05, 0.95, 0);
+      g.add(rider);
+
+      const helmet = new THREE.Mesh(
+        new THREE.SphereGeometry(0.18, 12, 12),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b })
+      );
+      helmet.position.set(0, 1.35, 0);
+      g.add(helmet);
+
+      const hl = new THREE.Mesh(
         new THREE.SphereGeometry(0.08, 8, 8),
         new THREE.MeshBasicMaterial({ color: 0xfef08a })
       );
-      headlight.position.set(0.65, 0.75, 0);
-      bike.add(headlight);
+      hl.position.set(0.65, 0.75, 0);
+      g.add(hl);
+      headlights.push(hl);
 
-      // Rider Silhouette (Helmet & Torso in dark slate)
-      const riderMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
-      const torso = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.5, 0.3), riderMat);
-      torso.position.set(-0.05, 0.95, 0);
-      bike.add(torso);
+      const wGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.09, 12);
+      wGeo.rotateZ(Math.PI / 2);
+      [0.55, -0.55].forEach((xP) => {
+        const w = new THREE.Mesh(wGeo, new THREE.MeshStandardMaterial({ color: 0x0f172a }));
+        w.position.set(xP, 0.24, 0);
+        g.add(w);
+        wheels.push(w);
+      });
 
-      const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 12), riderMat);
-      helmet.position.set(0.0, 1.35, 0);
-      bike.add(helmet);
-
-      // 2 Wheels
-      const wheelGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.09, 12);
-      wheelGeo.rotateZ(Math.PI / 2);
-      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
-
-      const frontW = new THREE.Mesh(wheelGeo, wheelMat);
-      frontW.position.set(0.55, 0.24, 0);
-      bike.add(frontW);
-      wheels.push(frontW);
-
-      const rearW = new THREE.Mesh(wheelGeo, wheelMat);
-      rearW.position.set(-0.55, 0.24, 0);
-      bike.add(rearW);
-      wheels.push(rearW);
-
-      return { group: bike, wheels };
+      return { group: g, wheels, headlights };
     };
 
-    // Factory E: Passenger Sedan / Car
-    const createCar = (carColor: number): { group: THREE.Group; wheels: THREE.Mesh[] } => {
-      const car = new THREE.Group();
+    // Factory: Sedan Car
+    const makeCar = (col: number): { group: THREE.Group; wheels: THREE.Mesh[]; headlights: THREE.Mesh[] } => {
+      const g = new THREE.Group();
       const wheels: THREE.Mesh[] = [];
+      const headlights: THREE.Mesh[] = [];
 
-      const bodyMat = new THREE.MeshStandardMaterial({ color: carColor, roughness: 0.25 });
-      const lower = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.6, 1.4), bodyMat);
-      lower.position.y = 0.5;
-      car.add(lower);
+      const body = new THREE.Mesh(
+        new THREE.BoxGeometry(2.8, 0.6, 1.4),
+        new THREE.MeshStandardMaterial({ color: col, roughness: 0.25 })
+      );
+      body.position.y = 0.5;
+      g.add(body);
 
-      const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.55, 1.25), bodyMat);
+      const cabin = new THREE.Mesh(
+        new THREE.BoxGeometry(1.6, 0.55, 1.25),
+        new THREE.MeshStandardMaterial({ color: col, roughness: 0.25 })
+      );
       cabin.position.set(-0.15, 1.05, 0);
-      car.add(cabin);
+      g.add(cabin);
 
-      // Glass Windows
-      const glassMat = new THREE.MeshStandardMaterial({
-        color: 0x38bdf8,
-        transparent: true,
-        opacity: 0.6,
-      });
-      const glass = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.45, 1.28), glassMat);
-      glass.position.set(-0.15, 1.05, 0);
-      car.add(glass);
-
-      // Headlights
       [-0.5, 0.5].forEach((zL) => {
         const hl = new THREE.Mesh(
           new THREE.SphereGeometry(0.1, 8, 8),
           new THREE.MeshBasicMaterial({ color: 0xfef08a })
         );
         hl.position.set(1.42, 0.52, zL);
-        car.add(hl);
+        g.add(hl);
+        headlights.push(hl);
       });
 
-      // 4 Wheels
-      const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.16, 12);
-      wheelGeo.rotateZ(Math.PI / 2);
-      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
-
+      const wGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.16, 12);
+      wGeo.rotateZ(Math.PI / 2);
       [-0.85, 0.85].forEach((xW) => {
         [-0.7, 0.7].forEach((zW) => {
-          const w = new THREE.Mesh(wheelGeo, wheelMat);
+          const w = new THREE.Mesh(wGeo, new THREE.MeshStandardMaterial({ color: 0x0f172a }));
           w.position.set(xW, 0.28, zW);
-          car.add(w);
+          g.add(w);
           wheels.push(w);
         });
       });
 
-      return { group: car, wheels };
+      return { group: g, wheels, headlights };
     };
 
-    // SPAWN FLEET OF INDIAN VEHICLES ACROSS DUAL LANES
-    // Lane 1: Heading East (Z = -2.2, direction = 1)
-    // Lane 2: Heading West (Z = +2.2, direction = -1)
-
-    // 1. Auto-Rickshaw in Lane 1
-    const auto1 = createAutoRickshaw();
-    auto1.group.position.set(-35, 0.9, -2.2);
+    // Spawn Indian Vehicles in Dual Lanes
+    // Eastbound (direction = 1)
+    const auto1 = makeAuto();
+    auto1.group.position.set(-45, 1.1, -2.4);
     bridgeGroup.add(auto1.group);
-    vehicles.push({ group: auto1.group, speed: 0.16, laneZ: -2.2, direction: 1, wheels: auto1.wheels });
+    vehicles.push({ group: auto1.group, speed: 0.16, laneZ: -2.4, direction: 1, wheels: auto1.wheels, headlights: auto1.headlights });
 
-    // 2. Heavy Tata Truck in Lane 1
-    const truck1 = createIndianTruck(0xea580c, 0x0284c7);
-    truck1.group.position.set(-10, 0.9, -2.2);
+    const truck1 = makeTruck(0xea580c, 0x0284c7);
+    truck1.group.position.set(-15, 1.1, -2.4);
     bridgeGroup.add(truck1.group);
-    vehicles.push({ group: truck1.group, speed: 0.12, laneZ: -2.2, direction: 1, wheels: truck1.wheels });
+    vehicles.push({ group: truck1.group, speed: 0.12, laneZ: -2.4, direction: 1, wheels: truck1.wheels, headlights: truck1.headlights });
 
-    // 3. Passenger White Car in Lane 1
-    const car1 = createCar(0xffffff);
-    car1.group.position.set(15, 0.9, -2.2);
+    const car1 = makeCar(0xffffff);
+    car1.group.position.set(15, 1.1, -2.4);
     bridgeGroup.add(car1.group);
-    vehicles.push({ group: car1.group, speed: 0.22, laneZ: -2.2, direction: 1, wheels: car1.wheels });
+    vehicles.push({ group: car1.group, speed: 0.22, laneZ: -2.4, direction: 1, wheels: car1.wheels, headlights: car1.headlights });
 
-    // 4. Scooty in Lane 1
-    const bike1 = createScooty(0x0d9488);
-    bike1.group.position.set(38, 0.9, -3.4);
-    bridgeGroup.add(bike1.group);
-    vehicles.push({ group: bike1.group, speed: 0.19, laneZ: -3.4, direction: 1, wheels: bike1.wheels });
+    const scooty1 = makeScooty(0x0d9488);
+    scooty1.group.position.set(38, 1.1, -4.0);
+    bridgeGroup.add(scooty1.group);
+    vehicles.push({ group: scooty1.group, speed: 0.20, laneZ: -4.0, direction: 1, wheels: scooty1.wheels, headlights: scooty1.headlights });
 
-    // 5. Farm Tractor in Lane 2 (Heading opposite direction)
-    const tractor1 = createTractor();
+    // Westbound (direction = -1)
+    const tractor1 = makeTractor();
     tractor1.group.rotation.y = Math.PI;
-    tractor1.group.position.set(40, 0.9, 2.2);
+    tractor1.group.position.set(45, 1.1, 2.4);
     bridgeGroup.add(tractor1.group);
-    vehicles.push({ group: tractor1.group, speed: 0.11, laneZ: 2.2, direction: -1, wheels: tractor1.wheels });
+    vehicles.push({ group: tractor1.group, speed: 0.11, laneZ: 2.4, direction: -1, wheels: tractor1.wheels, headlights: tractor1.headlights });
 
-    // 6. Second Auto-Rickshaw in Lane 2
-    const auto2 = createAutoRickshaw();
+    const auto2 = makeAuto();
     auto2.group.rotation.y = Math.PI;
-    auto2.group.position.set(18, 0.9, 2.2);
+    auto2.group.position.set(20, 1.1, 2.4);
     bridgeGroup.add(auto2.group);
-    vehicles.push({ group: auto2.group, speed: 0.15, laneZ: 2.2, direction: -1, wheels: auto2.wheels });
+    vehicles.push({ group: auto2.group, speed: 0.15, laneZ: 2.4, direction: -1, wheels: auto2.wheels, headlights: auto2.headlights });
 
-    // 7. Green Indian Truck in Lane 2
-    const truck2 = createIndianTruck(0xdc2626, 0x15803d);
+    const truck2 = makeTruck(0xdc2626, 0x15803d);
     truck2.group.rotation.y = Math.PI;
-    truck2.group.position.set(-8, 0.9, 2.2);
+    truck2.group.position.set(-10, 1.1, 2.4);
     bridgeGroup.add(truck2.group);
-    vehicles.push({ group: truck2.group, speed: 0.13, laneZ: 2.2, direction: -1, wheels: truck2.wheels });
+    vehicles.push({ group: truck2.group, speed: 0.13, laneZ: 2.4, direction: -1, wheels: truck2.wheels, headlights: truck2.headlights });
 
-    // 8. Motorbike in Lane 2
-    const bike2 = createScooty(0xef4444);
-    bike2.group.rotation.y = Math.PI;
-    bike2.group.position.set(-30, 0.9, 3.4);
-    bridgeGroup.add(bike2.group);
-    vehicles.push({ group: bike2.group, speed: 0.20, laneZ: 3.4, direction: -1, wheels: bike2.wheels });
+    const scooty2 = makeScooty(0xef4444);
+    scooty2.group.rotation.y = Math.PI;
+    scooty2.group.position.set(-35, 1.1, 4.0);
+    bridgeGroup.add(scooty2.group);
+    vehicles.push({ group: scooty2.group, speed: 0.19, laneZ: 4.0, direction: -1, wheels: scooty2.wheels, headlights: scooty2.headlights });
 
-    // 8. Animation & Camera Loop
+    // 7. SMOOTH ANIMATION LOOP & SCROLL-DRIVEN CAMERA ROTATION + SOLAR ARC
     let animationFrameId: number;
     const clock = new THREE.Clock();
+    let currentScroll = 0;
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      // Realistic river water micro-oscillation
-      water.position.y = -10 + Math.sin(elapsedTime * 1.2) * 0.1;
+      // Smooth interpolation of scroll progress
+      currentScroll += (scrollTargetRef.current - currentScroll) * 0.05;
 
-      // Animate Vehicles along the bridge
+      // Animate Vehicles along the deck
       vehicles.forEach((veh) => {
         veh.group.position.x += veh.speed * veh.direction;
-
-        // Rotate wheels realistically according to vehicle displacement
         veh.wheels.forEach((w) => {
-          w.rotation.x += (veh.speed * veh.direction) * 3.5;
+          w.rotation.x += veh.speed * veh.direction * 3.5;
         });
 
-        // Loop vehicles seamlessly when exiting bridge abutment
         if (veh.direction === 1 && veh.group.position.x > deckLength / 2 + 6) {
           veh.group.position.x = -deckLength / 2 - 6;
         } else if (veh.direction === -1 && veh.group.position.x < -deckLength / 2 - 6) {
@@ -877,52 +769,80 @@ export const BridgeHero3D: React.FC = () => {
         }
       });
 
-      // Camera positions based on mode and scroll progress
-      let targetCamX = 0;
-      let targetCamY = 22;
-      let targetCamZ = 60;
-      let targetLookY = 2;
+      // Ocean Wave Ripples
+      ocean.position.y = -8 + Math.sin(elapsedTime * 1.4) * 0.12;
 
-      // Dynamic Scroll Interpolation (Scroll haptics & camera descent)
-      const scrollFactor = scrollProgress; // 0 (top) to 1 (scrolled)
+      // DYNAMIC SUN & SOLAR ARC LINKED TO SCROLL
+      // At scroll = 0 (Noon): Sun is high, crisp white daylight
+      // At scroll = 0.5 (Sunset): Sun is low on horizon, warm fiery amber
+      // At scroll = 1.0 (Twilight): Sun dips below, dusk indigo sky
+      const sunAngle = (1 - currentScroll) * Math.PI * 0.5 + 0.15; // Arc from high to horizon
+      const sunDistance = 140;
+      const sunX = Math.cos(sunAngle) * sunDistance;
+      const sunY = Math.max(8, Math.sin(sunAngle) * sunDistance);
+      const sunZ = 50 + Math.sin(currentScroll * Math.PI) * 40;
 
-      if (cameraMode === "deck") {
-        // Deck eye-level perspective right next to moving traffic
-        targetCamX = -12;
-        targetCamY = 3.8 - scrollFactor * 1.5;
-        targetCamZ = 12 - scrollFactor * 4;
-        targetLookY = 2.5;
-      } else if (cameraMode === "piers") {
-        // Foundation & river scour sensor inspection
-        targetCamX = 24;
-        targetCamY = -2 + scrollFactor * 2;
-        targetCamZ = 34;
-        targetLookY = -6;
+      sunLight.position.set(sunX, sunY, sunZ);
+      sunMesh.position.set(sunX, sunY, sunZ - 20);
+
+      // Interpolate Sun Light Color and Intensity
+      if (currentScroll < 0.5) {
+        // Noon to Golden Hour
+        const t = currentScroll * 2;
+        sunLight.color.setRGB(1.0, 0.98 - t * 0.28, 0.92 - t * 0.6);
+        sunMeshMat.color.setRGB(1.0, 0.95 - t * 0.3, 0.85 - t * 0.6);
+        sunLight.intensity = 2.8 + t * 0.6; // Golden bloom
+        oceanMat.color.setRGB(0.01 + t * 0.12, 0.52 - t * 0.15, 0.78 - t * 0.35);
+        hemiLight.color.setRGB(1.0, 1.0 - t * 0.15, 1.0 - t * 0.3);
       } else {
-        // Aerial Vista default: smoothly lowers and rotates as user scrolls down
-        targetCamX = Math.sin(elapsedTime * 0.12) * 8;
-        targetCamY = 22 - scrollFactor * 14; // Drops down towards deck level
-        targetCamZ = 60 - scrollFactor * 25; // Zooms closer to bridge
-        targetLookY = 2 - scrollFactor * 2;
+        // Golden Hour to Dusk Twilight
+        const t = (currentScroll - 0.5) * 2;
+        sunLight.color.setRGB(1.0 - t * 0.4, 0.70 - t * 0.45, 0.32 + t * 0.2);
+        sunMeshMat.color.setRGB(1.0 - t * 0.3, 0.65 - t * 0.4, 0.25 + t * 0.15);
+        sunLight.intensity = 3.4 - t * 2.2;
+        oceanMat.color.setRGB(0.13 - t * 0.1, 0.37 - t * 0.28, 0.43 - t * 0.25);
+        hemiLight.color.setRGB(0.85 - t * 0.4, 0.85 - t * 0.5, 0.7 + t * 0.1);
       }
 
-      // Smooth camera interpolation (damping)
+      // Vehicles headlights brighten as sun sets
+      const headlightIntensity = Math.min(1.0, Math.max(0.2, currentScroll * 1.5));
+      vehicles.forEach((veh) => {
+        veh.headlights.forEach((h) => {
+          (h.material as THREE.MeshBasicMaterial).color.setRGB(
+            1.0,
+            0.94,
+            0.54 + headlightIntensity * 0.4
+          );
+        });
+      });
+
+      // CINEMATIC ROTATING CAMERA PATH DRIVEN BY SCROLL
+      // Camera smoothly rotates 180 degrees around the Bandra-Worli Sea Link
+      const orbitAngle = -0.4 + currentScroll * Math.PI * 0.95; // Rotates around the bridge
+      const camRadius = 78 - currentScroll * 18;
+      const targetCamX = Math.sin(orbitAngle) * camRadius;
+      const targetCamZ = Math.cos(orbitAngle) * camRadius;
+      // Camera height descends towards deck, then rises for grand dusk panorama
+      const targetCamY = 28 - Math.sin(currentScroll * Math.PI) * 14;
+
       camera.position.x += (targetCamX - camera.position.x) * 0.05;
       camera.position.y += (targetCamY - camera.position.y) * 0.05;
       camera.position.z += (targetCamZ - camera.position.z) * 0.05;
-      camera.lookAt(0, targetLookY, 0);
+
+      // Look target moves along the bridge deck
+      const lookX = Math.sin(currentScroll * Math.PI) * 12;
+      const lookY = 6 - currentScroll * 3;
+      camera.lookAt(lookX, lookY, 0);
 
       renderer.render(scene, camera);
     };
 
     animate();
 
-    // Resize Handler
     const handleResize = () => {
-      if (!container) return;
-      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener("resize", handleResize);
 
@@ -934,80 +854,69 @@ export const BridgeHero3D: React.FC = () => {
       }
       renderer.dispose();
     };
-  }, [cameraMode, scrollProgress]);
+  }, []);
 
   const activeCallout = callouts[activeCalloutIdx];
 
+  // Derive dynamic solar status label based on scroll
+  const solarStatus =
+    scrollProgress < 0.35
+      ? text.solarNoon
+      : scrollProgress < 0.7
+      ? text.solarGolden
+      : text.solarDusk;
+
+  const SolarIcon =
+    scrollProgress < 0.35 ? Sun : scrollProgress < 0.7 ? Sunset : Moon;
+
   return (
-    <div className="relative w-full h-[90vh] min-h-[620px] bg-sky-100 overflow-hidden border-b border-slate-200">
-      {/* 3D WebGL Canvas */}
-      <div ref={containerRef} className="absolute inset-0 w-full h-full z-0 cursor-grab active:cursor-grabbing" />
+    <>
+      {/* 1. FIXED 3D WEBGL BACKGROUND CANVAS (PERSISTS AS YOU SCROLL THE ENTIRE PAGE) */}
+      <div
+        ref={containerRef}
+        className="fixed inset-0 w-full h-full z-0 pointer-events-none overflow-hidden transition-opacity duration-300"
+        style={{
+          background:
+            scrollProgress < 0.4
+              ? "linear-gradient(to bottom, #bae6fd 0%, #e0f2fe 50%, #f1f5f9 100%)"
+              : scrollProgress < 0.75
+              ? "linear-gradient(to bottom, #fdba74 0%, #fed7aa 40%, #bae6fd 100%)"
+              : "linear-gradient(to bottom, #312e81 0%, #4338ca 40%, #1e1b4b 100%)",
+        }}
+      />
 
-      {/* Top Institutional Notification Bar */}
-      <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none text-xs">
-        {/* Left Live Badge */}
-        <div className="flex items-center gap-2.5 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-200/90 shadow-sm pointer-events-auto">
-          <span className="flex items-center gap-1.5 font-bold text-sky-700">
-            <Radio className="w-3.5 h-3.5 text-sky-600 animate-pulse" />
-            {text.liveTrafficBadge}
-          </span>
-          <span className="text-slate-300">|</span>
-          <span className="font-semibold text-slate-700">{text.bridgesMonitored}</span>
+      {/* 2. INITIAL HERO VIEWPORT OVERLAY (TOP OF PAGE) */}
+      <div className="relative min-h-[92vh] w-full flex flex-col justify-between p-6 sm:p-12 pointer-events-none">
+        {/* Top HUD Telemetry Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pointer-events-none text-xs">
+          {/* Live Sea Link Status */}
+          <div className="flex items-center gap-2.5 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-200/90 shadow-sm pointer-events-auto">
+            <span className="flex items-center gap-1.5 font-bold text-sky-800">
+              <Radio className="w-3.5 h-3.5 text-sky-600 animate-pulse" />
+              {text.liveTrafficBadge}
+            </span>
+            <span className="text-slate-300">|</span>
+            <span className="font-semibold text-slate-700 flex items-center gap-1">
+              <SolarIcon className="w-3.5 h-3.5 text-amber-500" />
+              <span>{solarStatus}</span>
+            </span>
+          </div>
+
+          {/* Dynamic Scroll Solar Progress Pill */}
+          <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200/90 shadow-sm pointer-events-auto flex items-center gap-2 text-xs font-mono">
+            <span className="text-slate-500">Solar Elevation:</span>
+            <div className="w-24 bg-slate-200 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-amber-400 via-orange-500 to-indigo-600 h-full transition-all duration-75"
+                style={{ width: `${Math.round(scrollProgress * 100)}%` }}
+              />
+            </div>
+            <span className="font-bold text-slate-800">{Math.round((1 - scrollProgress) * 75)}°</span>
+          </div>
         </div>
 
-        {/* Right Camera View Switcher Buttons */}
-        <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur-md p-1 rounded-xl border border-slate-200/90 shadow-sm pointer-events-auto">
-          <button
-            onClick={() => {
-              triggerHaptic(15);
-              setCameraMode("aerial");
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-              cameraMode === "aerial"
-                ? "bg-sky-600 text-white shadow-xs"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-            }`}
-          >
-            <Compass className="w-3.5 h-3.5" />
-            <span>{text.viewAerial}</span>
-          </button>
-
-          <button
-            onClick={() => {
-              triggerHaptic(15);
-              setCameraMode("deck");
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-              cameraMode === "deck"
-                ? "bg-sky-600 text-white shadow-xs"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-            }`}
-          >
-            <Car className="w-3.5 h-3.5" />
-            <span>{text.viewDeck}</span>
-          </button>
-
-          <button
-            onClick={() => {
-              triggerHaptic(15);
-              setCameraMode("piers");
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-              cameraMode === "piers"
-                ? "bg-sky-600 text-white shadow-xs"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>{text.viewPiers}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Foreground Overlay */}
-      <div className="absolute inset-0 z-20 flex flex-col justify-between p-6 sm:p-12 pointer-events-none">
-        {/* Top Header Information Card */}
-        <div className="max-w-2xl pt-12 pointer-events-auto">
+        {/* Center Institutional Headline */}
+        <div className="max-w-3xl pt-10 pointer-events-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/95 border border-slate-200 text-sky-800 text-xs font-semibold shadow-xs mb-3">
             <Shield className="w-3.5 h-3.5 text-sky-600" />
             <span>{text.dept}</span>
@@ -1016,15 +925,15 @@ export const BridgeHero3D: React.FC = () => {
           <h1 className="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight leading-none drop-shadow-xs">
             {text.title}
           </h1>
-          <p className="text-lg sm:text-xl font-bold text-sky-900 mt-2">
+          <p className="text-lg sm:text-2xl font-bold text-sky-900 mt-2">
             {text.subtitle}
           </p>
-          <p className="mt-2 text-sm sm:text-base text-slate-700 font-medium leading-relaxed max-w-xl bg-white/70 backdrop-blur-sm p-3 rounded-xl border border-white/80 shadow-xs">
+          <p className="mt-2 text-sm sm:text-base text-slate-700 font-medium leading-relaxed max-w-2xl bg-white/75 backdrop-blur-md p-3.5 rounded-2xl border border-white/80 shadow-xs">
             {text.desc}
           </p>
         </div>
 
-        {/* Bottom Unification Ethos Carousel & Scroll Prompt */}
+        {/* Bottom Unification Ethos Carousel & Prompt to Scroll */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2">
           {/* Active Citizen Group Callout */}
           <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl border border-slate-200/90 max-w-lg pointer-events-auto shadow-md relative overflow-hidden">
@@ -1072,7 +981,7 @@ export const BridgeHero3D: React.FC = () => {
           {/* Smooth Scroll Button to Operations Grid */}
           <div className="pointer-events-auto">
             <button
-              onClick={scrollToDashboard}
+              onClick={scrollToOperations}
               className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-md hover:shadow-lg active:scale-95 group"
             >
               <span>{text.scrollHint}</span>
@@ -1081,6 +990,6 @@ export const BridgeHero3D: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
