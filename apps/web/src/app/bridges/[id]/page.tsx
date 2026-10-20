@@ -20,6 +20,7 @@ import {
   Droplets,
   Compass,
   Zap,
+  ExternalLink,
 } from "lucide-react";
 import { RiskTierBadge } from "@/components/RiskTierBadge";
 import { useAppStore } from "@/lib/store";
@@ -266,7 +267,7 @@ export default function BridgeCockpitPage() {
           {/* Civil Engineering Structural Metadata */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <h2 className="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
-              <Layers className="w-5 h-5 text-teal-600" /> Structural Design Profile
+              <Layers className="w-5 h-5 text-sky-600" /> Structural Design Profile
             </h2>
             <div className="space-y-3 text-xs">
               <div className="flex justify-between py-1.5 border-b border-slate-100">
@@ -293,6 +294,47 @@ export default function BridgeCockpitPage() {
                 <span className="text-slate-500">Maximum Design Scour:</span>
                 <span className="font-semibold text-slate-900">{bridge?.design_scour_m}m</span>
               </div>
+            </div>
+          </div>
+
+          {/* Google Maps Real-Time Location Card */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-sky-600" /> Google Maps Satellite
+              </h2>
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=18.5204,73.8567`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-sky-600 hover:text-sky-700 font-semibold flex items-center gap-1"
+              >
+                Full Map <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+
+            <div className="relative w-full h-48 rounded-xl overflow-hidden border border-slate-200 mb-3 bg-slate-100">
+              <iframe
+                title="Bridge Google Maps Satellite View"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                src={`https://maps.google.com/maps?q=18.5204,73.8567&t=h&z=16&ie=UTF8&iwloc=&output=embed`}
+                className="w-full h-full"
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-slate-600">
+              <span className="font-mono text-[11px]">GPS: 18.5204° N, 73.8567° E</span>
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=18.5204,73.8567`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-sky-600 hover:underline flex items-center gap-1"
+              >
+                Directions →
+              </a>
             </div>
           </div>
         </div>
