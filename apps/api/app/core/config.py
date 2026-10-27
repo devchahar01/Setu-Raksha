@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     TIMEZONE: str = "Asia/Kolkata"
-    APP_NAME: str = "Setu Raksha - National Bridge Safety Grid"
+    APP_NAME: str = "Setu Rakshak - National Bridge Safety Grid"
     API_V1_STR: str = "/api/v1"
 
     # Security

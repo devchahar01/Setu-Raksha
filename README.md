@@ -1,10 +1,10 @@
-# Setu Raksha (सेतु रक्षा / सेतू रक्षा)
+# Setu Rakshak (सेतु रक्षक / सेतू रक्षा)
 ### National Bridge Infrastructure Safety & Intelligence Grid
 
 [![CI](https://github.com/devchahar01/Setu-Raksha/actions/workflows/ci.yml/badge.svg)](https://github.com/devchahar01/Setu-Raksha/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/status-Phase%200%20Foundation-emerald.svg)](CHANGELOG.md)
+[![Status](https://img.shields.io/badge/status-Production%20Ready-emerald.svg)](CHANGELOG.md)
 
 > **Department of Computer Engineering | Army Institute of Technology Pune**  
 > *Dev Chahar (Comp-A) | Based on Problem Identification and Modification Report*
@@ -12,22 +12,24 @@
 ---
 
 ## 1. Mission & Overview
-Setu Raksha is a predictive decision-support system designed to empower civil engineers and public works departments to identify structural vulnerabilities in bridges **before disasters strike**.
+Setu Rakshak is a predictive decision-support system designed to empower civil engineers and public works departments to identify structural vulnerabilities in bridges **before disasters strike**.
 
-Bridges and flyovers collapse during floods, cloudbursts, and seismic events when extreme environmental loads meet unaddressed structural weaknesses (scour, pier tilt, material fatigue, or deferred maintenance). Setu Raksha bridges this gap by unifying:
+Bridges and flyovers collapse during floods, cloudbursts, and seismic events when extreme environmental loads meet unaddressed structural weaknesses (scour, pier tilt, material fatigue, or deferred maintenance). Setu Rakshak bridges this gap by unifying:
 1. **Physical Engineering Inspections**: Standardized monthly 26-factor field audits ([Appendix A](docs/spec/factors.md)).
 2. **Live Telemetry Streams**: Real-time river water level, pier tilt, accelerometer vibration, and rainfall sensors.
-3. **Hybrid AI Predictive Risk Engine**: Deterministic Structural Vulnerability Index (SVI), live Dynamic Risk Index (DRI), 12-month ML deterioration advisories, and prescriptive engineering remediation.
+3. **Computer Vision & AR Defect Localization**: Photogrammetric 3D point cloud pinpointing of concrete cracks, spalls, and bearing faults using SIFT keypoint matching, multi-view triangulation, and interactive Augmented Reality overlay (derived from CS543 research).
+4. **Hybrid AI Predictive Risk Engine**: Deterministic Structural Vulnerability Index (SVI), live Dynamic Risk Index (DRI), 12-month ML deterioration advisories, and prescriptive engineering remediation.
 
 > [!IMPORTANT]
-> **Advisory Disclaimer & Honest Labelling**: Setu Raksha supports engineering judgement and **never** replaces detailed structural analysis, physical testing, or certified engineer decisions. All sensor feeds and starter bridge datasets are explicitly labelled **SIMULATED**. The 90% disaster prevention figure is a **simulation evaluation target** to be validated in Phase 8, not an achieved real-world statistic.
+> **Advisory Disclaimer & Honest Labelling**: Setu Rakshak supports engineering judgement and **never** replaces detailed structural analysis, physical testing, or certified engineer decisions. All sensor feeds and starter bridge datasets are explicitly labelled **SIMULATED**. The 90% disaster prevention figure is a **simulation evaluation target** to be validated in Phase 8, not an achieved real-world statistic.
 
 ---
 
-## 2. Seven-Stage Lifecycle Coverage (L1–L7)
+## 2. Seven-Stage Lifecycle Coverage (L1–L7) & Computer Vision AR Twin
 - **L1 Pre-construction & Design**: IRC loading class, seismic zone (IS 1893), design life, foundation depth, and design HFL.
 - **L2 Construction & Quality Audits**: Concrete/steel material logs, cube test results, initial load-tests, and defect liability tracking.
 - **L3 Live Monitoring & Telemetry**: Ultrasonic water levels, pier inclinometers, accelerometers, and rainfall feeds with anomaly detection.
+- **AR 3D Defect Twin & Localization**: Photogrammetric 3D bridge point cloud with SIFT feature matching, camera projection matrices, triangulation, and live AR HUD overlay.
 - **L4 Routine Audit Scheduling**: Celery Beat automation issuing reminders 7 days prior to month-end with escalation triggers.
 - **L5 Officer Field Portal**: Mobile-responsive 26-factor inspection submission with photographic evidence and offline resilience.
 - **L6 AI Predictive Risk Engine**: SVI, DRI, Markov-chain Remaining Useful Life (RUL), and ranked civil engineering remediation catalogue.

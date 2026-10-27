@@ -10,7 +10,6 @@ import {
   MapPin,
   Clock,
   Radio,
-  Cpu,
   AlertTriangle,
   CheckCircle2,
   AlertCircle,
@@ -25,6 +24,8 @@ import {
 import { RiskTierBadge } from "@/components/RiskTierBadge";
 import { useAppStore } from "@/lib/store";
 import { formatNumber } from "@/lib/formatters";
+import { TRANSLATIONS } from "@/lib/translations";
+import { triggerHaptic } from "@/lib/haptics";
 
 interface BridgeDetail {
   id: string;
@@ -49,6 +50,7 @@ export default function BridgeCockpitPage() {
   const params = useParams();
   const bridgeId = params.id as string;
   const { activeLocale, useDevanagariDigits } = useAppStore();
+  const t = TRANSLATIONS[activeLocale];
 
   const [bridge, setBridge] = useState<BridgeDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -104,6 +106,7 @@ export default function BridgeCockpitPage() {
   // Trigger simulated monsoon flash flood
   const triggerMonsoonSimulation = () => {
     setSimulating(true);
+    triggerHaptic("warning");
     let step = 0;
     const interval = setInterval(() => {
       step++;
@@ -147,11 +150,13 @@ export default function BridgeCockpitPage() {
           },
         ]);
         setSimulating(false);
+        triggerHaptic("error");
       }
     }, 800);
   };
 
   const resetBaseline = () => {
+    triggerHaptic("selection");
     setWaterLevel(538.4);
     setPierTilt(0.12);
     setVibration(0.35);
@@ -172,46 +177,47 @@ export default function BridgeCockpitPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-      {/* Top Banner */}
-      <div className="bg-navy-900 text-white py-8 px-4 sm:px-6 lg:px-8 border-b border-navy-800">
+      {/* Top Institutional Banner */}
+      <div className="bg-navy-900 text-white py-8 px-4 sm:px-6 lg:px-8 border-b border-navy-800 shadow-md">
         <div className="max-w-7xl mx-auto">
           <Link
             href="/bridges"
+            onClick={() => triggerHaptic("light")}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-300 hover:text-white mb-4 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Bridge Registry
+            <ArrowLeft className="w-4 h-4" /> {t.bridges.backToRegistry}
           </Link>
 
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
                 <span className="font-mono text-xs font-extrabold bg-teal-500/20 text-teal-300 px-3 py-1 rounded-md border border-teal-500/30">
                   {bridge?.code}
                 </span>
                 <RiskTierBadge tier={tier} size="md" />
-                <span className="text-xs text-navy-300 font-mono">source=simulated</span>
+                <span className="text-xs text-navy-300 font-mono">{t.common.simulatedTag}</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white">{bridge?.name}</h1>
-              <p className="text-sm text-navy-200 mt-1">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{bridge?.name}</h1>
+              <p className="text-xs sm:text-sm text-navy-200 mt-1">
                 {bridge?.river} River Basin • {bridge?.district} District • Built {bridge?.year_built}
               </p>
             </div>
 
             {/* Simulation Trigger Buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={triggerMonsoonSimulation}
                 disabled={simulating}
                 className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow transition-colors"
               >
                 <Flame className="w-4 h-4" />
-                {simulating ? "Simulating Flood Surge..." : "Inject Monsoon Flood Surge"}
+                {simulating ? t.bridges.simulatingFlood : t.bridges.simulateMonsoon}
               </button>
               <button
                 onClick={resetBaseline}
-                className="px-3 py-2.5 bg-navy-800 hover:bg-navy-700 text-navy-200 rounded-xl text-xs font-semibold transition-colors"
+                className="px-3.5 py-2.5 bg-navy-800 hover:bg-navy-700 text-navy-200 rounded-xl text-xs font-semibold transition-colors border border-navy-700"
               >
-                Reset Baseline
+                {t.bridges.resetBaseline}
               </button>
             </div>
           </div>
@@ -224,227 +230,193 @@ export default function BridgeCockpitPage() {
         <div className="space-y-6">
           {/* Dynamic Risk Index Card */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <Cpu className="w-5 h-5 text-teal-600" />
-                <h2 className="font-bold text-slate-900 text-base">Predictive Risk Index</h2>
+                <Activity className="w-5 h-5 text-teal-600" />
+                <h2 className="font-bold text-slate-900 text-base">{t.risk.driTitle}</h2>
               </div>
-              <span className="text-xs font-mono font-bold text-teal-600">Appendix D Math</span>
+              <span className="text-xs font-mono font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                Appendix D
+              </span>
             </div>
 
             <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 text-center mb-4">
               <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 mb-1">
-                Dynamic Risk Index (DRI)
+                {t.risk.driTitle}
               </div>
               <div className="text-4xl font-extrabold font-mono text-slate-900">{driScore.toFixed(1)}</div>
               <div className="text-xs text-slate-500 mt-1">Scale 0 (Pristine) to 100 (Critical)</div>
 
               <div className="w-full bg-slate-200 h-3 rounded-full mt-4 overflow-hidden flex">
-                <div style={{ width: `${Math.min(100, driScore)}%` }} className={`h-full transition-all duration-500 ${
-                  driScore >= 75 ? "bg-rose-500" : driScore >= 55 ? "bg-orange-500" : driScore >= 30 ? "bg-amber-500" : "bg-emerald-500"
-                }`} />
+                <div
+                  style={{ width: `${Math.min(100, driScore)}%` }}
+                  className={`h-full transition-all duration-500 ${
+                    driScore >= 75
+                      ? "bg-rose-500"
+                      : driScore >= 55
+                      ? "bg-orange-500"
+                      : driScore >= 30
+                      ? "bg-amber-500"
+                      : "bg-emerald-500"
+                  }`}
+                />
               </div>
             </div>
 
             {criticalFlags.length > 0 && (
               <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl mb-4 text-xs text-rose-900">
                 <div className="font-bold flex items-center gap-1.5 mb-1 text-rose-700">
-                  <AlertTriangle className="w-4 h-4" /> Active Critical Overrides:
+                  <AlertTriangle className="w-4 h-4 shrink-0" /> Safety Invariant Overrides:
                 </div>
-                <ul className="list-disc list-inside space-y-0.5">
+                <ul className="list-disc list-inside space-y-0.5 font-mono text-[11px]">
                   {criticalFlags.map((flag) => (
-                    <li key={flag} className="font-mono font-semibold">{flag}</li>
+                    <li key={flag}>{flag}</li>
                   ))}
                 </ul>
               </div>
             )}
 
-            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 leading-relaxed">
-              <strong>Advisory:</strong> Decision support system only. Does not replace physical civil engineering inspection.
+            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 leading-snug">
+              {t.risk.advisoryNote}
             </div>
           </div>
 
-          {/* Civil Engineering Structural Metadata */}
+          {/* Bridge Structural Specifications */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h2 className="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
-              <Layers className="w-5 h-5 text-sky-600" /> Structural Design Profile
-            </h2>
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
+            <h3 className="font-bold text-slate-900 text-sm mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+              <Layers className="w-4 h-4 text-slate-600" />
+              {t.bridges.specsTitle}
+            </h3>
+
+            <div className="space-y-2.5 text-xs">
+              <div className="flex justify-between py-1 border-b border-slate-100">
+                <span className="text-slate-500">Superstructure Type:</span>
+                <span className="font-semibold text-slate-900 text-right">{bridge?.type}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500">IRC Loading Class:</span>
                 <span className="font-semibold text-slate-900">{bridge?.irc_class}</span>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Seismic Zone (IS 1893):</span>
+              <div className="flex justify-between py-1 border-b border-slate-100">
+                <span className="text-slate-500">IS 1893 Seismic Zone:</span>
                 <span className="font-semibold text-slate-900">{bridge?.seismic_zone}</span>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
+              <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500">Foundation Type:</span>
                 <span className="font-semibold text-slate-900">{bridge?.foundation_type}</span>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
+              <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500">Foundation Depth:</span>
-                <span className="font-semibold text-slate-900">{bridge?.foundation_depth_m}m</span>
+                <span className="font-mono font-semibold text-slate-900">{bridge?.foundation_depth_m}m</span>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Design High Flood Level (HFL):</span>
-                <span className="font-semibold text-slate-900">{bridge?.design_hfl_m}m MSL</span>
+              <div className="flex justify-between py-1 border-b border-slate-100">
+                <span className="text-slate-500">{t.bridges.designHfl}:</span>
+                <span className="font-mono font-semibold text-slate-900">{bridge?.design_hfl_m}m MSL</span>
               </div>
-              <div className="flex justify-between py-1.5">
-                <span className="text-slate-500">Maximum Design Scour:</span>
-                <span className="font-semibold text-slate-900">{bridge?.design_scour_m}m</span>
+              <div className="flex justify-between py-1">
+                <span className="text-slate-500">{t.bridges.scourDepth}:</span>
+                <span className="font-mono font-semibold text-slate-900">{bridge?.design_scour_m}m</span>
               </div>
-            </div>
-          </div>
-
-          {/* Google Maps Real-Time Location Card */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-bold text-slate-900 text-base flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-sky-600" /> Google Maps Satellite
-              </h2>
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=18.5204,73.8567`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-sky-600 hover:text-sky-700 font-semibold flex items-center gap-1"
-              >
-                Full Map <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-
-            <div className="relative w-full h-48 rounded-xl overflow-hidden border border-slate-200 mb-3 bg-slate-100">
-              <iframe
-                title="Bridge Google Maps Satellite View"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                loading="lazy"
-                src={`https://maps.google.com/maps?q=18.5204,73.8567&t=h&z=16&ie=UTF8&iwloc=&output=embed`}
-                className="w-full h-full"
-              />
-            </div>
-
-            <div className="flex items-center justify-between text-xs text-slate-600">
-              <span className="font-mono text-[11px]">GPS: 18.5204° N, 73.8567° E</span>
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=18.5204,73.8567`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-sky-600 hover:underline flex items-center gap-1"
-              >
-                Directions →
-              </a>
             </div>
           </div>
         </div>
 
-        {/* Right 2 Columns: Live Telemetry Gauges & Prescriptive Remediations */}
+        {/* Right 2 Columns: Live Telemetry Feeds & Action Remediations */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Live Telemetry Sensor Gauges */}
+          {/* Live 4-Transducer Grid */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Radio className="w-5 h-5 text-teal-600" />
-                <h2 className="font-bold text-slate-900 text-base">Live Structural Telemetry Cockpit (L3)</h2>
+                <h2 className="font-bold text-slate-900 text-base">{t.telemetry.title}</h2>
               </div>
-              <span className="text-xs font-mono text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Live Ingestion
+              <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                {t.telemetry.streamActive}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {/* Ultrasonic Water Level */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
-                  <Droplets className="w-4 h-4 text-sky-600" /> Water Level
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Water Level */}
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="text-xs text-slate-500 mb-1">{t.telemetry.waterLevel}</div>
+                <div className="text-2xl font-extrabold font-mono text-slate-900">
+                  {waterLevel.toFixed(2)} m
                 </div>
-                <div className="text-2xl font-mono font-extrabold text-slate-900">{waterLevel}m</div>
-                <div className="text-[11px] text-slate-400 mt-1">HFL: {bridge?.design_hfl_m}m</div>
+                <div className="text-[11px] text-slate-400 mt-1">
+                  Design HFL: {bridge?.design_hfl_m}m MSL
+                </div>
               </div>
 
-              {/* Pier Inclinometer Tilt */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
-                  <Compass className="w-4 h-4 text-teal-600" /> Pier Tilt
+              {/* Pier Tilt */}
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="text-xs text-slate-500 mb-1">{t.telemetry.pierTilt}</div>
+                <div
+                  className={`text-2xl font-extrabold font-mono ${
+                    pierTilt >= 1.0 ? "text-rose-600" : "text-slate-900"
+                  }`}
+                >
+                  {pierTilt.toFixed(2)} mrad
                 </div>
-                <div className={`text-2xl font-mono font-extrabold ${pierTilt >= 1.0 ? "text-rose-600" : "text-slate-900"}`}>
-                  {pierTilt}°
+                <div className="text-[11px] text-slate-400 mt-1">
+                  Threshold: 1.0 mrad (IRC:SP:35 Warning)
                 </div>
-                <div className="text-[11px] text-slate-400 mt-1">Threshold: 1.0°</div>
               </div>
 
-              {/* Deck Accelerometer */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
-                  <Zap className="w-4 h-4 text-amber-600" /> Vibration
+              {/* Triaxial Vibration */}
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="text-xs text-slate-500 mb-1">{t.telemetry.vibration}</div>
+                <div className="text-2xl font-extrabold font-mono text-slate-900">
+                  {vibration.toFixed(2)} mm/s²
                 </div>
-                <div className="text-2xl font-mono font-extrabold text-slate-900">{vibration} m/s²</div>
-                <div className="text-[11px] text-slate-400 mt-1">Safe &lt; 2.5</div>
+                <div className="text-[11px] text-slate-400 mt-1">Peak particle deck velocity</div>
               </div>
 
-              {/* Rainfall Gauge */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
-                  <Droplets className="w-4 h-4 text-indigo-600" /> Rainfall
+              {/* Rainfall Surge */}
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="text-xs text-slate-500 mb-1">{t.telemetry.rainfall}</div>
+                <div className="text-2xl font-extrabold font-mono text-slate-900">
+                  {rainfall.toFixed(1)} mm/hr
                 </div>
-                <div className="text-2xl font-mono font-extrabold text-slate-900">{rainfall} mm/h</div>
-                <div className="text-[11px] text-slate-400 mt-1">Cloudburst &gt; 50</div>
+                <div className="text-[11px] text-slate-400 mt-1">Catchment rainfall intensity</div>
               </div>
             </div>
           </div>
 
-          {/* Prescriptive Remediation Catalogue Recommendations */}
+          {/* Triggered Prescriptive Remediations */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-slate-900 text-base flex items-center gap-2">
-                <Shield className="w-5 h-5 text-teal-600" /> Prescriptive Engineering Remediations
-              </h2>
-              <span className="text-xs text-slate-500">Trilingual Catalogue (EN / HI / MR)</span>
-            </div>
+            <h3 className="font-bold text-slate-900 text-sm mb-4 pb-2 border-b border-slate-100 flex items-center justify-between">
+              <span>{t.risk.remediationPlan}</span>
+              <span className="text-xs font-mono text-slate-400">Appendix D Catalogue</span>
+            </h3>
 
-            {remediations.length > 0 ? (
-              <div className="space-y-4">
-                {remediations.map((rem, idx) => {
-                  const lang = activeLocale as "en" | "hi" | "mr";
-                  const title = rem.title[lang] || rem.title.en;
-                  const desc = rem.description[lang] || rem.description.en;
-
-                  return (
-                    <div
-                      key={rem.rule_id || idx}
-                      className={`p-4 rounded-xl border ${
-                        rem.priority === "IMMEDIATE"
-                          ? "bg-rose-50 border-rose-200"
-                          : "bg-amber-50 border-amber-200"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="font-mono text-xs font-bold text-slate-800">
-                          [{rem.rule_id}]
-                        </span>
-                        <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                            rem.priority === "IMMEDIATE"
-                              ? "bg-rose-600 text-white"
-                              : "bg-amber-600 text-white"
-                          }`}
-                        >
-                          {rem.priority}
-                        </span>
-                      </div>
-                      <h4 className="font-bold text-slate-900 text-sm mb-1">{title}</h4>
-                      <p className="text-xs text-slate-700 leading-relaxed">{desc}</p>
-                    </div>
-                  );
-                })}
+            {remediations.length === 0 ? (
+              <div className="p-6 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border border-slate-100">
+                No active emergency interventions triggered. Bridge operating within nominal parameters.
               </div>
             ) : (
-              <div className="text-center py-10 bg-slate-50 rounded-xl border border-slate-100 text-slate-400 text-xs">
-                <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
-                Structural health is currently within normal operating tolerances.
-                <br />
-                No immediate emergency interventions triggered.
+              <div className="space-y-3">
+                {remediations.map((item) => (
+                  <div
+                    key={item.rule_id}
+                    className="p-4 rounded-xl bg-rose-50/70 border border-rose-200 text-xs"
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="font-mono font-bold text-rose-900 bg-white px-2 py-0.5 rounded border border-rose-300">
+                        {item.rule_id}
+                      </span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-rose-600 text-white">
+                        {item.priority}
+                      </span>
+                    </div>
+                    <h4 className="font-bold text-rose-950 text-xs mb-1">
+                      {item.title[activeLocale] || item.title.en}
+                    </h4>
+                    <p className="text-rose-800 leading-relaxed text-[11px]">
+                      {item.description[activeLocale] || item.description.en}
+                    </p>
+                  </div>
+                ))}
               </div>
             )}
           </div>

@@ -113,7 +113,7 @@ const CITIZEN_CALLOUTS: Record<"en" | "hi" | "mr", CitizenEthos[]> = {
 const HERO_TEXT = {
   en: {
     dept: "GOVERNMENT OF MAHARASHTRA • PUBLIC WORKS DEPARTMENT",
-    title: "SETU RAKSHA",
+    title: "SETU RAKSHAK",
     subtitle: "National Bridge Infrastructure Safety & Intelligence Grid",
     desc: "Photorealistic structural digital twin: observe authentic Rabindra Setu landscapes across daylight, golden sunset, monsoon, and twilight with live Indian traffic and dynamic solar lighting.",
     scrollHint: "Scroll to Orbit & Vary Sun",
@@ -130,7 +130,7 @@ const HERO_TEXT = {
   },
   hi: {
     dept: "महाराष्ट्र शासन • सार्वजनिक बांधकाम विभाग",
-    title: "सेतु रक्षा",
+    title: "सेतु रक्षक",
     subtitle: "राष्ट्रीय पुल अवसंरचना सुरक्षा एवं इंटेलिजेंस ग्रिड",
     desc: "यथार्थवादी संरचनात्मक डिजिटल ट्विन: दोपहर के सूर्य, स्वर्णिम सूर्यास्त, मान्सून और गोधूलि वेला में वास्तविक हावड़ा सेतु परिदृश्य और भारतीय वाहनों की लाइव गतिशीलता देखें।",
     scrollHint: "वातावरण बदलने व दृश्य घुमाने के लिए स्क्रॉल करें",
@@ -147,7 +147,7 @@ const HERO_TEXT = {
   },
   mr: {
     dept: "महाराष्ट्र शासन • सार्वजनिक बांधकाम विभाग",
-    title: "सेतू रक्षा",
+    title: "सेतू रक्षक",
     subtitle: "राष्ट्रीय पूल पायाभूत सुविधा सुरक्षा व गुप्तचर यंत्रणा",
     desc: "वास्तववादी संरचनात्मक डिजिटल ट्विन: दुपारचे ऊन, सोनेरी सूर्यास्त, मान्सून मेघ आणि गोधूलि वेळेतील प्रत्यक्ष हावडा पूल आणि भारतीय वाहनांची थेट हालचाल पहा.",
     scrollHint: "वातावरण बदलण्यासाठी व दृश्य फिरवण्यासाठी स्क्रोल करा",

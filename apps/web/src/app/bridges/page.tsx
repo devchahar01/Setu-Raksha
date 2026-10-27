@@ -12,7 +12,6 @@ import {
   ArrowRight,
   ExternalLink,
   Search,
-  Cpu,
   Radio,
   Compass,
   Navigation,
@@ -25,6 +24,8 @@ import {
 import { RiskTierBadge } from "@/components/RiskTierBadge";
 import { useAppStore } from "@/lib/store";
 import { formatNumber } from "@/lib/formatters";
+import { TRANSLATIONS } from "@/lib/translations";
+import { triggerHaptic } from "@/lib/haptics";
 
 interface Bridge {
   id: string;
@@ -57,66 +58,9 @@ const BASIN_COORDINATES: Record<string, { lat: number; lng: number; zoom: number
   Konkan: { lat: 18.0827, lng: 73.4219, zoom: 13 },
 };
 
-const LABELS = {
-  en: {
-    title: "National Bridge Infrastructure Registry",
-    subtitle: "Real-time structural health, live Google Maps GIS surveillance, and AI risk index across Maharashtra river basins",
-    filterBasin: "River Basin",
-    filterTier: "Risk Tier",
-    searchPlaceholder: "Search bridge code, river or district...",
-    bridgeList: "Registered Bridges",
-    viewDetails: "Inspect Live Cockpit",
-    mapTitle: "Live Google Maps GIS Surveillance Grid",
-    disclaimer: "Decision support system only. Does not replace physical civil engineering inspection.",
-    sourceLabel: "source=simulated",
-    openGoogleMaps: "Open in Google Maps",
-    getDirections: "Driving Directions",
-    mapTypeSatellite: "Satellite Aerial",
-    mapTypeHybrid: "Satellite Hybrid",
-    mapTypeTerrain: "River Basin Terrain",
-    mapTypeRoadmap: "Street Roadmap",
-  },
-  hi: {
-    title: "राष्ट्रीय पुल अवसंरचना रजिस्ट्री",
-    subtitle: "महाराष्ट्र नदी घाटियों में वास्तविक समय संरचनात्मक स्वास्थ्य, लाइव गूगल मैप्स जीआईएस और एआई जोखिम सूचकांक",
-    filterBasin: "नदी बेसिन",
-    filterTier: "जोखिम श्रेणी",
-    searchPlaceholder: "पुल कोड, नदी या जिला खोजें...",
-    bridgeList: "पंजीकृत पुल",
-    viewDetails: "लाइव कॉकपिट देखें",
-    mapTitle: "लाइव गूगल मैप्स जीआईएस निगरानी ग्रिड",
-    disclaimer: "केवल निर्णय सहायता प्रणाली। भौतिक सिविल इंजीनियरिंग निरीक्षण का स्थान नहीं लेती।",
-    sourceLabel: "source=simulated",
-    openGoogleMaps: "गूगल मैप्स में खोलें",
-    getDirections: "दिशा निर्देश",
-    mapTypeSatellite: "सैटेलाइट विहंगम",
-    mapTypeHybrid: "सैटेलाइट हाइब्रिड",
-    mapTypeTerrain: "नदी बेसिन भूभाग",
-    mapTypeRoadmap: "सड़क मानचित्र",
-  },
-  mr: {
-    title: "राष्ट्रीय पूल पायाभूत सुविधा नोंदवही",
-    subtitle: "महाराष्ट्र नदी खोऱ्यांमधील रिअल-टाइम संरचनात्मक आरोग्य, थेट गुगल मॅप्स जीआयएस आणि एआई जोखीम निर्देशांक",
-    filterBasin: "नदी खोरे",
-    filterTier: "जोखीम स्तर",
-    searchPlaceholder: "पूल कोड, नदी किंवा जिल्हा शोधा...",
-    bridgeList: "नोंदणीकृत पूल",
-    viewDetails: "थेट कॉकपिट पहा",
-    mapTitle: "थेट गुगल मॅप्स जीआयएस देखरेख ग्रीड",
-    disclaimer: "केवळ निर्णय सहाय्य प्रणाली. प्रत्यक्ष स्थापत्य अभियांत्रिकी तपासणीची जागा घेत नाही.",
-    sourceLabel: "source=simulated",
-    openGoogleMaps: "गुगल मॅप्समध्ये उघडा",
-    getDirections: "मार्ग दिशा",
-    mapTypeSatellite: "उपग्रह दृश्य",
-    mapTypeHybrid: "उपग्रह हायब्रिड",
-    mapTypeTerrain: "नदी खोरे भूप्रदेश",
-    mapTypeRoadmap: "रस्ता नकाशा",
-  },
-};
-
 export default function BridgesPage() {
   const { activeLocale, useDevanagariDigits } = useAppStore();
-  const t = LABELS[activeLocale] || LABELS.en;
+  const t = TRANSLATIONS[activeLocale];
 
   const [bridges, setBridges] = useState<Bridge[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -126,7 +70,7 @@ export default function BridgesPage() {
   const [activeBridge, setActiveBridge] = useState<Bridge | null>(null);
 
   // Google Maps View Settings
-  const [mapType, setMapType] = useState<"k" | "h" | "p" | "m">("h"); // 'h' = Hybrid (Satellite + Roads), 'k' = Satellite, 'p' = Terrain, 'm' = Roadmap
+  const [mapType, setMapType] = useState<"k" | "h" | "p" | "m">("h");
   const [zoomLevel, setZoomLevel] = useState<number>(15);
 
   useEffect(() => {
@@ -135,7 +79,7 @@ export default function BridgesPage() {
         const res = await fetch("http://127.0.0.1:8000/api/v1/public/bridges?limit=100");
         if (res.ok) {
           const data = await res.json();
-          const enhanced = data.map((b: Bridge, idx: number) => {
+          const enhanced = data.map((b: Bridge) => {
             const rawTier = (b.current_tier || "GOOD").toUpperCase();
             const tierMap: Record<string, string> = {
               GOOD: "Good",
@@ -191,6 +135,7 @@ export default function BridgesPage() {
 
   const handleBasinClick = (basin: string) => {
     setSelectedBasin(basin);
+    triggerHaptic("selection");
     const coords = BASIN_COORDINATES[basin];
     if (coords) {
       setZoomLevel(coords.zoom);
@@ -199,7 +144,8 @@ export default function BridgesPage() {
 
   const handleSelectBridge = (bridge: Bridge) => {
     setActiveBridge(bridge);
-    setZoomLevel(16); // Zoom in directly to bridge deck level
+    setZoomLevel(16);
+    triggerHaptic("selection");
   };
 
   return (
@@ -213,386 +159,315 @@ export default function BridgesPage() {
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span>GOVERNMENT OF MAHARASHTRA • PWD (L1 REGISTRY)</span>
                 <span className="text-slate-300">•</span>
-                <span className="font-mono text-[11px] text-sky-700">{t.sourceLabel}</span>
+                <span className="font-mono text-[11px] text-sky-700">{t.common.simulatedTag}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-                {t.title}
+                {t.bridges.title}
               </h1>
-              <p className="mt-1 text-sm text-slate-600 max-w-3xl">
-                {t.subtitle}
+              <p className="mt-1 text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
+                {t.bridges.subtitle}
               </p>
             </div>
-            <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 self-start md:self-auto shadow-xs">
-              <div className="w-10 h-10 rounded-lg bg-sky-100 border border-sky-200 flex items-center justify-center text-sky-700">
-                <Compass className="w-5 h-5" />
-              </div>
-              <div className="text-xs">
-                <div className="font-bold text-slate-900">Google Maps GIS Active</div>
-                <div className="text-slate-500">5 Strategic Basins • High-Res Aerial</div>
+
+            <div className="flex items-center gap-3">
+              <div className="bg-slate-100 px-4 py-2 rounded-xl border border-slate-200 text-xs flex items-center gap-2">
+                <Shield className="w-4 h-4 text-emerald-600" />
+                <span className="font-semibold text-slate-700">
+                  {formatNumber(filteredBridges.length, activeLocale, useDevanagariDigits)}{" "}
+                  {t.bridges.totalRegistered}
+                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         {/* Filters and Search Bar */}
-        <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-200 mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between">
-          {/* Search Input */}
-          <div className="relative w-full lg:w-80">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder={t.searchPlaceholder}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 text-slate-900 font-medium placeholder:text-slate-400"
-            />
-          </div>
+        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs mb-6 space-y-4">
+          <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
+            {/* Search Input */}
+            <div className="relative w-full md:w-80">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+              <input
+                type="text"
+                placeholder={t.bridges.searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </div>
 
-          {/* Basin Tabs */}
-          <div className="flex flex-wrap items-center gap-1.5 w-full lg:w-auto">
-            <span className="text-xs font-bold text-slate-600 mr-1 flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5 text-sky-600" /> {t.filterBasin}:
-            </span>
-            {BASINS.map((basin) => (
-              <button
-                key={basin}
-                onClick={() => handleBasinClick(basin)}
-                className={`px-3 py-1.5 text-xs rounded-lg font-semibold transition-all ${
-                  selectedBasin === basin
-                    ? "bg-sky-600 text-white shadow-xs"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
-              >
-                {basin}
-              </button>
-            ))}
-          </div>
+            {/* Basin Filter Pills */}
+            <div className="flex items-center gap-1.5 flex-wrap w-full md:w-auto">
+              <span className="text-xs font-semibold text-slate-500 mr-1 flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5" /> {t.bridges.filterBasin}:
+              </span>
+              {BASINS.map((basin) => (
+                <button
+                  key={basin}
+                  onClick={() => handleBasinClick(basin)}
+                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors ${
+                    selectedBasin === basin
+                      ? "bg-sky-700 text-white shadow-xs"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {basin === "All" ? t.bridges.allBasins : basin}
+                </button>
+              ))}
+            </div>
 
-          {/* Tier Filter */}
-          <div className="flex items-center gap-1.5 w-full lg:w-auto overflow-x-auto">
-            <span className="text-xs font-bold text-slate-600 mr-1">{t.filterTier}:</span>
-            {TIERS.map((tier) => (
-              <button
-                key={tier}
-                onClick={() => setSelectedTier(tier)}
-                className={`px-2.5 py-1 text-xs rounded-lg font-semibold transition-all ${
-                  selectedTier === tier
-                    ? "bg-slate-900 text-white shadow-xs"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
-              >
-                {tier}
-              </button>
-            ))}
+            {/* Risk Tier Filter */}
+            <div className="flex items-center gap-1.5 flex-wrap w-full md:w-auto">
+              <span className="text-xs font-semibold text-slate-500 mr-1">{t.bridges.filterTier}:</span>
+              {TIERS.map((tier) => (
+                <button
+                  key={tier}
+                  onClick={() => {
+                    setSelectedTier(tier);
+                    triggerHaptic("selection");
+                  }}
+                  className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors ${
+                    selectedTier === tier
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {tier === "All" ? t.bridges.allTiers : tier}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* 1. GOOGLE MAPS GIS SURVEILLANCE & SPOTLIGHT GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Main Interactive Google Maps Viewport */}
-          <div className="lg:col-span-2 bg-white p-5 rounded-2xl shadow-xs border border-slate-200 flex flex-col justify-between">
-            {/* Map Top Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-3 pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-sky-100 flex items-center justify-center text-sky-700">
-                  <MapPin className="w-4 h-4" />
-                </div>
-                <div>
-                  <h2 className="font-bold text-slate-900 text-sm">{t.mapTitle}</h2>
-                  <div className="text-[11px] font-mono text-slate-500">
-                    GPS: {currentLat.toFixed(4)}° N, {currentLng.toFixed(4)}° E • {activeBridge?.name || "Maharashtra Basin"}
-                  </div>
-                </div>
-              </div>
-
-              {/* Map Type Mode Controls */}
-              <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
-                <button
-                  onClick={() => setMapType("h")}
-                  className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
-                    mapType === "h" ? "bg-white text-sky-700 shadow-xs" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  {t.mapTypeHybrid}
-                </button>
-                <button
-                  onClick={() => setMapType("k")}
-                  className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
-                    mapType === "k" ? "bg-white text-sky-700 shadow-xs" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  {t.mapTypeSatellite}
-                </button>
-                <button
-                  onClick={() => setMapType("p")}
-                  className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
-                    mapType === "p" ? "bg-white text-sky-700 shadow-xs" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  {t.mapTypeTerrain}
-                </button>
-                <button
-                  onClick={() => setMapType("m")}
-                  className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
-                    mapType === "m" ? "bg-white text-sky-700 shadow-xs" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  {t.mapTypeRoadmap}
-                </button>
-              </div>
-            </div>
-
-            {/* Embedded Live Google Maps Frame */}
-            <div className="relative w-full h-96 sm:h-[420px] rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
-              <iframe
-                title="Google Maps Bridge View"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                loading="lazy"
-                allowFullScreen
-                referrerPolicy="no-referrer-when-downgrade"
-                src={googleMapsUrl}
-                className="w-full h-full"
-              />
-
-              {/* Floating Map Zoom & App Action Overlay */}
-              <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
-                <button
-                  onClick={() => setZoomLevel((z) => Math.min(z + 1, 19))}
-                  className="w-8 h-8 rounded-lg bg-white/95 backdrop-blur-md shadow-md border border-slate-200 flex items-center justify-center text-slate-700 hover:text-sky-600 hover:bg-white transition-all"
-                  aria-label="Zoom in"
-                >
-                  <ZoomIn className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setZoomLevel((z) => Math.max(z - 1, 10))}
-                  className="w-8 h-8 rounded-lg bg-white/95 backdrop-blur-md shadow-md border border-slate-200 flex items-center justify-center text-slate-700 hover:text-sky-600 hover:bg-white transition-all"
-                  aria-label="Zoom out"
-                >
-                  <ZoomOut className="w-4 h-4" />
-                </button>
-                <a
-                  href={externalGoogleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-lg bg-white/95 backdrop-blur-md shadow-md border border-slate-200 flex items-center justify-center text-sky-600 hover:bg-sky-50 transition-all"
-                  title="Open full Google Maps page"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </div>
-
-              {/* Floating Bottom Telemetry Badge on Map */}
-              <div className="absolute bottom-3 left-3 right-3 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
-                <div className="pointer-events-auto bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-200 shadow-md text-xs font-medium text-slate-800 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span className="font-bold text-slate-900">{activeBridge?.code || "SELECT BRIDGE"}</span>
-                  <span className="text-slate-300">|</span>
-                  <span className="text-slate-600">{activeBridge?.river || "River Basin"}</span>
-                  <span className="text-slate-300">|</span>
-                  <span className="font-mono text-sky-700 text-[11px]">
-                    {currentLat.toFixed(4)}° N, {currentLng.toFixed(4)}° E
-                  </span>
+        {/* Content Split: Left (Interactive Map), Right (Bridges List) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column: Live Google Maps GIS Surveillance Window */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[580px]">
+              {/* Map Controls Header */}
+              <div className="p-3 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-2 border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                  <span className="font-bold text-xs tracking-tight text-white">{t.bridges.mapTitle}</span>
+                  {activeBridge && (
+                    <span className="font-mono text-[11px] text-sky-300 font-semibold bg-sky-950/80 px-2 py-0.5 rounded border border-sky-800">
+                      {activeBridge.code}
+                    </span>
+                  )}
                 </div>
 
-                <div className="pointer-events-auto flex items-center gap-2">
+                {/* Map Type Switcher Buttons */}
+                <div className="flex items-center gap-1 bg-slate-800 p-0.5 rounded-lg border border-slate-700">
+                  <button
+                    onClick={() => {
+                      setMapType("h");
+                      triggerHaptic("light");
+                    }}
+                    className={`px-2 py-1 text-[11px] font-semibold rounded ${
+                      mapType === "h" ? "bg-sky-600 text-white" : "text-slate-300 hover:text-white"
+                    }`}
+                  >
+                    {t.bridges.hybrid}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMapType("k");
+                      triggerHaptic("light");
+                    }}
+                    className={`px-2 py-1 text-[11px] font-semibold rounded ${
+                      mapType === "k" ? "bg-sky-600 text-white" : "text-slate-300 hover:text-white"
+                    }`}
+                  >
+                    {t.bridges.satellite}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMapType("p");
+                      triggerHaptic("light");
+                    }}
+                    className={`px-2 py-1 text-[11px] font-semibold rounded ${
+                      mapType === "p" ? "bg-sky-600 text-white" : "text-slate-300 hover:text-white"
+                    }`}
+                  >
+                    {t.bridges.terrain}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMapType("m");
+                      triggerHaptic("light");
+                    }}
+                    className={`px-2 py-1 text-[11px] font-semibold rounded ${
+                      mapType === "m" ? "bg-sky-600 text-white" : "text-slate-300 hover:text-white"
+                    }`}
+                  >
+                    {t.bridges.roadmap}
+                  </button>
+                </div>
+
+                {/* Direct Google Maps Actions */}
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => {
+                      setZoomLevel((prev) => Math.min(prev + 1, 19));
+                      triggerHaptic("light");
+                    }}
+                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white"
+                    title="Zoom In"
+                  >
+                    <ZoomIn className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setZoomLevel((prev) => Math.max(prev - 1, 9));
+                      triggerHaptic("light");
+                    }}
+                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white"
+                    title="Zoom Out"
+                  >
+                    <ZoomOut className="w-3.5 h-3.5" />
+                  </button>
                   <a
                     href={directionsUrl}
                     target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-md transition-all"
+                    rel="noreferrer"
+                    className="px-2.5 py-1 text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded flex items-center gap-1 transition-colors"
                   >
-                    <Navigation className="w-3.5 h-3.5" />
-                    <span>{t.getDirections}</span>
+                    <Navigation className="w-3 h-3" />
+                    <span>{t.bridges.directions}</span>
                   </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Basin Navigation Shortcuts Bar */}
-            <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
-              <span className="text-slate-500 font-semibold text-[11px]">Basin Teleport:</span>
-              <div className="flex flex-wrap gap-1.5">
-                {[
-                  { name: "Pune (Mula-Mutha)", basin: "Mula-Mutha" },
-                  { name: "Solapur (Bhima)", basin: "Bhima" },
-                  { name: "Satara (Krishna)", basin: "Krishna" },
-                  { name: "Nashik (Godavari)", basin: "Godavari" },
-                  { name: "Mahad (Konkan)", basin: "Konkan" },
-                ].map((item) => (
-                  <button
-                    key={item.name}
-                    onClick={() => handleBasinClick(item.basin)}
-                    className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-600 font-medium text-[11px] transition-colors border border-slate-200/80"
-                  >
-                    {item.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Active Bridge Quick Spotlight Card */}
-          <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-col justify-between">
-            {activeBridge ? (
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 font-mono text-xs font-bold border border-sky-200">
-                    {activeBridge.code}
-                  </span>
-                  <RiskTierBadge tier={activeBridge.tier || "Good"} size="sm" />
-                </div>
-
-                <h3 className="font-extrabold text-slate-900 text-lg leading-snug mb-1">
-                  {activeBridge.name}
-                </h3>
-                <p className="text-xs text-slate-500 mb-4 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-sky-600" />
-                  {activeBridge.river} River • {activeBridge.district} District
-                </p>
-
-                <div className="space-y-2.5 bg-slate-50 p-4 rounded-xl border border-slate-200/80 mb-5 text-xs">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500">Superstructure:</span>
-                    <span className="font-semibold text-slate-900">{activeBridge.type}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500">Length & Spans:</span>
-                    <span className="font-semibold text-slate-900">
-                      {formatNumber(activeBridge.length_m, activeLocale, useDevanagariDigits)}m (
-                      {formatNumber(activeBridge.spans || 4, activeLocale, useDevanagariDigits)} spans)
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500">Year Built:</span>
-                    <span className="font-semibold text-slate-900">
-                      {formatNumber(activeBridge.year_built, activeLocale, useDevanagariDigits)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500">GPS Coordinates:</span>
-                    <span className="font-mono text-slate-700 font-semibold">
-                      {activeBridge.latitude.toFixed(4)}°, {activeBridge.longitude.toFixed(4)}°
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-slate-200">
-                    <span className="text-slate-500 font-medium">Dynamic Risk Index (DRI):</span>
-                    <span className="font-mono font-bold text-sky-800 text-sm">
-                      {activeBridge.dri_score?.toFixed(1) || "22.0"} / 100
-                    </span>
-                  </div>
-                </div>
-
-                {/* Direct Google Maps Action Links */}
-                <div className="space-y-2 mb-5">
                   <a
                     href={externalGoogleMapsUrl}
                     target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors border border-slate-200"
+                    rel="noreferrer"
+                    className="px-2.5 py-1 text-[11px] font-semibold bg-sky-700 hover:bg-sky-600 text-white rounded flex items-center gap-1 transition-colors"
                   >
-                    <MapPin className="w-3.5 h-3.5 text-sky-600" />
-                    <span>{t.openGoogleMaps}</span>
-                    <ExternalLink className="w-3 h-3 text-slate-400" />
+                    <span>{t.bridges.openMaps}</span>
+                    <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
+              </div>
 
-                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 leading-relaxed mb-5">
-                  <strong>Advisory:</strong> {t.disclaimer}
-                </div>
+              {/* Live Embedded Google Maps Iframe */}
+              <div className="relative flex-1 w-full bg-slate-200">
+                <iframe
+                  title="Google Maps Bridge View"
+                  src={googleMapsUrl}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                />
 
-                <Link
-                  href={`/bridges/${activeBridge.id}`}
-                  className="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors shadow-xs"
-                >
-                  <Activity className="w-4 h-4" />
-                  <span>{t.viewDetails}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+                {/* Floating Bridge Detail Pill Over Map */}
+                {activeBridge && (
+                  <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md p-3.5 rounded-xl border border-white/80 shadow-lg flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="font-mono text-xs font-extrabold text-sky-800 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+                          {activeBridge.code}
+                        </span>
+                        <RiskTierBadge tier={activeBridge.tier || "Good"} size="sm" />
+                      </div>
+                      <div className="font-bold text-xs text-slate-900 truncate">{activeBridge.name}</div>
+                      <div className="text-[11px] text-slate-500">
+                        {activeBridge.river} River • {activeBridge.district} • GPS: {currentLat.toFixed(4)},{" "}
+                        {currentLng.toFixed(4)}
+                      </div>
+                    </div>
+
+                    <Link
+                      href={`/bridges/${activeBridge.id}`}
+                      className="px-3 py-1.5 bg-sky-700 hover:bg-sky-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0 shadow-xs"
+                    >
+                      <span>{t.bridges.viewDetails}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Bridges List */}
+          <div className="lg:col-span-5 space-y-3 max-h-[580px] overflow-y-auto pr-1">
+            {loading ? (
+              <div className="p-8 text-center text-slate-400 text-xs">Loading Bridge Registry...</div>
+            ) : filteredBridges.length === 0 ? (
+              <div className="p-8 text-center text-slate-500 text-xs bg-white rounded-xl border border-slate-200">
+                No bridges match your filter criteria.
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-full text-slate-400 text-sm p-8 text-center">
-                <MapPin className="w-8 h-8 mb-2 text-slate-300" />
-                Select any bridge from the Google Map or list below to inspect live coordinates and structural health
-              </div>
-            )}
-          </div>
-        </div>
+              filteredBridges.map((bridge) => {
+                const isSelected = activeBridge?.id === bridge.id;
+                return (
+                  <div
+                    key={bridge.id}
+                    onClick={() => handleSelectBridge(bridge)}
+                    className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                      isSelected
+                        ? "bg-sky-50/80 border-sky-400 shadow-sm ring-1 ring-sky-300"
+                        : "bg-white border-slate-200 hover:border-slate-300 shadow-xs"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                          {bridge.code}
+                        </span>
+                        <RiskTierBadge tier={bridge.tier || "Good"} size="sm" />
+                      </div>
+                      <span className="text-[11px] text-slate-400 font-mono">
+                        DRI {formatNumber(bridge.dri_score ?? 22.0, activeLocale, useDevanagariDigits)}
+                      </span>
+                    </div>
 
-        {/* 2. BRIDGES DIRECTORY GRID */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Layers className="w-4 h-4 text-sky-600" />
-              <span>{t.bridgeList}</span>
-              <span className="text-xs font-mono bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-full font-bold">
-                {formatNumber(filteredBridges.length, activeLocale, useDevanagariDigits)}
-              </span>
-            </h2>
-          </div>
+                    <h3 className="font-bold text-xs text-slate-900 mb-1">{bridge.name}</h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredBridges.map((bridge) => {
-              const isSelected = activeBridge?.id === bridge.id;
-              return (
-                <div
-                  key={bridge.id}
-                  onClick={() => handleSelectBridge(bridge)}
-                  className={`bg-white p-5 rounded-2xl border transition-all cursor-pointer ${
-                    isSelected
-                      ? "border-sky-500 shadow-md ring-2 ring-sky-500/20 bg-sky-50/20"
-                      : "border-slate-200 shadow-xs hover:border-slate-300 hover:shadow-sm"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                      {bridge.code}
-                    </span>
-                    <RiskTierBadge tier={bridge.tier || "Good"} size="sm" />
-                  </div>
+                    <p className="text-[11px] text-slate-500 mb-2.5 flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                      <span>
+                        {bridge.river} River • {bridge.district} District
+                      </span>
+                    </p>
 
-                  <h3 className="font-bold text-slate-900 text-sm mb-1 line-clamp-1">{bridge.name}</h3>
-                  <p className="text-xs text-slate-500 mb-2 flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-slate-400" />
-                    {bridge.river} River • {bridge.district}
-                  </p>
+                    <div className="grid grid-cols-3 gap-2 text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-100 text-slate-600 mb-2.5">
+                      <div>
+                        <span className="text-slate-400 block">{t.bridges.length}:</span>
+                        <span className="font-semibold text-slate-800">
+                          {formatNumber(bridge.length_m, activeLocale, useDevanagariDigits)}m
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block">{t.bridges.spans}:</span>
+                        <span className="font-semibold text-slate-800">
+                          {formatNumber(bridge.spans ?? 6, activeLocale, useDevanagariDigits)}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block">{t.bridges.builtYear}:</span>
+                        <span className="font-semibold text-slate-800">{bridge.year_built}</span>
+                      </div>
+                    </div>
 
-                  <div className="text-[11px] font-mono text-slate-400 mb-3">
-                    GPS: {bridge.latitude.toFixed(4)}°, {bridge.longitude.toFixed(4)}°
-                  </div>
-
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
-                    <span className="text-slate-500">
-                      DRI: <strong className="text-slate-800 font-mono">{bridge.dri_score?.toFixed(1) || "18.5"}</strong>
-                    </span>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectBridge(bridge);
-                        }}
-                        className="text-sky-600 hover:text-sky-700 font-semibold text-xs flex items-center gap-1"
-                      >
-                        Pin Map <MapPin className="w-3 h-3" />
-                      </button>
-                      <span className="text-slate-300">•</span>
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
+                      <span className="text-sky-700 font-semibold">{bridge.type}</span>
                       <Link
                         href={`/bridges/${bridge.id}`}
-                        className="text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1"
                         onClick={(e) => e.stopPropagation()}
+                        className="text-xs text-slate-500 hover:text-sky-700 font-semibold flex items-center gap-1 transition-colors"
                       >
-                        Inspect <ArrowRight className="w-3 h-3" />
+                        <span>{t.bridges.viewDetails}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
       </div>

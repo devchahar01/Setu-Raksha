@@ -1,7 +1,7 @@
 [project]
-name = "setu-raksha"
+name = "setu-rakshak"
 version = "0.1.0"
-description = "National Bridge Infrastructure Safety & Intelligence Grid"
+description = "Setu Rakshak: National Bridge Infrastructure Safety & Intelligence Grid"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []

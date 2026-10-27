@@ -3,23 +3,25 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import {
-  Cpu,
-  Shield,
   Layers,
+  Shield,
   AlertTriangle,
   CheckCircle2,
   AlertCircle,
-  ShieldAlert,
   Sliders,
   Clock,
   BookOpen,
   ArrowRight,
+  Cpu,
 } from "lucide-react";
 import { RiskTierBadge } from "@/components/RiskTierBadge";
 import { useAppStore } from "@/lib/store";
+import { TRANSLATIONS } from "@/lib/translations";
+import { triggerHaptic } from "@/lib/haptics";
 
 export default function RiskEnginePage() {
-  const { activeLocale } = useAppStore();
+  const { activeLocale, setActiveLocale } = useAppStore();
+  const t = TRANSLATIONS[activeLocale];
 
   // Interactive SVI & DRI Calculator Sliders
   const [deckCondition, setDeckCondition] = useState<number>(7.0); // 0-9
@@ -28,7 +30,6 @@ export default function RiskEnginePage() {
   const [trafficVolume, setTrafficVolume] = useState<number>(15000); // vpd
   const [bridgeAge, setBridgeAge] = useState<number>(25); // years
   const [isCoastal, setIsCoastal] = useState<boolean>(false);
-  const [activeCatalogueLang, setActiveCatalogueLang] = useState<"en" | "hi" | "mr">("en");
 
   // Calculate live SVI & DRI
   const g_s = (9 - deckCondition) / 9;
@@ -55,10 +56,10 @@ export default function RiskEnginePage() {
 
   const tier = dri >= 75 ? "CRITICAL" : dri >= 55 ? "WARNING" : dri >= 30 ? "WATCH" : "GOOD";
   const rulYears = isCoastal
-    ? Math.max(0, +(22.0 - (dri * 0.24)).toFixed(1))
-    : Math.max(0, +(35.0 - (dri * 0.35)).toFixed(1));
+    ? Math.max(0, +(22.0 - dri * 0.24).toFixed(1))
+    : Math.max(0, +(35.0 - dri * 0.35).toFixed(1));
 
-  // 11 Prescriptive Rules
+  // 11 Prescriptive Rules mapped trilingually
   const catalogue = [
     {
       id: "RIPRAP-01",
@@ -229,27 +230,29 @@ export default function RiskEnginePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-      {/* Top Header */}
-      <div className="bg-navy-900 text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-navy-800">
+      {/* Institutional Civil Top Header */}
+      <div className="bg-navy-900 text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-navy-800 shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-navy-800 text-teal-300 text-xs font-mono mb-3 border border-navy-700">
-              <Cpu className="w-3.5 h-3.5 text-teal-400" />
-              AI PREDICTIVE RISK ENGINE & REMEDIATION (L6)
+              <span className="w-2 h-2 rounded-full bg-teal-400"></span>
+              <span>PWD MAHARASHTRA • RISK & REMEDIATION (L6)</span>
+              <span className="text-navy-400">•</span>
+              <span className="text-teal-400">{t.common.simulatedTag}</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-              SVI, DRI & Prescriptive Engineering Catalogue
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              {t.risk.title}
             </h1>
-            <p className="mt-1 text-sm text-navy-200">
-              Deterministic civil engineering vulnerability maths, stochastic Markov RUL, and rule-based safety invariants.
+            <p className="mt-1 text-xs sm:text-sm text-navy-200 max-w-3xl leading-relaxed">
+              {t.risk.subtitle}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-navy-800 p-2 rounded-xl border border-navy-700">
-            <Shield className="w-5 h-5 text-teal-400" />
+          <div className="flex items-center gap-3 bg-navy-800/90 p-3 rounded-xl border border-navy-700 self-start md:self-auto">
+            <Shield className="w-5 h-5 text-teal-400 shrink-0" />
             <div className="text-xs">
-              <div className="font-semibold text-white">Safety Invariant Active</div>
-              <div className="text-teal-300">ML Cannot Downgrade Risk</div>
+              <div className="font-bold text-white">{t.risk.safetyInvariant}</div>
+              <div className="text-teal-300 text-[11px]">{t.risk.mlInvariantDesc}</div>
             </div>
           </div>
         </div>
@@ -258,22 +261,24 @@ export default function RiskEnginePage() {
       {/* Main Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
         {/* Live Mathematical Formula & Calculator */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
           {/* Sliders Input Panel */}
           <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
               <h2 className="font-bold text-slate-900 text-base flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-teal-600" /> Interactive SVI Risk Calculator
+                <Sliders className="w-5 h-5 text-teal-600" /> {t.risk.calculatorTitle}
               </h2>
-              <span className="text-xs font-mono text-slate-400">Appendix D Formulation</span>
+              <span className="text-xs font-mono font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
+                {t.risk.calculatorSub}
+              </span>
             </div>
 
-            <div className="space-y-4 text-xs">
+            <div className="space-y-5 text-xs">
               {/* Deck Condition */}
               <div>
-                <div className="flex justify-between mb-1">
-                  <span className="font-semibold text-slate-700">S-01 Deck Condition (0=Failed, 9=Pristine):</span>
-                  <span className="font-mono font-bold text-slate-900">{deckCondition}</span>
+                <div className="flex justify-between mb-1.5">
+                  <span className="font-semibold text-slate-700">{t.risk.deckCondition}:</span>
+                  <span className="font-mono font-bold text-slate-900 text-sm">{deckCondition.toFixed(1)}</span>
                 </div>
                 <input
                   type="range"
@@ -281,19 +286,24 @@ export default function RiskEnginePage() {
                   max="9"
                   step="0.5"
                   value={deckCondition}
-                  onChange={(e) => setDeckCondition(parseFloat(e.target.value))}
-                  className="w-full accent-teal-600 cursor-pointer"
+                  onChange={(e) => {
+                    setDeckCondition(parseFloat(e.target.value));
+                    triggerHaptic("selection");
+                  }}
+                  className="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
                 />
               </div>
 
               {/* Scour Ratio */}
               <div>
-                <div className="flex justify-between mb-1">
-                  <span className="font-semibold text-slate-700">
-                    H-01 Scour Ratio (Measured / Design Depth):
-                  </span>
-                  <span className={`font-mono font-bold ${scourRatio >= 1.0 ? "text-rose-600" : "text-slate-900"}`}>
-                    {scourRatio.toFixed(2)}x {scourRatio >= 1.0 && "(CRITICAL TRIGGER)"}
+                <div className="flex justify-between mb-1.5">
+                  <span className="font-semibold text-slate-700">{t.risk.scourRatio}:</span>
+                  <span
+                    className={`font-mono font-bold text-sm ${
+                      scourRatio >= 1.0 ? "text-rose-600" : "text-slate-900"
+                    }`}
+                  >
+                    {scourRatio.toFixed(2)}x {scourRatio >= 1.0 && `(${t.risk.criticalTrigger})`}
                   </span>
                 </div>
                 <input
@@ -302,19 +312,24 @@ export default function RiskEnginePage() {
                   max="1.5"
                   step="0.05"
                   value={scourRatio}
-                  onChange={(e) => setScourRatio(parseFloat(e.target.value))}
-                  className="w-full accent-teal-600 cursor-pointer"
+                  onChange={(e) => {
+                    setScourRatio(parseFloat(e.target.value));
+                    triggerHaptic("selection");
+                  }}
+                  className="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
                 />
               </div>
 
               {/* Pier Tilt */}
               <div>
-                <div className="flex justify-between mb-1">
-                  <span className="font-semibold text-slate-700">
-                    E-02 Pier Inclinometer Tilt:
-                  </span>
-                  <span className={`font-mono font-bold ${pierTilt >= 1.0 ? "text-rose-600" : "text-slate-900"}`}>
-                    {pierTilt.toFixed(2)}° {pierTilt >= 1.0 && "(CRITICAL OVERRIDE)"}
+                <div className="flex justify-between mb-1.5">
+                  <span className="font-semibold text-slate-700">{t.risk.pierTilt}:</span>
+                  <span
+                    className={`font-mono font-bold text-sm ${
+                      pierTilt >= 1.0 ? "text-rose-600" : "text-slate-900"
+                    }`}
+                  >
+                    {pierTilt.toFixed(2)}° {pierTilt >= 1.0 && `(${t.risk.criticalOverride})`}
                   </span>
                 </div>
                 <input
@@ -323,38 +338,47 @@ export default function RiskEnginePage() {
                   max="2.5"
                   step="0.05"
                   value={pierTilt}
-                  onChange={(e) => setPierTilt(parseFloat(e.target.value))}
-                  className="w-full accent-teal-600 cursor-pointer"
+                  onChange={(e) => {
+                    setPierTilt(parseFloat(e.target.value));
+                    triggerHaptic("selection");
+                  }}
+                  className="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
                 />
               </div>
 
               {/* Bridge Age & Coastal Toggle */}
-              <div className="grid grid-cols-2 gap-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="font-semibold text-slate-700">A-01 Structure Age:</span>
-                    <span className="font-mono font-bold text-slate-900">{bridgeAge} yrs</span>
+                  <div className="flex justify-between mb-1.5">
+                    <span className="font-semibold text-slate-700">{t.risk.bridgeAge}:</span>
+                    <span className="font-mono font-bold text-slate-900 text-sm">{bridgeAge} yrs</span>
                   </div>
                   <input
                     type="range"
                     min="1"
                     max="100"
                     value={bridgeAge}
-                    onChange={(e) => setBridgeAge(parseInt(e.target.value, 10))}
-                    className="w-full accent-teal-600 cursor-pointer"
+                    onChange={(e) => {
+                      setBridgeAge(parseInt(e.target.value, 10));
+                      triggerHaptic("selection");
+                    }}
+                    className="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
                   />
                 </div>
 
-                <div className="flex items-center gap-2 mt-4">
+                <div className="flex items-center gap-2.5 mt-2 sm:mt-5 p-3 rounded-xl bg-slate-50 border border-slate-200">
                   <input
                     type="checkbox"
                     id="coastalCheck"
                     checked={isCoastal}
-                    onChange={(e) => setIsCoastal(e.target.checked)}
-                    className="w-4 h-4 text-teal-600 rounded"
+                    onChange={(e) => {
+                      setIsCoastal(e.target.checked);
+                      triggerHaptic("light");
+                    }}
+                    className="w-4 h-4 text-teal-600 rounded cursor-pointer accent-teal-600"
                   />
-                  <label htmlFor="coastalCheck" className="font-semibold text-slate-700 cursor-pointer">
-                    Konkan Coastal Regime (High Chloride)
+                  <label htmlFor="coastalCheck" className="font-semibold text-slate-700 cursor-pointer text-xs">
+                    {t.risk.coastalRegime}
                   </label>
                 </div>
               </div>
@@ -365,43 +389,49 @@ export default function RiskEnginePage() {
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs uppercase font-bold text-slate-500">Computed Output</span>
+                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+                  {t.risk.computedOutput}
+                </span>
                 <RiskTierBadge tier={tier} size="md" />
               </div>
 
-              <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 text-center mb-4">
-                <div className="text-xs text-slate-500 font-semibold mb-1">Dynamic Risk Index (DRI)</div>
+              <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 text-center mb-5">
+                <div className="text-xs text-slate-500 font-semibold mb-1">{t.risk.driTitle}</div>
                 <div className="text-4xl font-extrabold font-mono text-slate-900">{dri.toFixed(1)}</div>
-                <div className="text-xs text-slate-400 mt-1">SVI: {svi.toFixed(1)} • Hazard Mult: 1.05x</div>
+                <div className="text-xs text-slate-400 mt-1 font-mono">
+                  SVI: {svi.toFixed(1)} • Hazard Mult: 1.05x
+                </div>
               </div>
 
-              <div className="space-y-2 text-xs mb-4">
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Markov Remaining Life:</span>
+              <div className="space-y-2.5 text-xs mb-4">
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-600">{t.risk.rulTitle}:</span>
                   <span className="font-mono font-bold text-teal-700">{rulYears} years</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Degradation Regime:</span>
-                  <span className="font-semibold text-slate-900">{isCoastal ? "Coastal-Accelerated" : "Inland-Standard"}</span>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-600">Exposure Profile:</span>
+                  <span className="font-semibold text-slate-900">
+                    {isCoastal ? "Coastal-Accelerated (IS 456 Extreme)" : "Inland-Standard (Moderate)"}
+                  </span>
                 </div>
               </div>
 
               {criticalFlags.length > 0 && (
                 <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-900 mb-4">
                   <div className="font-bold flex items-center gap-1.5 mb-1 text-rose-700">
-                    <AlertTriangle className="w-4 h-4" /> Single-Defect Overrides:
+                    <AlertTriangle className="w-4 h-4 shrink-0" /> Invariant Overrides Active:
                   </div>
-                  <ul className="list-disc list-inside space-y-0.5">
+                  <ul className="list-disc list-inside space-y-0.5 font-mono text-[11px]">
                     {criticalFlags.map((f) => (
-                      <li key={f} className="font-mono">{f}</li>
+                      <li key={f}>{f}</li>
                     ))}
                   </ul>
                 </div>
               )}
             </div>
 
-            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900">
-              <strong>Advisory:</strong> Decision support system only. Does not replace physical civil engineering inspection.
+            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 leading-snug">
+              {t.risk.advisoryNote}
             </div>
           </div>
         </div>
@@ -412,23 +442,22 @@ export default function RiskEnginePage() {
             <div>
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-teal-600" />
-                <h2 className="font-bold text-slate-900 text-lg">
-                  Prescriptive Remediation Action Catalogue (Appendix D)
-                </h2>
+                <h2 className="font-bold text-slate-900 text-lg">{t.risk.remediationTitle}</h2>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Certified civil engineering interventions mapped to failure triggers. Fully trilingual.
-              </p>
+              <p className="text-xs text-slate-500 mt-1">{t.risk.remediationSub}</p>
             </div>
 
             {/* Language Switcher for Catalogue */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-start sm:self-auto">
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-start sm:self-auto border border-slate-200">
               {(["en", "hi", "mr"] as const).map((lang) => (
                 <button
                   key={lang}
-                  onClick={() => setActiveCatalogueLang(lang)}
+                  onClick={() => {
+                    setActiveLocale(lang);
+                    triggerHaptic("selection");
+                  }}
                   className={`px-3 py-1 text-xs rounded-lg font-semibold transition-colors ${
-                    activeCatalogueLang === lang
+                    activeLocale === lang
                       ? "bg-teal-600 text-white shadow-sm"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
@@ -443,29 +472,31 @@ export default function RiskEnginePage() {
             {catalogue.map((item) => (
               <div
                 key={item.id}
-                className="p-4 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 transition-colors"
+                className="p-4 bg-slate-50 hover:bg-slate-100/90 rounded-xl border border-slate-200 transition-colors flex flex-col justify-between"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-xs font-bold text-slate-800 bg-white px-2 py-0.5 rounded border border-slate-200">
-                    {item.id}
-                  </span>
-                  <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                      item.priority === "IMMEDIATE"
-                        ? "bg-rose-100 text-rose-800"
-                        : item.priority === "URGENT"
-                        ? "bg-amber-100 text-amber-800"
-                        : "bg-teal-100 text-teal-800"
-                    }`}
-                  >
-                    {item.priority}
-                  </span>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-mono text-xs font-bold text-slate-800 bg-white px-2 py-0.5 rounded border border-slate-200">
+                      {item.id}
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                        item.priority === "IMMEDIATE"
+                          ? "bg-rose-100 text-rose-800 border border-rose-200"
+                          : item.priority === "URGENT"
+                          ? "bg-amber-100 text-amber-800 border border-amber-200"
+                          : "bg-teal-100 text-teal-800 border border-teal-200"
+                      }`}
+                    >
+                      {item.priority}
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-slate-900 text-xs mb-1.5">{item.title[activeLocale]}</h4>
+                  <p className="text-xs text-slate-600 leading-relaxed">{item.desc[activeLocale]}</p>
                 </div>
-                <h4 className="font-bold text-slate-900 text-xs mb-1.5">{item.title[activeCatalogueLang]}</h4>
-                <p className="text-xs text-slate-600 leading-relaxed">{item.desc[activeCatalogueLang]}</p>
-                <div className="mt-3 pt-2 border-t border-slate-200 flex justify-between items-center text-[10px] text-slate-400">
+                <div className="mt-3 pt-2.5 border-t border-slate-200 flex justify-between items-center text-[10px] text-slate-400">
                   <span>Category: {item.category}</span>
-                  <span className="font-mono text-teal-600">SE_PWD_Approved</span>
+                  <span className="font-mono text-teal-600 font-semibold">SE_PWD_Approved</span>
                 </div>
               </div>
             ))}

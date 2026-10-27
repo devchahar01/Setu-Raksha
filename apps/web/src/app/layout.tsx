@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Setu Raksha | National Bridge Infrastructure Safety & Intelligence Grid",
+  title: "Setu Rakshak | National Bridge Infrastructure Safety & Intelligence Grid",
   description:
     "Predictive decision-support grid for bridge infrastructure resilience, combining 26-factor physical inspections with live IoT telemetry.",
 };
