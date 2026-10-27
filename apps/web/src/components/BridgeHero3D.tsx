@@ -21,12 +21,14 @@ import {
   Droplets,
   Eye,
   CheckCircle2,
+  Calendar,
+  Check,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { triggerHaptic } from "@/lib/haptics";
 
 type EnvironmentMode = "daylight" | "sunset" | "monsoon" | "dusk";
-type CameraViewMode = "live" | "structure" | "deck" | "piers" | "aerial" | "cam1" | "cam2";
+type CameraViewMode = "live" | "structure" | "river" | "deck" | "piers" | "approach" | "aerial" | "cam1" | "cam2";
 
 interface EnvironmentData {
   timeStr: string;
@@ -311,7 +313,44 @@ export const BridgeHero3D: React.FC = () => {
       bridgeStructure.add(lineMesh);
     });
 
-    // HIGHWAY TRAFFIC SIMULATION (Tata Trucks, Buses, Cars, Scooters)
+    // Concrete Crash Barriers (IRC:5 / MoRTH Standard) along both edges
+    [-4.45, 4.45].forEach((zB) => {
+      const barrierGeo = new THREE.BoxGeometry(deckLength, 0.9, 0.35);
+      const barrierMat = new THREE.MeshStandardMaterial({
+        color: 0x94a3b8,
+        roughness: 0.9,
+      });
+      const barrier = new THREE.Mesh(barrierGeo, barrierMat);
+      barrier.position.set(0, 1.65, zB);
+      barrier.castShadow = true;
+      barrier.receiveShadow = true;
+      bridgeStructure.add(barrier);
+
+      // Steel Safety Handrail on Top of Barrier
+      const railGeo = new THREE.CylinderGeometry(0.04, 0.04, deckLength, 8);
+      railGeo.rotateZ(Math.PI / 2);
+      const railMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.8, roughness: 0.3 });
+      const rail = new THREE.Mesh(railGeo, railMat);
+      rail.position.set(0, 2.15, zB);
+      bridgeStructure.add(rail);
+    });
+
+    // Highway Streetlight Poles & IoT Solar Masts every 22m
+    [-44, -22, 0, 22, 44].forEach((xPole) => {
+      const poleGeo = new THREE.CylinderGeometry(0.08, 0.12, 6.0, 8);
+      const poleMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.6 });
+      const pole = new THREE.Mesh(poleGeo, poleMat);
+      pole.position.set(xPole, 4.2, 4.45);
+      bridgeStructure.add(pole);
+
+      const lampGeo = new THREE.SphereGeometry(0.14, 8, 8);
+      const lampMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+      const lamp = new THREE.Mesh(lampGeo, lampMat);
+      lamp.position.set(xPole, 7.1, 3.4);
+      bridgeStructure.add(lamp);
+    });
+
+    // HIGHWAY TRAFFIC SIMULATION (Tata Trucks, Buses, Cars, Scooters, Autos)
     const vehicles: {
       group: THREE.Group;
       speed: number;
@@ -320,6 +359,80 @@ export const BridgeHero3D: React.FC = () => {
       wheels: THREE.Mesh[];
       headlights: THREE.Mesh[];
     }[] = [];
+
+    // Regional Transit Bus (MSRTC State Transport / Interstate Express)
+    const makeBus = (mainColor: number, stripeColor: number) => {
+      const g = new THREE.Group();
+      const wheels: THREE.Mesh[] = [];
+      const headlights: THREE.Mesh[] = [];
+
+      // Main Coach Body
+      const body = new THREE.Mesh(
+        new THREE.BoxGeometry(6.4, 2.2, 1.8),
+        new THREE.MeshStandardMaterial({ color: mainColor, roughness: 0.4 })
+      );
+      body.position.set(0, 1.6, 0);
+      body.castShadow = true;
+      g.add(body);
+
+      // Cream Accent Stripe along Midsection
+      const stripe = new THREE.Mesh(
+        new THREE.BoxGeometry(6.42, 0.35, 1.82),
+        new THREE.MeshStandardMaterial({ color: stripeColor, roughness: 0.3 })
+      );
+      stripe.position.set(0, 1.45, 0);
+      g.add(stripe);
+
+      // Passenger Tinted Window Strip
+      const windowMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.1, metalness: 0.9 });
+      [-0.92, 0.92].forEach((zSide) => {
+        const windows = new THREE.Mesh(
+          new THREE.BoxGeometry(5.2, 0.65, 0.04),
+          windowMat
+        );
+        windows.position.set(-0.2, 2.05, zSide);
+        g.add(windows);
+      });
+
+      // Front Windshield
+      const frontGlass = new THREE.Mesh(
+        new THREE.BoxGeometry(0.04, 0.9, 1.6),
+        windowMat
+      );
+      frontGlass.position.set(3.21, 2.0, 0);
+      g.add(frontGlass);
+
+      // Destination Display Board
+      const destBoard = new THREE.Mesh(
+        new THREE.BoxGeometry(0.06, 0.28, 1.2),
+        new THREE.MeshBasicMaterial({ color: 0xfacc15 })
+      );
+      destBoard.position.set(3.22, 2.58, 0);
+      g.add(destBoard);
+
+      // Headlights
+      [-0.65, 0.65].forEach((zL) => {
+        const hl = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
+        hl.position.set(3.22, 0.8, zL);
+        g.add(hl);
+        headlights.push(hl);
+      });
+
+      // Wheels (Front single axle, rear dual axle)
+      const wGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.28, 14);
+      wGeo.rotateZ(Math.PI / 2);
+      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8 });
+      [2.0, -1.5, -2.4].forEach((xW) => {
+        [-0.85, 0.85].forEach((zW) => {
+          const w = new THREE.Mesh(wGeo, wheelMat);
+          w.position.set(xW, 0.42, zW);
+          g.add(w);
+          wheels.push(w);
+        });
+      });
+
+      return { group: g, wheels, headlights };
+    };
 
     // Auto-rickshaw
     const makeAuto = () => {
@@ -491,57 +604,70 @@ export const BridgeHero3D: React.FC = () => {
 
     // Spawn initial vehicles
     // Lane 1 (Eastbound)
-    const auto1 = makeAuto();
-    auto1.group.position.set(-45, 0.9, -2.4);
-    bridgeStructure.add(auto1.group);
-    vehicles.push({ group: auto1.group, speed: 0.16, laneZ: -2.4, direction: 1, wheels: auto1.wheels, headlights: auto1.headlights });
+    const bus1 = makeBus(0xb91c1c, 0xfef3c7); // MSRTC Red & Cream
+    bus1.group.position.set(-48, 0.9, -2.4);
+    bridgeStructure.add(bus1.group);
+    vehicles.push({ group: bus1.group, speed: 0.11, laneZ: -2.4, direction: 1, wheels: bus1.wheels, headlights: bus1.headlights });
 
     const truck1 = makeTruck(0xea580c, 0x0284c7);
-    truck1.group.position.set(-18, 0.9, -2.4);
+    truck1.group.position.set(-20, 0.9, -2.4);
     bridgeStructure.add(truck1.group);
-    vehicles.push({ group: truck1.group, speed: 0.12, laneZ: -2.4, direction: 1, wheels: truck1.wheels, headlights: truck1.headlights });
+    vehicles.push({ group: truck1.group, speed: 0.13, laneZ: -2.4, direction: 1, wheels: truck1.wheels, headlights: truck1.headlights });
 
     const car1 = makeCar(0xffffff);
-    car1.group.position.set(16, 0.9, -2.4);
+    car1.group.position.set(12, 0.9, -2.4);
     bridgeStructure.add(car1.group);
     vehicles.push({ group: car1.group, speed: 0.22, laneZ: -2.4, direction: 1, wheels: car1.wheels, headlights: car1.headlights });
 
+    const auto1 = makeAuto();
+    auto1.group.position.set(34, 0.9, -2.4);
+    bridgeStructure.add(auto1.group);
+    vehicles.push({ group: auto1.group, speed: 0.16, laneZ: -2.4, direction: 1, wheels: auto1.wheels, headlights: auto1.headlights });
+
     const scooter1 = makeScooter(0x0d9488);
-    scooter1.group.position.set(38, 0.9, -3.8);
+    scooter1.group.position.set(48, 0.9, -3.8);
     bridgeStructure.add(scooter1.group);
     vehicles.push({ group: scooter1.group, speed: 0.19, laneZ: -3.8, direction: 1, wheels: scooter1.wheels, headlights: scooter1.headlights });
 
     // Lane 2 (Westbound)
+    const bus2 = makeBus(0x1e3a8a, 0xe2e8f0); // Interstate Cruiser
+    bus2.group.rotation.y = Math.PI;
+    bus2.group.position.set(46, 0.9, 2.4);
+    bridgeStructure.add(bus2.group);
+    vehicles.push({ group: bus2.group, speed: 0.12, laneZ: 2.4, direction: -1, wheels: bus2.wheels, headlights: bus2.headlights });
+
     const truck2 = makeTruck(0xdc2626, 0x15803d);
     truck2.group.rotation.y = Math.PI;
-    truck2.group.position.set(40, 0.9, 2.4);
+    truck2.group.position.set(18, 0.9, 2.4);
     bridgeStructure.add(truck2.group);
-    vehicles.push({ group: truck2.group, speed: 0.13, laneZ: 2.4, direction: -1, wheels: truck2.wheels, headlights: truck2.headlights });
-
-    const auto2 = makeAuto();
-    auto2.group.rotation.y = Math.PI;
-    auto2.group.position.set(12, 0.9, 2.4);
-    bridgeStructure.add(auto2.group);
-    vehicles.push({ group: auto2.group, speed: 0.15, laneZ: 2.4, direction: -1, wheels: auto2.wheels, headlights: auto2.headlights });
+    vehicles.push({ group: truck2.group, speed: 0.14, laneZ: 2.4, direction: -1, wheels: truck2.wheels, headlights: truck2.headlights });
 
     const car2 = makeCar(0x0f172a);
     car2.group.rotation.y = Math.PI;
-    car2.group.position.set(-16, 0.9, 2.4);
+    car2.group.position.set(-14, 0.9, 2.4);
     bridgeStructure.add(car2.group);
     vehicles.push({ group: car2.group, speed: 0.21, laneZ: 2.4, direction: -1, wheels: car2.wheels, headlights: car2.headlights });
 
+    const auto2 = makeAuto();
+    auto2.group.rotation.y = Math.PI;
+    auto2.group.position.set(-36, 0.9, 2.4);
+    bridgeStructure.add(auto2.group);
+    vehicles.push({ group: auto2.group, speed: 0.15, laneZ: 2.4, direction: -1, wheels: auto2.wheels, headlights: auto2.headlights });
+
     const scooter2 = makeScooter(0xef4444);
     scooter2.group.rotation.y = Math.PI;
-    scooter2.group.position.set(-42, 0.9, 3.8);
+    scooter2.group.position.set(-50, 0.9, 3.8);
     bridgeStructure.add(scooter2.group);
     vehicles.push({ group: scooter2.group, speed: 0.18, laneZ: 3.8, direction: -1, wheels: scooter2.wheels, headlights: scooter2.headlights });
 
-    // Camera view presets
+    // Professional Camera View Presets (Section 8)
     const CAM_PRESETS: Record<CameraViewMode, { pos: [number, number, number]; lookAt: [number, number, number] }> = {
       live: { pos: [-22, 14, 60], lookAt: [0, 2, 0] },
       structure: { pos: [-12, 10, 32], lookAt: [-4, 5, 0] },
+      river: { pos: [-14, -4.5, 20], lookAt: [-10, -5.5, 0] },
       deck: { pos: [-38, 2.8, -2.4], lookAt: [10, 2.0, -2.4] },
       piers: { pos: [-16, -2.5, 22], lookAt: [-8, -4.5, 0] },
+      approach: { pos: [-52, 5, 20], lookAt: [-30, 1.5, 0] },
       aerial: { pos: [0, 72, 35], lookAt: [0, 0, 0] },
       cam1: { pos: [-28, 18, 55], lookAt: [2, 1, 0] },
       cam2: { pos: [28, 16, 55], lookAt: [-2, 1, 0] },
@@ -665,7 +791,7 @@ export const BridgeHero3D: React.FC = () => {
       <div className="relative min-h-[92vh] w-full flex flex-col justify-between p-4 sm:p-8 pointer-events-none">
         {/* TOP BAR: Asset Identifier & Environmental Telemetry */}
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-3 pointer-events-none">
-          {/* Top Left: Operational Asset Tag */}
+          {/* Top Left: Operational Asset Tag (Section 10) */}
           <div className="bg-[#ffffff]/95 backdrop-blur-sm p-3 rounded-lg border border-slate-300 shadow-xs pointer-events-auto max-w-md">
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -678,18 +804,19 @@ export const BridgeHero3D: React.FC = () => {
               </span>
             </div>
             <div className="font-extrabold text-sm text-[#0f172a] tracking-tight">
-              RABINDRA SETU (HOWRAH) • CLASS 70R CANTILEVER
+              RABINDRA SETU (HOWRAH) • CLASS 70R TRUSS
             </div>
-            <div className="text-[11px] text-slate-600 font-mono mt-0.5 flex items-center gap-2">
-              <span>ID: WB-HOW-001</span>
-              <span>•</span>
-              <span>RIVER: HOOGHLY</span>
-              <span>•</span>
-              <span className="text-sky-700 font-semibold">12 SENSORS ONLINE</span>
+            <div className="text-[11px] text-slate-600 font-mono mt-0.5 grid grid-cols-2 gap-x-2 gap-y-0.5">
+              <span>Asset ID: WB-HOW-001</span>
+              <span>River: Hooghly</span>
+              <span>District: Howrah</span>
+              <span>Structure: Cantilever Truss</span>
+              <span>Commissioned: 1943</span>
+              <span>Length: 705m (3 Spans)</span>
             </div>
           </div>
 
-          {/* Top Right: Environmental Observation Controls */}
+          {/* Top Right: Environmental Observation Controls (Section 12) */}
           <div className="bg-[#ffffff]/95 backdrop-blur-sm p-2.5 rounded-lg border border-slate-300 shadow-xs pointer-events-auto flex flex-col gap-2">
             <div className="flex items-center justify-between text-[11px] font-mono text-slate-600 border-b border-slate-200 pb-1.5 gap-4">
               <span className="font-bold text-slate-800">ENVIRONMENTAL TELEMETRY</span>
@@ -746,7 +873,7 @@ export const BridgeHero3D: React.FC = () => {
 
         {/* BOTTOM ROW: Operational Status Panel & Camera Observation Presets */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mt-auto">
-          {/* Bottom Left: Engineering Status & Setu Risk Breakdown */}
+          {/* Bottom Left: Engineering Status & Setu Risk Breakdown (Section 11 & 14) */}
           <div className="bg-[#ffffff]/95 backdrop-blur-sm p-4 rounded-lg border border-slate-300 shadow-xs pointer-events-auto max-w-lg w-full">
             <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-200">
               <div>
@@ -791,15 +918,19 @@ export const BridgeHero3D: React.FC = () => {
               </div>
             </div>
 
-            {/* Key Sensor Measurements */}
-            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200 text-[11px] font-mono text-slate-700">
+            {/* Key Sensor Measurements & Operational Inspection Dates */}
+            <div className="grid grid-cols-4 gap-2 pt-2 border-t border-slate-200 text-[11px] font-mono text-slate-700">
               <div>
-                <span className="text-slate-400 block text-[9px]">DECK VIBRATION</span>
+                <span className="text-slate-400 block text-[9px]">DECK VIBE</span>
                 <span className="font-bold text-slate-900">2.14 Hz</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[9px]">PIER P-02 TILT</span>
+                <span className="text-slate-400 block text-[9px]">PIER TILT</span>
                 <span className="font-bold text-slate-900">0.12 mrad</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[9px]">LAST AUDIT</span>
+                <span className="font-semibold text-slate-800">14 Oct 2026</span>
               </div>
               <div>
                 <span className="text-slate-400 block text-[9px]">NEXT REVIEW</span>
@@ -808,20 +939,22 @@ export const BridgeHero3D: React.FC = () => {
             </div>
           </div>
 
-          {/* Bottom Right: Camera Observation Presets & Operations Link */}
+          {/* Bottom Right: Camera Observation Presets & Operations Link (Section 8) */}
           <div className="bg-[#ffffff]/95 backdrop-blur-sm p-3 rounded-lg border border-slate-300 shadow-xs pointer-events-auto flex flex-col gap-2.5">
             <div className="flex items-center justify-between text-[10px] font-mono text-slate-600 pb-1 border-b border-slate-200">
               <span className="font-bold text-slate-800">OBSERVATION CAMERA MODES</span>
-              <span className="text-slate-500">PZT SENSOR FEED</span>
+              <span className="text-slate-500">CALIBRATED PZT FEEDS</span>
             </div>
 
-            {/* Camera Preset Buttons */}
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-1">
+            {/* Camera Preset Buttons (Section 8) */}
+            <div className="grid grid-cols-4 sm:grid-cols-7 gap-1">
               {[
                 { id: "live", label: "LIVE VIEW" },
-                { id: "structure", label: "TRUSS" },
+                { id: "structure", label: "STRUCTURE" },
+                { id: "river", label: "RIVER" },
                 { id: "deck", label: "DECK" },
                 { id: "piers", label: "PIERS" },
+                { id: "approach", label: "APPROACH" },
                 { id: "aerial", label: "AERIAL" },
               ].map((btn) => (
                 <button
@@ -830,7 +963,7 @@ export const BridgeHero3D: React.FC = () => {
                     setCamMode(btn.id as CameraViewMode);
                     triggerHaptic("selection");
                   }}
-                  className={`px-2 py-1 text-[11px] font-mono font-semibold rounded text-center transition-colors ${
+                  className={`px-2 py-1 text-[10px] font-mono font-semibold rounded text-center transition-colors ${
                     camMode === btn.id
                       ? "bg-[#1e293b] text-white"
                       : "bg-slate-100 text-slate-700 hover:bg-slate-200"
