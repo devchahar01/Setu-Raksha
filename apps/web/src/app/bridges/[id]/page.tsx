@@ -20,30 +20,42 @@ import {
   Compass,
   Zap,
   ExternalLink,
+  History as HistoryIcon,
 } from "lucide-react";
 import { RiskTierBadge } from "@/components/RiskTierBadge";
 import { useAppStore } from "@/lib/store";
 import { formatNumber } from "@/lib/formatters";
 import { TRANSLATIONS } from "@/lib/translations";
 import { triggerHaptic } from "@/lib/haptics";
+import { MASTER_BRIDGES_DATABASE, BridgeAsset } from "@/lib/bridgesData";
 
 interface BridgeDetail {
   id: string;
   code: string;
   name: string;
+  name_hi?: string;
+  name_mr?: string;
+  state?: string;
   river: string;
   district: string;
   type: string;
   length_m: number;
   spans: number;
   year_built: number;
+  age_years?: number;
   design_life_y: number;
+  remaining_life_y?: number;
   irc_class: string;
   seismic_zone: string;
   foundation_type: string;
   foundation_depth_m: number;
   design_hfl_m: number;
   design_scour_m: number;
+  superstructure_type?: string;
+  material_specs?: string;
+  history_summary?: string;
+  engineering_significance?: string;
+  builder_contractor?: string;
 }
 
 export default function BridgeCockpitPage() {
@@ -70,31 +82,88 @@ export default function BridgeCockpitPage() {
 
   useEffect(() => {
     async function fetchBridge() {
+      // 1. First check local master database
+      const localMatch = MASTER_BRIDGES_DATABASE.find(
+        (b) =>
+          b.id.toLowerCase() === bridgeId.toLowerCase() ||
+          b.code.toLowerCase() === bridgeId.toLowerCase()
+      );
+
+      if (localMatch) {
+        setBridge({
+          id: localMatch.id,
+          code: localMatch.code,
+          name: localMatch.name,
+          name_hi: localMatch.name_hi,
+          name_mr: localMatch.name_mr,
+          state: localMatch.state,
+          river: localMatch.river,
+          district: localMatch.district,
+          type: localMatch.superstructure_type,
+          length_m: localMatch.length_m,
+          spans: localMatch.spans,
+          year_built: localMatch.year_built,
+          age_years: localMatch.age_years,
+          design_life_y: localMatch.design_life_y,
+          remaining_life_y: localMatch.remaining_life_y,
+          irc_class: localMatch.irc_class,
+          seismic_zone: localMatch.seismic_zone,
+          foundation_type: localMatch.foundation_type,
+          foundation_depth_m: localMatch.foundation_depth_m,
+          design_hfl_m: localMatch.design_hfl_m,
+          design_scour_m: localMatch.design_scour_m,
+          superstructure_type: localMatch.superstructure_type,
+          material_specs: localMatch.material_specs,
+          history_summary: localMatch.history_summary,
+          engineering_significance: localMatch.engineering_significance,
+          builder_contractor: localMatch.builder_contractor,
+        });
+        setDriScore(localMatch.dri_score);
+        setTier(localMatch.tier);
+        setWaterLevel(localMatch.design_hfl_m > 0 ? +(localMatch.design_hfl_m * 0.75).toFixed(2) : 12.4);
+        setLoading(false);
+        return;
+      }
+
+      // 2. Otherwise try remote API
       try {
         const res = await fetch(`http://127.0.0.1:8000/api/v1/bridges/${bridgeId}`);
         if (res.ok) {
           const data = await res.json();
           setBridge(data);
+        } else {
+          throw new Error("Bridge not found");
         }
       } catch (err) {
         console.warn("Could not fetch bridge from API, loading fallback demo bridge:", err);
+        const fallback = MASTER_BRIDGES_DATABASE[0];
         setBridge({
-          id: bridgeId,
-          code: "MH-PUN-MM-001",
-          name: "Bund Garden Bridge across Mula-Mutha",
-          river: "Mula-Mutha",
-          district: "Pune",
-          type: "Prestressed Concrete Box Girder",
-          length_m: 240.0,
-          spans: 8,
-          year_built: 1998,
-          design_life_y: 100,
-          irc_class: "Class 70R",
-          seismic_zone: "Zone III",
-          foundation_type: "Well Foundation",
-          foundation_depth_m: 18.5,
-          design_hfl_m: 542.8,
-          design_scour_m: 8.2,
+          id: fallback.id,
+          code: fallback.code,
+          name: fallback.name,
+          name_hi: fallback.name_hi,
+          name_mr: fallback.name_mr,
+          state: fallback.state,
+          river: fallback.river,
+          district: fallback.district,
+          type: fallback.superstructure_type,
+          length_m: fallback.length_m,
+          spans: fallback.spans,
+          year_built: fallback.year_built,
+          age_years: fallback.age_years,
+          design_life_y: fallback.design_life_y,
+          remaining_life_y: fallback.remaining_life_y,
+          irc_class: fallback.irc_class,
+          seismic_zone: fallback.seismic_zone,
+          foundation_type: fallback.foundation_type,
+          foundation_depth_m: fallback.foundation_depth_m,
+          design_hfl_m: fallback.design_hfl_m,
+          design_scour_m: fallback.design_scour_m,
+          superstructure_type: fallback.superstructure_type,
+          material_specs: fallback.material_specs,
+          history_summary: fallback.history_summary,
+          engineering_significance: fallback.engineering_significance,
+          builder_contractor: fallback.builder_contractor,
         });
       } finally {
         setLoading(false);
@@ -319,6 +388,35 @@ export default function BridgeCockpitPage() {
               </div>
             </div>
           </div>
+
+          {/* Bridge History & Commissioning Era */}
+          {bridge?.history_summary && (
+            <div className="bg-white p-5 rounded-lg shadow-xs border border-slate-300 space-y-3">
+              <h3 className="font-bold text-slate-900 text-xs pb-2 border-b border-slate-200 flex items-center gap-2 uppercase tracking-wide font-mono">
+                <HistoryIcon className="w-3.5 h-3.5 text-slate-600" />
+                HISTORY &amp; COMMISSIONING CHRONOLOGY
+              </h3>
+              <div className="flex items-center justify-between text-xs font-mono p-2 bg-[#f8fafc] rounded border border-slate-200">
+                <span>Commissioned: <strong className="text-slate-900">{bridge.year_built}</strong></span>
+                <span>Active Service: <strong className="text-slate-900">{bridge.age_years || (2026 - bridge.year_built)} Years</strong></span>
+              </div>
+              <div className="text-xs text-slate-700 leading-relaxed bg-[#fbfbfa] p-3 rounded border border-slate-200">
+                {bridge.history_summary}
+              </div>
+              {bridge.engineering_significance && (
+                <div className="text-xs text-slate-700 leading-relaxed bg-sky-50/60 p-3 rounded border border-sky-200">
+                  <span className="font-bold text-sky-950 font-mono block mb-1 text-[11px]">CIVIL ENGINEERING SIGNIFICANCE</span>
+                  {bridge.engineering_significance}
+                </div>
+              )}
+              {bridge.builder_contractor && (
+                <div className="p-2.5 bg-slate-100 rounded border border-slate-200 text-xs flex justify-between items-center">
+                  <span className="text-slate-500">Builder / Agency:</span>
+                  <span className="font-bold text-slate-900">{bridge.builder_contractor}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right 2 Columns: Live Telemetry Feeds & Action Remediations */}

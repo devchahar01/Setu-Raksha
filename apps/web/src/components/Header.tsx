@@ -57,7 +57,7 @@ export const Header: React.FC = () => {
     {
       step: "01",
       href: "/bridges",
-      label: activeLocale === "hi" ? "परिसंपत्ति रजिस्ट्री" : activeLocale === "mr" ? "मालमत्ता नोंदवही" : "ASSET REGISTRY",
+      label: activeLocale === "hi" ? "पुल एवं स्थान खोज" : activeLocale === "mr" ? "पूल व जागा शोध" : "ASSET & LOCATOR",
       icon: <Layers className="w-3.5 h-3.5" />,
     },
     {

@@ -814,6 +814,16 @@ export const BridgeHero3D: React.FC = () => {
               <span>Commissioned: 1943</span>
               <span>Length: 705m (3 Spans)</span>
             </div>
+            <div className="pt-2 mt-1.5 border-t border-slate-200 flex items-center justify-between">
+              <span className="text-[10px] text-slate-500 font-mono">National Infrastructure Grid</span>
+              <a
+                href="/bridges"
+                className="text-[11px] font-bold text-sky-800 hover:text-sky-950 flex items-center gap-1 bg-sky-50 px-2 py-0.5 rounded border border-sky-200 transition-colors"
+              >
+                <span>Locate Bridges &amp; Flyovers</span>
+                <span className="text-xs">&rarr;</span>
+              </a>
+            </div>
           </div>
 
           {/* Top Right: Environmental Observation Controls (Section 12) */}

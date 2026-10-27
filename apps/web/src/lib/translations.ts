@@ -61,6 +61,29 @@ export interface TranslationDictionary {
     simulatingFlood: string;
     resetBaseline: string;
     backToRegistry: string;
+    locateTitle: string;
+    locateSubtitle: string;
+    historyTimeline: string;
+    operationalAge: string;
+    designLife: string;
+    remainingLife: string;
+    structuralParams: string;
+    superstructure: string;
+    substructure: string;
+    materials: string;
+    hydraulicSeismic: string;
+    locateOnMap: string;
+    allCategories: string;
+    filterState: string;
+    filterAge: string;
+    flyoversOnly: string;
+    bridgesOnly: string;
+    historicOnly: string;
+    dossierTitle: string;
+    trafficPcu: string;
+    activeSensors: string;
+    seismicZone: string;
+    builderContractor: string;
   };
   audits: {
     title: string;
@@ -226,6 +249,30 @@ export const TRANSLATIONS: Record<"en" | "hi" | "mr", TranslationDictionary> = {
       simulatingFlood: "Simulating Flood Surge...",
       resetBaseline: "Reset Baseline",
       backToRegistry: "Back to Bridge Registry",
+      locateTitle: "Locate Bridge or Flyover",
+      locateSubtitle:
+        "National infrastructure intelligence: explore historical provenance, commissioning era, calculated operational age, engineering parameters, and calibrated GIS coordinates.",
+      historyTimeline: "History & Construction Chronology",
+      operationalAge: "Operational Age",
+      designLife: "Design Service Life",
+      remainingLife: "Remaining Service Life",
+      structuralParams: "Civil Engineering Specifications",
+      superstructure: "Superstructure Classification",
+      substructure: "Substructure & Foundation",
+      materials: "Material & Metallurgy Specifications",
+      hydraulicSeismic: "Hydraulic, Marine & Seismic Profile",
+      locateOnMap: "Locate on GIS Map",
+      allCategories: "All Infrastructure Types",
+      filterState: "State / UT",
+      filterAge: "Era / Age",
+      flyoversOnly: "Flyovers & Elevated Viaducts",
+      bridgesOnly: "Bridges & Sea Links",
+      historicOnly: "Historic Heritage (>50 Yrs)",
+      dossierTitle: "Civil Infrastructure Intelligence Dossier",
+      trafficPcu: "Daily Traffic Volume",
+      activeSensors: "Active IoT Telemetry Nodes",
+      seismicZone: "Seismic Zone (IS:1893)",
+      builderContractor: "Builder / Executing Agency",
     },
     audits: {
       title: "26-Factor Field Structural Audit",
@@ -394,6 +441,30 @@ export const TRANSLATIONS: Record<"en" | "hi" | "mr", TranslationDictionary> = {
       simulatingFlood: "बाढ़ प्रवाह सिमुलेशन जारी...",
       resetBaseline: "आधार रेखा रीसेट करें",
       backToRegistry: "पुल रजिस्ट्री पर वापस जाएं",
+      locateTitle: "पुल एवं फ्लाईओवर खोजें व पता लगाएं",
+      locateSubtitle:
+        "राष्ट्रीय अवसंरचना अन्वेषण: ऐतिहासिक पृष्ठभूमि, निर्माण वर्ष, सक्रिय परिचालन आयु, सिविल इंजीनियरिंग मापदंड और सटीक जीआईएस निर्देशांक।",
+      historyTimeline: "इतिहास एवं निर्माण कालक्रम",
+      operationalAge: "सक्रिय परिचालन आयु",
+      designLife: "डिजाइन सेवा काल",
+      remainingLife: "अवशिष्ट सेवा काल",
+      structuralParams: "सिविल इंजीनियरिंग विनिर्देश",
+      superstructure: "अधिरचना वर्गीकरण",
+      substructure: "उपसंरचना एवं गहरी नींव",
+      materials: "सामग्री एवं इस्पात विनिर्देश",
+      hydraulicSeismic: "हाइड्रोलिक, सागरीय एवं भूकंपीय प्रोफाइल",
+      locateOnMap: "जीआईएस मानचित्र पर खोजें",
+      allCategories: "सभी अवसंरचना प्रकार",
+      filterState: "राज्य / केंद्रशासित प्रदेश",
+      filterAge: "आयु काल / युग",
+      flyoversOnly: "फ्लाईओवर एवं उन्नत वायाडक्ट",
+      bridgesOnly: "पुल एवं सागरीय सेतु",
+      historicOnly: "ऐतिहासिक धरोहर (>५० वर्ष)",
+      dossierTitle: "सिविल अवसंरचना तकनीकी डोजियर",
+      trafficPcu: "दैनिक यातायात घनत्व",
+      activeSensors: "सक्रिय आईओटी सेंसर नोड्स",
+      seismicZone: "भूकंपीय क्षेत्र (IS:1893)",
+      builderContractor: "निर्माण एवं निष्पादन एजेंसी",
     },
     audits: {
       title: "२६-घटक फील्ड संरचनात्मक ऑडिट",
@@ -562,6 +633,30 @@ export const TRANSLATIONS: Record<"en" | "hi" | "mr", TranslationDictionary> = {
       simulatingFlood: "पूर प्रवाह सिम्युलेशन सुरू...",
       resetBaseline: "मूळ स्थिती रीसेट करा",
       backToRegistry: "पूल नोंदवहीकडे परत जा",
+      locateTitle: "पूल आणि उड्डाणपूल शोधा व स्थान निश्चित करा",
+      locateSubtitle:
+        "राष्ट्रीय पायाभूत सुविधा शोध: ऐतिहासिक पार्श्वभूमी, बांधकाम वर्ष, सक्रिय परिचालन वय, स्थापत्य अभियांत्रिकी मापदंड आणि अचूक जीआयएस समन्वय.",
+      historyTimeline: "इतिहास आणि बांधकाम कालक्रम",
+      operationalAge: "सक्रिय परिचालन वय",
+      designLife: "डिझाइन सेवा काळ",
+      remainingLife: "उर्वरित सेवा काळ",
+      structuralParams: "स्थापत्य अभियांत्रिकी तपशील",
+      superstructure: "अधिरचना वर्गीकरण",
+      substructure: "उपसंरचना आणि खोल पाया",
+      materials: "साहित्य आणि धातू तपशील",
+      hydraulicSeismic: "हायड्रॉलिक, सागरी व भूकंपीय प्रोफाइल",
+      locateOnMap: "जीआयएस नकाशावर शोधा",
+      allCategories: "सर्व पायाभूत सुविधा प्रकार",
+      filterState: "राज्य / केंद्रशासित प्रदेश",
+      filterAge: "वय काळ / युग",
+      flyoversOnly: "उड्डाणपूल आणि उन्नत मार्ग",
+      bridgesOnly: "पूल आणि सागरी सेतू",
+      historicOnly: "ऐतिहासिक वारसा (>५० वर्षे)",
+      dossierTitle: "नागरी पायाभूत सुविधा तांत्रिक संचिका (डोजियर)",
+      trafficPcu: "दैनिक वाहतूक घनता",
+      activeSensors: "सक्रिय आयओटी सेन्सर नोड्स",
+      seismicZone: "भूकंपीय क्षेत्र (IS:1893)",
+      builderContractor: "बांधकाम व अंमलबजावणी संस्था",
     },
     audits: {
       title: "२६-घटक प्रत्यक्ष संरचनात्मक तपासणी (ऑडिट)",
