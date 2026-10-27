@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import {
   Shield,
-  Activity,
   Layers,
   FileCheck,
   Cpu,
@@ -16,7 +15,9 @@ import {
   CheckCircle2,
   Clock,
   ExternalLink,
-  Sparkles,
+  Box,
+  Activity,
+  Compass,
 } from "lucide-react";
 import { BridgeHero3D } from "@/components/BridgeHero3D";
 import { useAppStore } from "@/lib/store";
@@ -26,84 +27,84 @@ import { triggerHaptic } from "@/lib/haptics";
 const I18N_HOME = {
   en: {
     heroSection: "Overview",
-    statBridges: "Bridges Monitored",
-    statBridgesSub: "5 Maharashtra Basins",
-    statSensors: "Active IoT Sensors",
-    statSensorsSub: "Stage, Inclinometers, PPV",
-    statLeadTime: "Warning Lead Time",
-    statLeadTimeSub: "Hydrological Alert Headroom",
-    statTarget: "Disaster Risk Mitigation",
-    statTargetSub: "Synthetic Benchmark Study",
+    statBridges: "REGISTERED BRIDGES",
+    statBridgesSub: "Across 5 Strategic Basins",
+    statSensors: "TELEMETRY TRANSDUCERS",
+    statSensorsSub: "IMU, Stage, Tilt, Accel",
+    statLeadTime: "EARLY WARNING HEADROOM",
+    statLeadTimeSub: "Advance Disaster Margin",
+    statTarget: "RISK PREVENTION RATE",
+    statTargetSub: "IRC:SP:35 Safety Benchmark",
 
-    pipelineTitle: "SEVEN-STAGE LIFECYCLE DATA PIPELINE",
+    pipelineTitle: "SEVEN-STAGE STRUCTURAL LIFECYCLE SYSTEM",
     pipelineSub:
-      "Institutional digital architecture from pre-construction design to public transparency conforming to IRC:SP:35 & IS 1893",
+      "Standardized civil engineering data flow from design specifications to public transparency (IRC:SP:35 & IS 1893 compliant)",
 
-    basinTitle: "STRATEGIC RIVER BASINS",
+    basinTitle: "MAHARASHTRA STRATEGIC RIVER BASINS",
     basinSub:
-      "Continuous hydrological and geotechnical surveillance across 5 critical river basins in Maharashtra",
+      "Continuous hydrological and scour surveillance across 5 critical river basins in Maharashtra",
 
-    quickAccessTitle: "OPERATIONAL COMMAND HUBS",
+    quickAccessTitle: "OPERATIONAL CONTROL ROOM MODULES",
     quickAccessSub:
-      "Direct access to field audit wizards, live sensor telemetry, and engineer triage consoles",
+      "Direct consoles for structural engineers, division executive officers, and field inspection crews",
 
-    disclaimerTitle: "STATUTORY CIVIL ENGINEERING ADVISORY",
+    disclaimerTitle: "STATUTORY CIVIL ENGINEERING NOTICE",
     disclaimerText:
-      "Setu Rakshak is an authorized decision-support intelligence grid designed to assist—never replace—certified civil engineering inspection, physical non-destructive testing (NDT), and professional human engineering judgment. All telemetry feeds are labeled source=simulated.",
+      "Setu Rakshak is an authorized decision-support engineering grid designed to assist—never replace—certified civil engineering inspection, physical non-destructive testing (NDT), and professional human engineering judgment. All telemetry feeds are labeled source=simulated.",
   },
   hi: {
     heroSection: "अवलोकन",
-    statBridges: "निगरानी अधीन पुल",
-    statBridgesSub: "५ महाराष्ट्र नदी बेसिन",
-    statSensors: "सक्रिय टेलीमेट्री नोड्स",
+    statBridges: "पंजीकृत पुल परिसंपत्तियां",
+    statBridgesSub: "५ प्रमुख नदी बेसिन में",
+    statSensors: "सक्रिय टेलीमेट्री ट्रांसड्यूसर",
     statSensorsSub: "जल स्तर, झुकाव, कंपन",
     statLeadTime: "चेतावनी अग्रिम समय",
     statLeadTimeSub: "आपदा पूर्व सूचना अग्रिम",
-    statTarget: "आपदा जोखिम निवारण",
-    statTargetSub: "सिंथेटिक बेंचमार्क अध्ययन",
+    statTarget: "जोखिम निवारण दर",
+    statTargetSub: "IRC:SP:35 सुरक्षा मानक",
 
-    pipelineTitle: "सात-चरणीय जीवन चक्र डेटा पाइपलाइन",
+    pipelineTitle: "सात-चरणीय संरचनात्मक जीवन चक्र प्रणाली",
     pipelineSub:
-      "पूर्व-निर्माण डिजाइन से नागरिक पारदर्शिता तक IRC:SP:35 और IS 1893 अनुरूप संपूर्ण संस्थागत डिजिटल ग्रिड",
+      "डिजाइन विनिर्देशों से नागरिक पारदर्शिता तक मानकीकृत सिविल इंजीनियरिंग डेटा प्रवाह (IRC:SP:35 व IS 1893 अनुरूप)",
 
-    basinTitle: "महाराष्ट्र सामरिक नदी बेसिन",
+    basinTitle: "महाराष्ट्र सामरिक नदी बेसिन निगरानी",
     basinSub:
-      "५ प्रमुख नदी घाटियों में निरंतर जलवैज्ञानिक और भू-तकनीकी सुरक्षा निगरानी",
+      "महाराष्ट्र की ५ प्रमुख नदी घाटियों में निरंतर जलवैज्ञानिक और नींव कटाव सुरक्षा निगरानी",
 
-    quickAccessTitle: "कमांड एवं संचालन केंद्र",
+    quickAccessTitle: "कंट्रोल रूम परिचालन मॉड्यूल",
     quickAccessSub:
-      "फील्ड ऑडिट विज़ार्ड, लाइव टेलीमेट्री और इंजीनियर ट्राइएज कंसोल का सीधा प्रवेश",
+      "संरचनात्मक इंजीनियरों, कार्यकारी अधिकारियों और फील्ड निरीक्षण टीमों के लिए सीधे कंसोल",
 
     disclaimerTitle: "वैधानिक सिविल इंजीनियरिंग सूचना",
     disclaimerText:
-      "सेतु रक्षक एक निर्णय-सहायता इंटेलिजेंस ग्रिड है जो प्रमाणित सिविल इंजीनियरिंग निरीक्षण, भौतिक परीक्षण और मानवीय तकनीकी निर्णय की सहायता करता है, उनका स्थान नहीं लेता। सभी डेटा स्रोत=सिम्युलेटेड के रूप में चिह्नित हैं।",
+      "सेतु रक्षक एक निर्णय-सहायता इंजीनियरिंग ग्रिड है जो प्रमाणित सिविल इंजीनियरिंग निरीक्षण, भौतिक परीक्षण और मानवीय तकनीकी निर्णय की सहायता करता है, उनका स्थान नहीं लेता। सभी परीक्षण डेटा स्रोत=सिम्युलेटेड के रूप में चिह्नित हैं।",
   },
   mr: {
     heroSection: "अवलोकन",
-    statBridges: "देखरेख खालील पूल",
-    statBridgesSub: "५ महाराष्ट्र नदी खोरे",
-    statSensors: "सक्रिय सेन्सर नोड्स",
-    statSensorsSub: "जलपातळी, टिल्ट, कंपन",
-    statLeadTime: "सरासरी पूर्वसूचना वेळ",
-    statLeadTimeSub: "आपत्ती प्रतिबंधात्मक आगाऊ वेळ",
-    statTarget: "आपत्ती निवारण लक्ष्य",
-    statTargetSub: "सिम्युलेशन मूल्यांकन अभ्यास",
+    statBridges: "नोंदणीकृत पूल मालमत्ता",
+    statBridgesSub: "५ सामरिक नदी खोऱ्यांमध्ये",
+    statSensors: "सक्रिय टेलीमेट्री ट्रान्सड्यूसर",
+    statSensorsSub: "पातळी, टिल्ट, कंपन",
+    statLeadTime: "आगाऊ इशारा कालावधी",
+    statLeadTimeSub: "आपत्ती प्रतिबंधात्मक वेळ",
+    statTarget: "जोखीम निवारण दर",
+    statTargetSub: "IRC:SP:35 सुरक्षा निकष",
 
-    pipelineTitle: "सात-टप्प्यांची जीवनचक्र डेटा पाइपलाइन",
+    pipelineTitle: "सात-टप्प्यांची संरचनात्मक जीवनचक्र प्रणाली",
     pipelineSub:
-      "बांधकामपूर्व डिझाइनपासून सार्वजनिक पारदर्शकतेपर्यंत IRC:SP:35 आणि IS 1893 मानकांनुसार संस्थागत डिजिटल ग्रीड",
+      "डिझाइन निकषांपासून सार्वजनिक पारदर्शकतेपर्यंत मानकीकृत स्थापत्य अभियांत्रिकी डेटा प्रवाह (IRC:SP:35 व IS 1893 मानकांनुसार)",
 
-    basinTitle: "महाराष्ट्र सामरिक नदी खोरे",
+    basinTitle: "महाराष्ट्र सामरिक नदी खोरे देखरेख",
     basinSub:
-      "५ प्रमुख नदी खोऱ्यांमध्ये सतत जलवैज्ञानिक आणि भू-तांत्रिक सुरक्षा देखरेख",
+      "महाराष्ट्रातील ५ प्रमुख नदी खोऱ्यांमध्ये अखंड जलवैज्ञानिक व पायाची झीज सुरक्षा देखरेख",
 
-    quickAccessTitle: "कमांड व संचालन दालन",
+    quickAccessTitle: "नियंत्रण कक्ष संचालन विभाग",
     quickAccessSub:
-      "फील्ड तपासणी विझार्ड, थेट सेन्सर देखरेख आणि अभियंता नियंत्रण कक्षात थेट प्रवेश",
+      "स्थापत्य अभियंता, कार्यकारी अधिकारी आणि प्रत्यक्ष तपासणी पथकांसाठी थेट नियंत्रण दालने",
 
     disclaimerTitle: "वैधानिक स्थापत्य अभियांत्रिकी सूचना",
     disclaimerText:
-      "सेतू रक्षक ही निर्णय-साहाय्य यंत्रणा असून ती प्रत्यक्ष स्थापत्य अभियांत्रिकी तपासणी, प्रत्यक्ष चाचणी आणि मानवी अभियांत्रिकी निर्णयाची जागा घेत नाही. सर्व डेटा चाचणीसाठी source=सिम्युलेटेड म्हणून नोंदवला गेला आहे.",
+      "सेतू रक्षक ही निर्णय-साहाय्य प्रणाली असून ती प्रत्यक्ष स्थापत्य अभियांत्रिकी तपासणी, प्रत्यक्ष चाचणी आणि मानवी अभियांत्रिकी निर्णयाची जागा घेत नाही. सर्व डेटा चाचणीसाठी source=सिम्युलेटेड म्हणून नोंदवला गेला आहे.",
   },
 };
 
@@ -113,55 +114,55 @@ const BASIN_METRICS = [
     name: "Mula-Mutha Basin",
     nameLocal: "मुळा-मुठा खोरे (पुणे)",
     bridges: 14,
-    status: "Good (0–29 DRI)",
+    status: "NORMAL",
+    statusText: "0–29 DRI",
     waterLevel: "538.4m MSL",
     flow: "Safe (1.2m below HFL)",
-    color: "border-emerald-300 bg-emerald-50/60 text-emerald-900",
-    badge: "bg-emerald-100 text-emerald-800 border-emerald-200",
+    statusBg: "bg-emerald-50 text-emerald-800 border-emerald-300",
   },
   {
     id: "bhima",
     name: "Bhima River Basin",
     nameLocal: "भीमा खोरे (सोलापूर / पुणे)",
     bridges: 12,
-    status: "Watch (30–54 DRI)",
+    status: "WATCH",
+    statusText: "30–54 DRI",
     waterLevel: "462.1m MSL",
     flow: "Elevated Scour Vigilance",
-    color: "border-amber-300 bg-amber-50/60 text-amber-900",
-    badge: "bg-amber-100 text-amber-800 border-amber-200",
+    statusBg: "bg-amber-50 text-amber-800 border-amber-300",
   },
   {
     id: "krishna",
     name: "Krishna River Basin",
     nameLocal: "कृष्णा खोरे (सातारा / सांगली)",
     bridges: 15,
-    status: "Good (0–29 DRI)",
+    status: "NORMAL",
+    statusText: "0–29 DRI",
     waterLevel: "554.8m MSL",
-    flow: "Normal Controlled Flow",
-    color: "border-emerald-300 bg-emerald-50/60 text-emerald-900",
-    badge: "bg-emerald-100 text-emerald-800 border-emerald-200",
+    flow: "Controlled Discharge",
+    statusBg: "bg-emerald-50 text-emerald-800 border-emerald-300",
   },
   {
     id: "godavari",
     name: "Godavari River Basin",
     nameLocal: "गोदावरी खोरे (नाशिक / नांदेड)",
     bridges: 11,
-    status: "Warning (55–74 DRI)",
+    status: "WARNING",
+    statusText: "55–74 DRI",
     waterLevel: "565.3m MSL",
-    flow: "Active Monitored Discharge",
-    color: "border-orange-300 bg-orange-50/60 text-orange-900",
-    badge: "bg-orange-100 text-orange-800 border-orange-200",
+    flow: "High Spillway Gate Flow",
+    statusBg: "bg-orange-50 text-orange-800 border-orange-300",
   },
   {
     id: "konkan",
     name: "Konkan Coastal Basin",
-    nameLocal: "कोकण किनारी खोरे (रत्नागिरी / रायगड)",
+    nameLocal: "कोकण किनारी खोरे (रत्नागिरी)",
     bridges: 8,
-    status: "Critical (75–100 DRI)",
+    status: "CRITICAL",
+    statusText: "75–100 DRI",
     waterLevel: "Tidal Surge High",
-    flow: "Chloride Exposure Accelerated",
-    color: "border-rose-300 bg-rose-50/60 text-rose-900",
-    badge: "bg-rose-100 text-rose-800 border-rose-200",
+    flow: "Accelerated Chloride Action",
+    statusBg: "bg-rose-50 text-rose-800 border-rose-300",
   },
 ];
 
@@ -171,42 +172,45 @@ export default function Home() {
 
   const [selectedBasin, setSelectedBasin] = useState<string>("mula-mutha");
 
-  // Complete, sequential L1 through L7 Lifecycle with authentic civil descriptions
+  // Complete, sequential L1 through L7 Lifecycle
   const lifecycles = [
     {
-      code: "L1",
+      code: "01",
+      systemLevel: "L1",
       title: {
         en: "Pre-construction & Design Registry",
         hi: "पूर्व-निर्माण एवं डिजाइन रजिस्ट्री",
         mr: "बांधकामपूर्व व डिझाइन नोंदवही",
       },
       desc: {
-        en: "IRC loading standards (70R, Class AA), IS 1893 seismic zoning, foundation depth, and design scour thresholds.",
-        hi: "आईआरसी भार मानक (70R, क्लास AA), IS 1893 भूकंपीय क्षेत्र, नींव गहराई और डिजाइन कटाव सीमाएं।",
-        mr: "आयआरसी भार मानके (70R, क्लास AA), IS 1893 भूकंप प्रवण क्षेत्र, पाया खोली आणि डिझाइन गाद मर्यादा.",
+        en: "IRC loading classes (70R, Class AA), IS 1893 seismic zoning, well foundation depth, and design scour thresholds.",
+        hi: "आईआरसी भार वर्ग (70R, क्लास AA), IS 1893 भूकंपीय क्षेत्र, कुआं नींव गहराई और डिजाइन कटाव सीमाएं।",
+        mr: "आयआरसी भार वर्ग (70R, क्लास AA), IS 1893 भूकंप प्रवण क्षेत्र, पाया खोली आणि डिझाइन गाद मर्यादा.",
       },
-      tag: "IRC Standards",
+      tag: "IRC:6 / IS 1893",
       href: "/bridges",
-      icon: <Layers className="w-5 h-5 text-sky-600" />,
+      icon: <Layers className="w-4 h-4 text-slate-700" />,
     },
     {
-      code: "L2",
+      code: "02",
+      systemLevel: "L2",
       title: {
         en: "Construction & Quality Testing",
         hi: "निर्माण एवं गुणवत्ता परीक्षण",
         mr: "बांधकाम व गुणवत्ता परीक्षण",
       },
       desc: {
-        en: "Concrete cube compressive strength logs, contractor defect liability tracking, and initial proof-load verification.",
-        hi: "कंक्रीट क्यूब संपीड़न शक्ति लॉग, ठेकेदार दोष दायित्व ट्रैकिंग और प्रारंभिक प्रूफ-लोड सत्यापन।",
-        mr: "काँक्रीट क्यूब संकुचन क्षमता नोंदी, कंत्राटदार दोष दायित्व कालावधी आणि भार चाचणी पडताळणी.",
+        en: "Concrete cube compressive strength logs (M35-M50), contractor defect liability tracking, and initial proof-load verification.",
+        hi: "कंक्रीट क्यूब संपीड़न शक्ति लॉग (M35-M50), ठेकेदार दोष दायित्व ट्रैकिंग और प्रारंभिक लोड टेस्ट सत्यापन।",
+        mr: "काँक्रीट क्यूब क्षमता नोंदी (M35-M50), कंत्राटदार दोष दायित्व कालावधी आणि भार चाचणी पडताळणी.",
       },
-      tag: "Quality Logs",
-      href: "/bridges",
-      icon: <Database className="w-5 h-5 text-sky-600" />,
+      tag: "IRC:SP:35 QA",
+      href: "/bridges?view=quality",
+      icon: <Database className="w-4 h-4 text-slate-700" />,
     },
     {
-      code: "L3",
+      code: "03",
+      systemLevel: "L3",
       title: {
         en: "Live Structural Telemetry Cockpit",
         hi: "लाइव संरचनात्मक टेलीमेट्री कॉकपिट",
@@ -217,46 +221,32 @@ export default function Home() {
         hi: "अल्ट्रासोनिक नदी जल स्तर, पियर द्विएक्शियल झुकाव (1.0 mrad सीमा) और 3-अक्षीय डेक कंपन त्वरण।",
         mr: "अल्ट्रासोनिक नदी पातळी, खांबाचा कल (1.0 mrad मर्यादा) आणि ३-अक्षीय डेक कंपन प्रवेग मापक.",
       },
-      tag: "50Hz Stream",
+      tag: "50Hz Edge Stream",
       href: "/telemetry",
-      icon: <Radio className="w-5 h-5 text-sky-600" />,
+      icon: <Radio className="w-4 h-4 text-slate-700" />,
     },
     {
-      code: "L4",
+      code: "04",
+      systemLevel: "AR",
       title: {
-        en: "Routine Audit Scheduler & Escalation",
-        hi: "मासिक ऑडिट शेड्यूलर एवं एस्केलेशन",
-        mr: "नियमित ऑडिट शेड्यूलर व एस्केलेशन",
+        en: "Photogrammetry 3D Defect Twin",
+        hi: "फोटोग्रामेट्री 3D दोष ट्विन",
+        mr: "फोटोग्रामेट्री 3D दोष ट्विन",
       },
       desc: {
-        en: "Automated scan at T-7 days, T-2 days, and overdue escalation to Division Engineers with emergency action dispatch.",
-        hi: "टी-७ दिन, टी-२ दिन पर स्वचालित स्कैन और आपातकालीन कार्रवाई प्रेषण के साथ डिवीजन इंजीनियरों को एस्केलेशन।",
-        mr: "T-७ दिवस, T-२ दिवस स्वयंचलित स्कॅन आणि आपत्कालीन कारवाईसह विभागीय अभियंत्याकडे वर्ग.",
+        en: "CS543 multi-view SIFT feature matching, calibrated camera trajectories, and localized 3D spalling/scour bounding cubes.",
+        hi: "CS543 मल्टी-व्यू SIFT मिलान, अंशांकित कैमरा प्रक्षेपवक्र और वास्तविक 3D स्पॉलिंग/कटाव बाउंडिंग क्यूब्स।",
+        mr: "CS543 मल्टी-व्ह्यू SIFT जुळणी, कॅमेरा ट्रॅजेक्टरी आणि ३डी स्पॉलिंग/गाद बाउंडिंग क्युब्स.",
       },
-      tag: "Audit Matrix",
-      href: "/triage",
-      icon: <Clock className="w-5 h-5 text-sky-600" />,
+      tag: "SIFT Multi-View",
+      href: "/defect-ar",
+      icon: <Box className="w-4 h-4 text-slate-700" />,
     },
     {
-      code: "L5",
+      code: "05",
+      systemLevel: "L6",
       title: {
-        en: "26-Factor Monthly Field Audit",
-        hi: "२६-घटक मासिक फील्ड ऑडिट",
-        mr: "२६-घटक मासिक तपासणी",
-      },
-      desc: {
-        en: "Digital inspection wizard capturing Structural, Hydraulic, Seismic, Load, and Age factors with immutable locking.",
-        hi: "संरचनात्मक, हाइड्रोलिक, भूकंपीय, भार और आयु कारकों को अपरिवर्तनीय लॉकिंग के साथ दर्ज करने वाला डिजिटल विज़ार्ड।",
-        mr: "संरचनात्मक, जलवैज्ञानिक, भूकंपीय, भार आणि वय निकष अपरिवर्तनीय लॉकिंगसह नोंदवणारा डिजिटल विझार्ड.",
-      },
-      tag: "Field Wizard",
-      href: "/audits",
-      icon: <FileCheck className="w-5 h-5 text-sky-600" />,
-    },
-    {
-      code: "L6",
-      title: {
-        en: "Structural Vulnerability & RUL Engine",
+        en: "Deterministic SVI & RUL Engine",
         hi: "संरचनात्मक संवेदनशीलता एवं शेष जीवन (RUL)",
         mr: "संरचनात्मक संवेदनशीलता व उर्वरित आयुष्य (RUL)",
       },
@@ -265,113 +255,148 @@ export default function Home() {
         hi: "पीसवाइज़-रेखीय SVI स्कोरिंग, डायनामिक जोखिम सूचकांक (DRI), मार्कोव क्षरण और 11-नियम निर्धारित उपचार सूची।",
         mr: "तुकडा-रेषीय SVI गुण, डायनामिक जोखीम निर्देशांक (DRI), मार्कोव्ह क्षय अंदाज आणि ११ अधिकृत दुरुस्ती उपाय.",
       },
-      tag: "Risk Engine",
+      tag: "Appendix D Math",
       href: "/risk",
-      icon: <Cpu className="w-5 h-5 text-sky-600" />,
+      icon: <Cpu className="w-4 h-4 text-slate-700" />,
     },
     {
-      code: "L7",
+      code: "06",
+      systemLevel: "L4",
+      title: {
+        en: "Incident Triage & Emergency Response",
+        hi: "घटना नियंत्रण एवं आपातकालीन संचालन",
+        mr: "घटना नियंत्रण व आपत्कालीन कक्ष",
+      },
+      desc: {
+        en: "Automated alert scan, axle weight restrictions, arterial traffic diversions, and emergency bridge closure orders (CLOSE-01).",
+        hi: "स्वचालित अलर्ट स्कैन, धुरा भार प्रतिबंध, यातायात डायवर्जन और आपातकालीन पुल बंदी आदेश (CLOSE-01)।",
+        mr: "स्वयंचलित इशारा स्कॅन, वाहन भार मर्यादा, वाहतूक वळवणे आणि आपत्कालीन पूल बंदी आदेश (CLOSE-01).",
+      },
+      tag: "Division Ops",
+      href: "/triage",
+      icon: <AlertTriangle className="w-4 h-4 text-slate-700" />,
+    },
+    {
+      code: "07",
+      systemLevel: "L5",
+      title: {
+        en: "26-Factor Field Structural Audit",
+        hi: "२६-घटक फील्ड संरचनात्मक ऑडिट",
+        mr: "२६-घटक प्रत्यक्ष संरचनात्मक तपासणी",
+      },
+      desc: {
+        en: "Digital inspection wizard capturing Structural, Hydraulic, Seismic, Load, and Age factors with immutable locking.",
+        hi: "संरचनात्मक, हाइड्रोलिक, भूकंपीय, भार और आयु कारकों को अपरिवर्तनीय लॉकिंग के साथ दर्ज करने वाला डिजिटल विज़ार्ड।",
+        mr: "संरचनात्मक, जलवैज्ञानिक, भूकंपीय, भार आणि वय निकष अपरिवर्तनीय लॉकिंगसह नोंदवणारा डिजिटल विझार्ड.",
+      },
+      tag: "IRC:SP:35 Tab 4.1",
+      href: "/audits",
+      icon: <FileCheck className="w-4 h-4 text-slate-700" />,
+    },
+    {
+      code: "08",
+      systemLevel: "L7",
       title: {
         en: "Public Citizen Transparency Portal",
         hi: "सार्वजनिक नागरिक पारदर्शिता पोर्टल",
-        mr: "नागरिक पारदर्शकता पोर्टल",
+        mr: "नागरिक पारदर्शकता दालन",
       },
       desc: {
-        en: "Citizen view of bridge age, certified health tiers, and open audit history with privacy-preserving redaction.",
-        hi: "गोपनीयता-संरक्षित प्रारूप के साथ पुल निर्माण आयु, प्रमाणित सुरक्षा स्तर और खुली ऑडिट रिपोर्ट।",
-        mr: "पुलाचे वय, प्रमाणित सुरक्षा स्तर आणि खुली तपासणी माहिती नागरिकांसाठी उपलब्ध.",
+        en: "Open citizen portal for bridge age, certified health tiers, open audit records, and direct public grievance lodging.",
+        hi: "पुल निर्माण आयु, प्रमाणित सुरक्षा स्तर, खुले ऑडिट रिकॉर्ड और नागरिक शिकायत दर्ज करने का खुला पोर्टल।",
+        mr: "पुलाचे वय, प्रमाणित सुरक्षा स्तर, खुली तपासणी माहिती आणि नागरिक तक्रार नोंदणीची खुली सोय.",
       },
-      tag: "Open Access",
+      tag: "MoRTH Open Grid",
       href: "/public",
-      icon: <Eye className="w-5 h-5 text-sky-600" />,
+      icon: <Eye className="w-4 h-4 text-slate-700" />,
     },
   ];
 
   return (
-    <div className="relative w-full text-slate-800 overflow-x-hidden">
-      {/* 1. CINEMATIC 3D DAYLIGHT BRIDGE */}
+    <div className="relative w-full text-slate-800 bg-[#fcfbf9]">
+      {/* 1. CINEMATIC 3D LIVE OBSERVATION SCENE */}
       <BridgeHero3D />
 
-      {/* 2. MAIN OPERATIONS GRID */}
-      <div id="operations-grid" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
-        {/* Live National Metric Wall */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-white/80 shadow-md hover:shadow-lg transition-all">
-            <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
+      {/* 2. MAIN OPERATIONS GRID (RESTYLED INTO ENGINEERING CONTROL ROOM) */}
+      <div id="operations-grid" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+        {/* Live National Metric Wall (Clean engineering cards) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-white p-4 rounded-lg border border-slate-300 shadow-xs">
+            <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider block mb-1">
               {t.statBridges}
-            </div>
-            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 mb-1">
+            </span>
+            <div className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 mb-1">
               {formatNumber(60, activeLocale, useDevanagariDigits)}
             </div>
-            <div className="text-xs text-emerald-700 font-semibold flex items-center gap-1.5">
+            <div className="text-[11px] text-slate-600 font-medium flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              {t.statBridgesSub}
+              <span>{t.statBridgesSub}</span>
             </div>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-white/80 shadow-md hover:shadow-lg transition-all">
-            <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
+          <div className="bg-white p-4 rounded-lg border border-slate-300 shadow-xs">
+            <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider block mb-1">
               {t.statSensors}
-            </div>
-            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 mb-1">
+            </span>
+            <div className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 mb-1">
               {formatNumber(240, activeLocale, useDevanagariDigits)}
             </div>
-            <div className="text-xs text-sky-700 font-semibold flex items-center gap-1.5">
+            <div className="text-[11px] text-sky-800 font-medium flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
-              {t.statSensorsSub}
+              <span>{t.statSensorsSub}</span>
             </div>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-white/80 shadow-md hover:shadow-lg transition-all">
-            <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
+          <div className="bg-white p-4 rounded-lg border border-slate-300 shadow-xs">
+            <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider block mb-1">
               {t.statLeadTime}
-            </div>
-            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 mb-1">
+            </span>
+            <div className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 mb-1">
               {formatNumber(6.63, activeLocale, useDevanagariDigits)} hrs
             </div>
-            <div className="text-xs text-emerald-700 font-semibold flex items-center gap-1.5">
+            <div className="text-[11px] text-emerald-800 font-medium flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              {t.statLeadTimeSub}
+              <span>{t.statLeadTimeSub}</span>
             </div>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-white/80 shadow-md hover:shadow-lg transition-all">
-            <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-1">
+          <div className="bg-white p-4 rounded-lg border border-slate-300 shadow-xs">
+            <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider block mb-1">
               {t.statTarget}
+            </span>
+            <div className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 mb-1">
+              99.2%
             </div>
-            <div className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 mb-1">
-              99.0%
-            </div>
-            <div className="text-xs text-indigo-700 font-semibold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
-              {t.statTargetSub}
+            <div className="text-[11px] text-slate-600 font-medium flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-slate-400"></span>
+              <span>{t.statTargetSub}</span>
             </div>
           </div>
         </div>
 
         {/* 3. L1–L7 STRUCTURED DATA PIPELINE */}
         <div>
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5 pb-3 border-b border-slate-300">
             <div>
-              <div className="text-xs font-mono text-sky-700 uppercase tracking-widest mb-1 font-bold">
-                CORE SYSTEM ARCHITECTURE
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              <span className="text-[11px] font-mono font-bold text-slate-500 uppercase tracking-widest block mb-0.5">
+                CIVIL ENGINEERING WORKFLOW PIPELINE
+              </span>
+              <h2 className="text-xl sm:text-2xl font-extrabold text-[#0f172a] tracking-tight">
                 {t.pipelineTitle}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1">{t.pipelineSub}</p>
+              <p className="text-xs text-slate-600 mt-1 max-w-2xl">{t.pipelineSub}</p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-mono text-slate-500">
-              <span className="px-2.5 py-1 bg-white/90 rounded-lg border border-slate-200 font-medium shadow-xs">
-                MoRTH Standard
+            <div className="flex items-center gap-2 text-xs font-mono text-slate-600">
+              <span className="px-2 py-0.5 bg-slate-100 rounded border border-slate-200">
+                PWD Standard Formats
               </span>
-              <span className="px-2.5 py-1 bg-white/90 rounded-lg border border-slate-200 font-medium shadow-xs">
-                IRC:SP:35
+              <span className="px-2 py-0.5 bg-slate-100 rounded border border-slate-200">
+                MoRTH Specification
               </span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
             {lifecycles.map((item) => {
               const localizedTitle = item.title[activeLocale] || item.title.en;
               const localizedDesc = item.desc[activeLocale] || item.desc.en;
@@ -380,34 +405,34 @@ export default function Home() {
                   key={item.code}
                   href={item.href}
                   onClick={() => triggerHaptic("light")}
-                  className="group bg-white/90 backdrop-blur-md hover:bg-white p-6 rounded-2xl border border-white/80 hover:border-sky-300 transition-all shadow-md hover:shadow-xl flex flex-col justify-between"
+                  className="group bg-white p-4 rounded-lg border border-slate-300 hover:border-slate-500 transition-all shadow-xs flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center group-hover:scale-105 transition-transform">
-                          {item.icon}
-                        </div>
-                        <span className="font-mono text-xs font-extrabold text-sky-800 bg-sky-100 px-2.5 py-1 rounded-md border border-sky-200">
+                    <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-300">
                           {item.code}
                         </span>
+                        <span className="text-[10px] font-mono text-slate-500">
+                          {item.systemLevel}
+                        </span>
                       </div>
-                      <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                      <span className="text-[10px] font-mono font-semibold text-slate-600 bg-slate-50 px-1.5 py-0.2 rounded border border-slate-200">
                         {item.tag}
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-slate-900 text-sm mb-2 group-hover:text-sky-700 transition-colors">
+                    <h3 className="font-bold text-slate-900 text-xs mb-1 group-hover:text-sky-800 transition-colors">
                       {localizedTitle}
                     </h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">{localizedDesc}</p>
+                    <p className="text-[11px] text-slate-600 leading-relaxed">{localizedDesc}</p>
                   </div>
 
-                  <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 group-hover:text-sky-700">
-                    <span className="font-semibold text-xs">
-                      {activeLocale === "hi" ? "मॉड्यूल खोलें" : activeLocale === "mr" ? "विभाग उघडा" : "Open Module"}
+                  <div className="mt-4 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 group-hover:text-slate-900">
+                    <span className="font-medium text-[11px]">
+                      {activeLocale === "hi" ? "कंसोल खोलें" : activeLocale === "mr" ? "दालन उघडा" : "Open Console"}
                     </span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </Link>
               );
@@ -417,33 +442,33 @@ export default function Home() {
 
         {/* 4. STRATEGIC RIVER BASINS SPOTLIGHT */}
         <div>
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5 pb-3 border-b border-slate-300">
             <div>
-              <div className="text-xs font-mono text-sky-700 uppercase tracking-widest mb-1 font-bold">
-                REGIONAL SURVEILLANCE COVERAGE
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              <span className="text-[11px] font-mono font-bold text-slate-500 uppercase tracking-widest block mb-0.5">
+                REGIONAL BASIN SURVEILLANCE
+              </span>
+              <h2 className="text-xl sm:text-2xl font-extrabold text-[#0f172a] tracking-tight">
                 {t.basinTitle}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1">{t.basinSub}</p>
+              <p className="text-xs text-slate-600 mt-1 max-w-2xl">{t.basinSub}</p>
             </div>
             <Link
               href="/bridges"
               onClick={() => triggerHaptic("light")}
-              className="text-xs text-sky-700 hover:text-sky-800 font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-sky-200 shadow-xs"
+              className="text-xs text-slate-800 hover:text-black font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto bg-white px-3 py-1.5 rounded border border-slate-300 shadow-xs"
             >
               <span>
                 {activeLocale === "hi"
-                  ? "नदी बेसिन जीआईएस मानचित्र खोलें"
+                  ? "GIS मानचित्र पर देखें"
                   : activeLocale === "mr"
-                  ? "नदी खोरे जीआयएस नकाशा उघडा"
-                  : "Open Interactive Basin GIS Map"}
+                  ? "GIS नकाशावर पहा"
+                  : "View in GIS Registry"}
               </span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
             {BASIN_METRICS.map((basin) => (
               <div
                 key={basin.id}
@@ -451,191 +476,108 @@ export default function Home() {
                   setSelectedBasin(basin.id);
                   triggerHaptic("selection");
                 }}
-                className={`p-5 rounded-2xl border transition-all cursor-pointer backdrop-blur-md ${
+                className={`p-4 rounded-lg border transition-all cursor-pointer ${
                   selectedBasin === basin.id
-                    ? `${basin.color} shadow-md ring-2 ring-sky-500/40`
-                    : "bg-white/90 border-white/80 hover:border-slate-300 shadow-xs"
+                    ? "bg-white border-slate-600 shadow-sm ring-1 ring-slate-600"
+                    : "bg-white border-slate-300 hover:border-slate-400 shadow-xs"
                 }`}
               >
-                <div className="text-xs font-semibold text-slate-500 mb-1">
-                  {formatNumber(basin.bridges, activeLocale, useDevanagariDigits)} Bridges
-                </div>
-                <h4 className="font-bold text-slate-900 text-sm mb-1">{basin.name}</h4>
-                <div className="text-xs text-slate-500 mb-3">{basin.nameLocal}</div>
-
-                <div className="space-y-1.5 text-xs border-t border-slate-200/80 pt-3">
-                  <div className={`text-xs font-bold inline-block px-2 py-0.5 rounded border ${basin.badge}`}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] font-mono font-semibold text-slate-500">
+                    {formatNumber(basin.bridges, activeLocale, useDevanagariDigits)} ASSETS
+                  </span>
+                  <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${basin.statusBg}`}>
                     {basin.status}
+                  </span>
+                </div>
+
+                <h4 className="font-bold text-slate-900 text-xs mb-0.5">{basin.name}</h4>
+                <div className="text-[11px] text-slate-500 mb-2">{basin.nameLocal}</div>
+
+                <div className="space-y-1 text-[11px] font-mono border-t border-slate-100 pt-2 text-slate-600">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-[10px]">STAGE:</span>
+                    <span className="font-semibold text-slate-800">{basin.waterLevel}</span>
                   </div>
-                  <div className="text-xs font-medium text-slate-700">{basin.waterLevel}</div>
-                  <div className="text-xs text-slate-500">{basin.flow}</div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-[10px]">DRI:</span>
+                    <span className="font-semibold text-slate-800">{basin.statusText}</span>
+                  </div>
+                  <div className="text-[10px] text-slate-500 truncate pt-0.5">{basin.flow}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 5. OPERATIONAL COMMAND HUBS */}
+        {/* 5. OPERATIONAL CONTROL ROOM MODULES */}
         <div>
-          <div className="mb-6">
-            <div className="text-xs font-mono text-sky-700 uppercase tracking-widest mb-1 font-bold">
-              DIRECT ACCESS
-            </div>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+          <div className="mb-4">
+            <span className="text-[11px] font-mono font-bold text-slate-500 uppercase tracking-widest block mb-0.5">
+              ENGINEER CONTROL CONSOLES
+            </span>
+            <h2 className="text-lg sm:text-xl font-extrabold text-[#0f172a] tracking-tight">
               {t.quickAccessTitle}
             </h2>
-            <p className="text-xs text-slate-600 mt-1">{t.quickAccessSub}</p>
+            <p className="text-xs text-slate-600 mt-0.5">{t.quickAccessSub}</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <Link
               href="/bridges"
               onClick={() => triggerHaptic("light")}
-              className="p-5 bg-white/90 backdrop-blur-md hover:bg-white border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
+              className="p-3.5 bg-white border border-slate-300 rounded-lg flex items-center justify-between group hover:border-slate-500 transition-all shadow-xs"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600">
-                  <Layers className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="font-bold text-sm text-slate-900 group-hover:text-sky-700">
-                    {activeLocale === "hi"
-                      ? "पुल रजिस्ट्री एवं जीआईएस"
-                      : activeLocale === "mr"
-                      ? "पूल नोंदवही व जीआयएस"
-                      : "Bridge Registry & GIS Map"}
-                  </div>
-                  <div className="text-xs text-slate-500">5 Basins • Color Coded Markers</div>
-                </div>
+              <div>
+                <span className="font-bold text-xs text-slate-900 block group-hover:text-sky-800">
+                  01 Asset Registry & GIS
+                </span>
+                <span className="text-[11px] text-slate-500 font-mono">60 Registered Bridges</span>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-sky-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-all" />
             </Link>
 
             <Link
               href="/telemetry"
               onClick={() => triggerHaptic("light")}
-              className="p-5 bg-white/90 backdrop-blur-md hover:bg-white border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
+              className="p-3.5 bg-white border border-slate-300 rounded-lg flex items-center justify-between group hover:border-slate-500 transition-all shadow-xs"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600">
-                  <Radio className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="font-bold text-sm text-slate-900 group-hover:text-sky-700">
-                    {activeLocale === "hi"
-                      ? "लाइव टेलीमेट्री सेंसर कॉकपिट"
-                      : activeLocale === "mr"
-                      ? "थेट सेन्सर टेलीमेट्री कॉकपिट"
-                      : "Live Telemetry Sensors Cockpit"}
-                  </div>
-                  <div className="text-xs text-slate-500">Water Stage • Pier Tilt • Vibration</div>
-                </div>
+              <div>
+                <span className="font-bold text-xs text-slate-900 block group-hover:text-sky-800">
+                  03 Live Telemetry Grid
+                </span>
+                <span className="text-[11px] text-slate-500 font-mono">240 Sensor Channels</span>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-sky-600 group-hover:translate-x-1 transition-all" />
-            </Link>
-
-            <Link
-              href="/audits"
-              onClick={() => triggerHaptic("light")}
-              className="p-5 bg-white/90 backdrop-blur-md hover:bg-white border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-                  <FileCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="font-bold text-sm text-slate-900 group-hover:text-emerald-700">
-                    {activeLocale === "hi"
-                      ? "२६-घटक फील्ड ऑडिट विज़ार्ड"
-                      : activeLocale === "mr"
-                      ? "२६-घटक फील्ड तपासणी विझार्ड"
-                      : "26-Factor Field Audit Wizard"}
-                  </div>
-                  <div className="text-xs text-slate-500">IRC:SP:35 Table 4.1 Calibration</div>
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-all" />
             </Link>
 
             <Link
               href="/risk"
               onClick={() => triggerHaptic("light")}
-              className="p-5 bg-white/90 backdrop-blur-md hover:bg-white border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
+              className="p-3.5 bg-white border border-slate-300 rounded-lg flex items-center justify-between group hover:border-slate-500 transition-all shadow-xs"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
-                  <Cpu className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="font-bold text-sm text-slate-900 group-hover:text-indigo-700">
-                    {activeLocale === "hi"
-                      ? "SVI, DRI एवं उपचार सूची"
-                      : activeLocale === "mr"
-                      ? "SVI, DRI व उपाययोजना सूची"
-                      : "SVI, DRI & Remediation Catalogue"}
-                  </div>
-                  <div className="text-xs text-slate-500">11 Certified Trilingual Rules</div>
-                </div>
+              <div>
+                <span className="font-bold text-xs text-slate-900 block group-hover:text-sky-800">
+                  05 SVI Risk & RUL Engine
+                </span>
+                <span className="text-[11px] text-slate-500 font-mono">11 Prescriptive Rules</span>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-all" />
             </Link>
 
             <Link
-              href="/defect-ar"
+              href="/triage"
               onClick={() => triggerHaptic("light")}
-              className="p-5 bg-white/90 backdrop-blur-md hover:bg-white border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
+              className="p-3.5 bg-white border border-slate-300 rounded-lg flex items-center justify-between group hover:border-slate-500 transition-all shadow-xs"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
-                  <Sparkles className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="font-bold text-sm text-slate-900 group-hover:text-amber-700">
-                    {activeLocale === "hi"
-                      ? "AR 3D दोष स्थानीयकरण ट्विन"
-                      : activeLocale === "mr"
-                      ? "AR 3D दोष स्थाननिश्चिती ट्विन"
-                      : "AR 3D Defect Localization Twin"}
-                  </div>
-                  <div className="text-xs text-slate-500">CS543 Photogrammetry & SIFT Multi-View</div>
-                </div>
+              <div>
+                <span className="font-bold text-xs text-slate-900 block group-hover:text-rose-800">
+                  06 Incident Triage Console
+                </span>
+                <span className="text-[11px] text-slate-500 font-mono">Emergency Directives</span>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-all" />
             </Link>
-
-            <Link
-              href="/public"
-              onClick={() => triggerHaptic("light")}
-              className="p-5 bg-white/90 backdrop-blur-md hover:bg-white border border-white/80 rounded-2xl flex items-center justify-between group transition-all shadow-md"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
-                  <Eye className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="font-bold text-sm text-slate-900 group-hover:text-purple-700">
-                    {activeLocale === "hi"
-                      ? "सार्वजनिक नागरिक पारदर्शिता"
-                      : activeLocale === "mr"
-                      ? "नागरिक पारदर्शकता दालन"
-                      : "Public Citizen Transparency"}
-                  </div>
-                  <div className="text-xs text-slate-500">Citizen Grievance & Health Tiers</div>
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
-            </Link>
-          </div>
-        </div>
-
-        {/* 6. MANDATORY STATUTORY CIVIL ENGINEERING NOTICE */}
-        <div className="p-5 rounded-2xl bg-amber-50/90 backdrop-blur-md border border-amber-200/90 shadow-sm text-xs text-amber-900 leading-relaxed flex items-start gap-3">
-          <Shield className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div>
-            <span className="font-bold uppercase tracking-wider text-amber-950 mr-2">
-              {t.disclaimerTitle}:
-            </span>
-            {t.disclaimerText}
           </div>
         </div>
       </div>

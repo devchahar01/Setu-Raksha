@@ -228,57 +228,65 @@ export default function RiskEnginePage() {
     },
   ];
 
+  // Segmented Setu Score Component Scores (0-100 where 100 is best)
+  const structuralScore = Math.max(10, Math.min(100, Math.round(100 - g_s * 100)));
+  const hydraulicScore = Math.max(10, Math.min(100, Math.round(100 - g_h * 100)));
+  const seismicScore = Math.max(10, Math.min(100, Math.round(100 - g_e * 100)));
+  const trafficScore = Math.max(10, Math.min(100, Math.round(100 - g_l * 100)));
+  const environmentalScore = Math.max(10, Math.min(100, Math.round(100 - g_a * 100)));
+  const setuScoreOverall = Math.max(15, Math.min(100, Math.round(100 - (dri * 0.85))));
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-      {/* Institutional Civil Top Header */}
-      <div className="bg-navy-900 text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-navy-800 shadow-md">
+    <div className="min-h-screen bg-[#fcfbf9] text-slate-900 pb-16">
+      {/* Top Institutional Header */}
+      <section className="bg-white border-b border-slate-300 px-4 sm:px-6 lg:px-8 py-5">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-navy-800 text-teal-300 text-xs font-mono mb-3 border border-navy-700">
-              <span className="w-2 h-2 rounded-full bg-teal-400"></span>
-              <span>PWD MAHARASHTRA • RISK & REMEDIATION (L6)</span>
-              <span className="text-navy-400">•</span>
-              <span className="text-teal-400">{t.common.simulatedTag}</span>
+            <div className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-slate-600 mb-1.5 font-bold">
+              <span className="w-2 h-2 rounded-full bg-teal-600"></span>
+              <span>GOVERNMENT OF MAHARASHTRA • PUBLIC WORKS DEPARTMENT</span>
+              <span className="text-slate-400">•</span>
+              <span className="text-teal-700">IRC:SP:35 RISK & REMEDIATION (L6)</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               {t.risk.title}
             </h1>
-            <p className="mt-1 text-xs sm:text-sm text-navy-200 max-w-3xl leading-relaxed">
+            <p className="mt-1 text-xs sm:text-sm text-slate-600 max-w-3xl leading-relaxed">
               {t.risk.subtitle}
             </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-navy-800/90 p-3 rounded-xl border border-navy-700 self-start md:self-auto">
-            <Shield className="w-5 h-5 text-teal-400 shrink-0" />
+          <div className="flex items-center gap-2.5 bg-slate-50 p-2.5 rounded-lg border border-slate-200 self-start md:self-auto">
+            <Shield className="w-4 h-4 text-teal-700 shrink-0" />
             <div className="text-xs">
-              <div className="font-bold text-white">{t.risk.safetyInvariant}</div>
-              <div className="text-teal-300 text-[11px]">{t.risk.mlInvariantDesc}</div>
+              <div className="font-bold text-slate-900">{t.risk.safetyInvariant}</div>
+              <div className="text-slate-500 text-[11px]">{t.risk.mlInvariantDesc}</div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Main Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         {/* Live Mathematical Formula & Calculator */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-          {/* Sliders Input Panel */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
-              <h2 className="font-bold text-slate-900 text-base flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-teal-600" /> {t.risk.calculatorTitle}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+          {/* Sliders Input Panel (7 Cols) */}
+          <div className="lg:col-span-7 bg-white p-5 rounded-lg border border-slate-300">
+            <div className="flex items-center justify-between mb-4 pb-2.5 border-b border-slate-200">
+              <h2 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-teal-700" /> {t.risk.calculatorTitle}
               </h2>
-              <span className="text-xs font-mono font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
+              <span className="text-[11px] font-mono font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                 {t.risk.calculatorSub}
               </span>
             </div>
 
-            <div className="space-y-5 text-xs">
+            <div className="space-y-4 text-xs">
               {/* Deck Condition */}
               <div>
-                <div className="flex justify-between mb-1.5">
+                <div className="flex justify-between mb-1">
                   <span className="font-semibold text-slate-700">{t.risk.deckCondition}:</span>
-                  <span className="font-mono font-bold text-slate-900 text-sm">{deckCondition.toFixed(1)}</span>
+                  <span className="font-mono font-bold text-slate-900 text-xs">{deckCondition.toFixed(1)} / 9</span>
                 </div>
                 <input
                   type="range"
@@ -290,17 +298,17 @@ export default function RiskEnginePage() {
                     setDeckCondition(parseFloat(e.target.value));
                     triggerHaptic("selection");
                   }}
-                  className="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
+                  className="w-full accent-slate-800 cursor-pointer h-1.5 bg-slate-200 rounded"
                 />
               </div>
 
               {/* Scour Ratio */}
               <div>
-                <div className="flex justify-between mb-1.5">
+                <div className="flex justify-between mb-1">
                   <span className="font-semibold text-slate-700">{t.risk.scourRatio}:</span>
                   <span
-                    className={`font-mono font-bold text-sm ${
-                      scourRatio >= 1.0 ? "text-rose-600" : "text-slate-900"
+                    className={`font-mono font-bold text-xs ${
+                      scourRatio >= 1.0 ? "text-rose-700" : "text-slate-900"
                     }`}
                   >
                     {scourRatio.toFixed(2)}x {scourRatio >= 1.0 && `(${t.risk.criticalTrigger})`}
@@ -316,17 +324,17 @@ export default function RiskEnginePage() {
                     setScourRatio(parseFloat(e.target.value));
                     triggerHaptic("selection");
                   }}
-                  className="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
+                  className="w-full accent-slate-800 cursor-pointer h-1.5 bg-slate-200 rounded"
                 />
               </div>
 
               {/* Pier Tilt */}
               <div>
-                <div className="flex justify-between mb-1.5">
+                <div className="flex justify-between mb-1">
                   <span className="font-semibold text-slate-700">{t.risk.pierTilt}:</span>
                   <span
-                    className={`font-mono font-bold text-sm ${
-                      pierTilt >= 1.0 ? "text-rose-600" : "text-slate-900"
+                    className={`font-mono font-bold text-xs ${
+                      pierTilt >= 1.0 ? "text-rose-700" : "text-slate-900"
                     }`}
                   >
                     {pierTilt.toFixed(2)}° {pierTilt >= 1.0 && `(${t.risk.criticalOverride})`}
@@ -342,16 +350,16 @@ export default function RiskEnginePage() {
                     setPierTilt(parseFloat(e.target.value));
                     triggerHaptic("selection");
                   }}
-                  className="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
+                  className="w-full accent-slate-800 cursor-pointer h-1.5 bg-slate-200 rounded"
                 />
               </div>
 
               {/* Bridge Age & Coastal Toggle */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                 <div>
-                  <div className="flex justify-between mb-1.5">
+                  <div className="flex justify-between mb-1">
                     <span className="font-semibold text-slate-700">{t.risk.bridgeAge}:</span>
-                    <span className="font-mono font-bold text-slate-900 text-sm">{bridgeAge} yrs</span>
+                    <span className="font-mono font-bold text-slate-900 text-xs">{bridgeAge} yrs</span>
                   </div>
                   <input
                     type="range"
@@ -362,11 +370,11 @@ export default function RiskEnginePage() {
                       setBridgeAge(parseInt(e.target.value, 10));
                       triggerHaptic("selection");
                     }}
-                    className="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
+                    className="w-full accent-slate-800 cursor-pointer h-1.5 bg-slate-200 rounded"
                   />
                 </div>
 
-                <div className="flex items-center gap-2.5 mt-2 sm:mt-5 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center gap-2 p-2.5 rounded bg-slate-50 border border-slate-200">
                   <input
                     type="checkbox"
                     id="coastalCheck"
@@ -375,7 +383,7 @@ export default function RiskEnginePage() {
                       setIsCoastal(e.target.checked);
                       triggerHaptic("light");
                     }}
-                    className="w-4 h-4 text-teal-600 rounded cursor-pointer accent-teal-600"
+                    className="w-4 h-4 text-teal-700 rounded cursor-pointer accent-teal-700"
                   />
                   <label htmlFor="coastalCheck" className="font-semibold text-slate-700 cursor-pointer text-xs">
                     {t.risk.coastalRegime}
@@ -385,43 +393,122 @@ export default function RiskEnginePage() {
             </div>
           </div>
 
-          {/* Real-Time Result Gauge */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+          {/* Segmented Engineering Risk Indicator (5 Cols) */}
+          <div className="lg:col-span-5 bg-white p-5 rounded-lg border border-slate-300 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
-                  {t.risk.computedOutput}
-                </span>
-                <RiskTierBadge tier={tier} size="md" />
-              </div>
-
-              <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 text-center mb-5">
-                <div className="text-xs text-slate-500 font-semibold mb-1">{t.risk.driTitle}</div>
-                <div className="text-4xl font-extrabold font-mono text-slate-900">{dri.toFixed(1)}</div>
-                <div className="text-xs text-slate-400 mt-1 font-mono">
-                  SVI: {svi.toFixed(1)} • Hazard Mult: 1.05x
-                </div>
-              </div>
-
-              <div className="space-y-2.5 text-xs mb-4">
-                <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-600">{t.risk.rulTitle}:</span>
-                  <span className="font-mono font-bold text-teal-700">{rulYears} years</span>
-                </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-600">Exposure Profile:</span>
-                  <span className="font-semibold text-slate-900">
-                    {isCoastal ? "Coastal-Accelerated (IS 456 Extreme)" : "Inland-Standard (Moderate)"}
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
+                <div>
+                  <span className="text-[10px] font-mono uppercase font-bold text-slate-500 tracking-wider">
+                    OPERATIONAL RISK INDEX
                   </span>
+                  <div className="text-sm font-extrabold text-slate-900">SETU SCORE & SVI METRICS</div>
+                </div>
+                <RiskTierBadge tier={tier} size="sm" />
+              </div>
+
+              {/* Main Overall Setu Score Indicator */}
+              <div className="bg-slate-50 p-3.5 rounded border border-slate-200 mb-4">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xs font-bold text-slate-700">SETU SCORE</span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-extrabold font-mono text-slate-900">{setuScoreOverall}</span>
+                    <span className="text-xs text-slate-400 font-mono">/ 100</span>
+                    <span className={`text-xs font-mono font-bold ml-2 ${
+                      setuScoreOverall >= 75 ? "text-teal-700" : setuScoreOverall >= 55 ? "text-amber-700" : "text-rose-700"
+                    }`}>
+                      {setuScoreOverall >= 75 ? "NORMAL" : setuScoreOverall >= 55 ? "WATCH" : setuScoreOverall >= 35 ? "WARNING" : "CRITICAL"}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-[11px] text-slate-500 mt-1 font-mono">
+                  SVI: {svi.toFixed(1)} • Dynamic DRI: {dri.toFixed(1)} • RUL: {rulYears} yrs
+                </div>
+              </div>
+
+              {/* Segmented Component Bars */}
+              <div className="space-y-2.5 text-xs">
+                <div>
+                  <div className="flex justify-between text-[11px] mb-1">
+                    <span className="text-slate-600 font-medium">Structural Condition</span>
+                    <span className="font-mono font-bold text-slate-900">{structuralScore} / 100</span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded overflow-hidden border border-slate-200">
+                    <div
+                      className={`h-full transition-all duration-500 ${
+                        structuralScore >= 75 ? "bg-teal-700" : structuralScore >= 55 ? "bg-amber-600" : "bg-rose-600"
+                      }`}
+                      style={{ width: `${structuralScore}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-[11px] mb-1">
+                    <span className="text-slate-600 font-medium">Hydraulic / Scour Safety</span>
+                    <span className="font-mono font-bold text-slate-900">{hydraulicScore} / 100</span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded overflow-hidden border border-slate-200">
+                    <div
+                      className={`h-full transition-all duration-500 ${
+                        hydraulicScore >= 75 ? "bg-teal-700" : hydraulicScore >= 55 ? "bg-amber-600" : "bg-rose-600"
+                      }`}
+                      style={{ width: `${hydraulicScore}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-[11px] mb-1">
+                    <span className="text-slate-600 font-medium">Seismic & Substructure Tilt</span>
+                    <span className="font-mono font-bold text-slate-900">{seismicScore} / 100</span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded overflow-hidden border border-slate-200">
+                    <div
+                      className={`h-full transition-all duration-500 ${
+                        seismicScore >= 75 ? "bg-teal-700" : seismicScore >= 55 ? "bg-amber-600" : "bg-rose-600"
+                      }`}
+                      style={{ width: `${seismicScore}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-[11px] mb-1">
+                    <span className="text-slate-600 font-medium">Traffic Axle Loading</span>
+                    <span className="font-mono font-bold text-slate-900">{trafficScore} / 100</span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded overflow-hidden border border-slate-200">
+                    <div
+                      className={`h-full transition-all duration-500 ${
+                        trafficScore >= 75 ? "bg-teal-700" : trafficScore >= 55 ? "bg-amber-600" : "bg-rose-600"
+                      }`}
+                      style={{ width: `${trafficScore}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-[11px] mb-1">
+                    <span className="text-slate-600 font-medium">Environmental & Asset Age</span>
+                    <span className="font-mono font-bold text-slate-900">{environmentalScore} / 100</span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded overflow-hidden border border-slate-200">
+                    <div
+                      className={`h-full transition-all duration-500 ${
+                        environmentalScore >= 75 ? "bg-teal-700" : environmentalScore >= 55 ? "bg-amber-600" : "bg-rose-600"
+                      }`}
+                      style={{ width: `${environmentalScore}%` }}
+                    />
+                  </div>
                 </div>
               </div>
 
               {criticalFlags.length > 0 && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-900 mb-4">
-                  <div className="font-bold flex items-center gap-1.5 mb-1 text-rose-700">
-                    <AlertTriangle className="w-4 h-4 shrink-0" /> Invariant Overrides Active:
+                <div className="mt-3.5 p-2.5 bg-rose-50 border border-rose-200 rounded text-xs text-rose-900">
+                  <div className="font-bold flex items-center gap-1 mb-1 text-rose-700 text-[11px]">
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" /> Safety Invariant Overrides Active:
                   </div>
-                  <ul className="list-disc list-inside space-y-0.5 font-mono text-[11px]">
+                  <ul className="list-disc list-inside space-y-0.5 font-mono text-[10px]">
                     {criticalFlags.map((f) => (
                       <li key={f}>{f}</li>
                     ))}
@@ -430,25 +517,27 @@ export default function RiskEnginePage() {
               )}
             </div>
 
-            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 leading-snug">
+            <div className="mt-3 p-2.5 bg-slate-50 rounded border border-slate-200 text-[11px] text-slate-600">
               {t.risk.advisoryNote}
             </div>
           </div>
         </div>
 
         {/* Prescriptive Remediation Catalogue Section */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+        <div className="bg-white p-5 rounded-lg border border-slate-300">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 pb-3 border-b border-slate-200">
             <div>
               <div className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-teal-600" />
-                <h2 className="font-bold text-slate-900 text-lg">{t.risk.remediationTitle}</h2>
+                <BookOpen className="w-4 h-4 text-teal-700" />
+                <h2 className="font-bold text-slate-900 text-sm uppercase tracking-wide">
+                  {t.risk.remediationTitle}
+                </h2>
               </div>
-              <p className="text-xs text-slate-500 mt-1">{t.risk.remediationSub}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">{t.risk.remediationSub}</p>
             </div>
 
             {/* Language Switcher for Catalogue */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-start sm:self-auto border border-slate-200">
+            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded border border-slate-200 self-start sm:self-auto">
               {(["en", "hi", "mr"] as const).map((lang) => (
                 <button
                   key={lang}
@@ -456,9 +545,9 @@ export default function RiskEnginePage() {
                     setActiveLocale(lang);
                     triggerHaptic("selection");
                   }}
-                  className={`px-3 py-1 text-xs rounded-lg font-semibold transition-colors ${
+                  className={`px-2.5 py-1 text-xs rounded font-semibold transition-colors ${
                     activeLocale === lang
-                      ? "bg-teal-600 text-white shadow-sm"
+                      ? "bg-slate-900 text-white"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
@@ -468,35 +557,35 @@ export default function RiskEnginePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {catalogue.map((item) => (
               <div
                 key={item.id}
-                className="p-4 bg-slate-50 hover:bg-slate-100/90 rounded-xl border border-slate-200 transition-colors flex flex-col justify-between"
+                className="p-3.5 bg-slate-50 hover:bg-slate-100/90 rounded border border-slate-200 transition-colors flex flex-col justify-between text-xs"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-xs font-bold text-slate-800 bg-white px-2 py-0.5 rounded border border-slate-200">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-mono text-[11px] font-bold text-slate-800 bg-white px-1.5 py-0.5 rounded border border-slate-200">
                       {item.id}
                     </span>
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                      className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
                         item.priority === "IMMEDIATE"
-                          ? "bg-rose-100 text-rose-800 border border-rose-200"
+                          ? "bg-rose-100 text-rose-800 border border-rose-300"
                           : item.priority === "URGENT"
-                          ? "bg-amber-100 text-amber-800 border border-amber-200"
-                          : "bg-teal-100 text-teal-800 border border-teal-200"
+                          ? "bg-amber-100 text-amber-800 border border-amber-300"
+                          : "bg-teal-50 text-teal-700 border border-teal-200"
                       }`}
                     >
                       {item.priority}
                     </span>
                   </div>
-                  <h4 className="font-bold text-slate-900 text-xs mb-1.5">{item.title[activeLocale]}</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">{item.desc[activeLocale]}</p>
+                  <h4 className="font-bold text-slate-900 text-xs mb-1">{item.title[activeLocale]}</h4>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">{item.desc[activeLocale]}</p>
                 </div>
-                <div className="mt-3 pt-2.5 border-t border-slate-200 flex justify-between items-center text-[10px] text-slate-400">
+                <div className="mt-2.5 pt-2 border-t border-slate-200 flex justify-between items-center text-[10px] text-slate-500 font-mono">
                   <span>Category: {item.category}</span>
-                  <span className="font-mono text-teal-600 font-semibold">SE_PWD_Approved</span>
+                  <span className="text-teal-700 font-semibold">IRC:SP:35 Certified</span>
                 </div>
               </div>
             ))}
