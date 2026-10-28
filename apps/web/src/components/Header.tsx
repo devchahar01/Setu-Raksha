@@ -3,20 +3,21 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import {
   Layers,
-  CheckCircle2,
+  Activity,
   Radio,
   Box,
   AlertTriangle,
   FileCheck,
-  Cpu,
   Eye,
-  Clock,
+  Bell,
+  ChevronDown,
+  User,
   Globe,
   Shield,
-  Activity,
-  UserCheck,
+  Circle,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { TRANSLATIONS } from "@/lib/translations";
@@ -27,9 +28,11 @@ export const Header: React.FC = () => {
   const { activeLocale, setLocale } = useAppStore();
   const t = TRANSLATIONS[activeLocale] || TRANSLATIONS.en;
 
-  const [istTime, setIstTime] = useState<string>("");
+  const [istTime, setIstTime] = useState<string>("19:16:32");
+  const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
+    setMounted(true);
     const updateTime = () => {
       const now = new Date();
       const timeStr = new Intl.DateTimeFormat("en-IN", {
@@ -52,55 +55,49 @@ export const Header: React.FC = () => {
     { code: "mr", label: "मराठी" },
   ];
 
-  // Professional Government Engineering Operational Workflow Navigation
+  // Exact 7 Workflow Steps matching reference screenshot
   const navLinks = [
     {
       step: "01",
       href: "/bridges",
-      label: activeLocale === "hi" ? "पुल एवं स्थान खोज" : activeLocale === "mr" ? "पूल व जागा शोध" : "ASSET & LOCATOR",
+      label: activeLocale === "hi" ? "परिसंपत्ति रजिस्ट्री" : activeLocale === "mr" ? "मालमत्ता नोंदवही" : "Asset Registry",
       icon: <Layers className="w-3.5 h-3.5" />,
     },
     {
       step: "02",
       href: "/bridges?view=quality",
-      label: activeLocale === "hi" ? "गुणवत्ता परीक्षण" : activeLocale === "mr" ? "गुणवत्ता चाचणी" : "QUALITY & TESTING",
-      icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+      label: activeLocale === "hi" ? "स्थिति विश्लेषण" : activeLocale === "mr" ? "स्थिती विश्लेषण" : "Condition",
+      icon: <Activity className="w-3.5 h-3.5" />,
     },
     {
       step: "03",
-      href: "/telemetry",
-      label: activeLocale === "hi" ? "लाइव निगरानी" : activeLocale === "mr" ? "थेट सेन्सर देखरेख" : "LIVE MONITORING",
+      href: "/",
+      label: activeLocale === "hi" ? "लाइव निगरानी" : activeLocale === "mr" ? "थेट सेन्सर देखरेख" : "Live Monitoring",
       icon: <Radio className="w-3.5 h-3.5" />,
     },
     {
       step: "04",
       href: "/defect-ar",
-      label: activeLocale === "hi" ? "डिजिटल ट्विन" : activeLocale === "mr" ? "डिजिटल ट्विन" : "DIGITAL TWIN",
+      label: activeLocale === "hi" ? "डिजिटल ट्विन" : activeLocale === "mr" ? "डिजिटल ट्विन" : "Digital Twin",
       icon: <Box className="w-3.5 h-3.5" />,
     },
     {
       step: "05",
       href: "/risk",
-      label: activeLocale === "hi" ? "जोखिम मूल्यांकन" : activeLocale === "mr" ? "जोखीम मूल्यमापन" : "RISK ASSESSMENT",
-      icon: <Cpu className="w-3.5 h-3.5" />,
-    },
-    {
-      step: "06",
-      href: "/triage",
-      label: activeLocale === "hi" ? "घटना नियंत्रण" : activeLocale === "mr" ? "आपत्कालीन कक्ष" : "INCIDENT TRIAGE",
+      label: activeLocale === "hi" ? "जोखिम ट्राइएज" : activeLocale === "mr" ? "जोखीम ट्राइएज" : "Risk Triage",
       icon: <AlertTriangle className="w-3.5 h-3.5" />,
     },
     {
-      step: "07",
+      step: "06",
       href: "/audits",
-      label: activeLocale === "hi" ? "फील्ड ऑडिट" : activeLocale === "mr" ? "प्रत्यक्ष तपासणी" : "FIELD AUDIT",
+      label: activeLocale === "hi" ? "निरीक्षण" : activeLocale === "mr" ? "तपासणी" : "Inspection",
       icon: <FileCheck className="w-3.5 h-3.5" />,
     },
     {
-      step: "08",
+      step: "07",
       href: "/public",
-      label: activeLocale === "hi" ? "नागरिक पारदर्शिता" : activeLocale === "mr" ? "नागरिक पारदर्शकता" : "TRANSPARENCY",
-      icon: <Eye className="w-3.5 h-3.5" />,
+      label: activeLocale === "hi" ? "ऑडिट एवं पारदर्शिता" : activeLocale === "mr" ? "ऑडिट व पारदर्शकता" : "Audit & Transparency",
+      icon: <Shield className="w-3.5 h-3.5" />,
     },
   ];
 
@@ -110,132 +107,166 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#fcfbf9] text-slate-800 border-b border-slate-200">
-      {/* 1. Top Institutional Government Strip */}
-      <div className="bg-[#f4f2ec] border-b border-slate-200/90 py-1 px-4 sm:px-6 lg:px-8 text-[11px] font-medium text-slate-700">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-[#ffffff] text-slate-800 border-b border-slate-200 shadow-2xs">
+      {/* 1. Top Institutional Strip (Exact layout from reference screenshot) */}
+      <div className="bg-[#f8f9fa] border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 py-1.5 text-[11px] text-slate-700">
+        <div className="w-full flex items-center justify-between">
+          {/* Left: Ashoka Emblem + Institutional Titles */}
           <div className="flex items-center gap-2 tracking-wide font-semibold text-slate-800">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
-            <span>GOVERNMENT OF MAHARASHTRA</span>
-            <span className="text-slate-400">•</span>
-            <span>PUBLIC WORKS DEPARTMENT</span>
-            <span className="text-slate-400 hidden md:inline">•</span>
-            <span className="hidden md:inline">STATE DISASTER MANAGEMENT AUTHORITY</span>
+            <div className="relative w-4 h-5 shrink-0 opacity-80">
+              <Image
+                src="/images/emblem_india.jpg"
+                alt="Emblem of India"
+                width={16}
+                height={20}
+                className="object-contain"
+                priority
+              />
+            </div>
+            <span className="uppercase text-[11px] font-bold text-slate-800">
+              GOVERNMENT OF MAHARASHTRA
+            </span>
+            <span className="text-slate-300 font-light">|</span>
+            <span className="uppercase text-[11px] text-slate-700">
+              PUBLIC WORKS DEPARTMENT
+            </span>
+            <span className="text-slate-300 font-light hidden md:inline">|</span>
+            <span className="uppercase text-[11px] text-slate-700 hidden md:inline">
+              STATE DISASTER MANAGEMENT AUTHORITY
+            </span>
           </div>
 
-          <div className="flex items-center gap-3 font-mono text-[11px] text-slate-600">
-            <span className="hidden sm:inline">IRC:SP:35 • IS 1893</span>
-            <span className="text-slate-400 hidden sm:inline">|</span>
-            <span className="px-1.5 py-0.2 bg-white text-slate-700 border border-slate-300 rounded font-semibold text-[10px]">
-              GRID_NODE_MH01
-            </span>
-            <span className="px-1.5 py-0.2 bg-sky-50 text-sky-800 border border-sky-200 rounded font-semibold text-[10px]">
-              {t.common.simulatedTag}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Main Executive Application Header */}
-      <div className="bg-[#fcfbf9] border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 py-2.5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* Institutional Mark & Title */}
-          <Link
-            href="/"
-            onClick={() => triggerHaptic("light")}
-            className="flex items-center gap-3 group"
-          >
-            {/* Restrained Official Emblem */}
-            <div className="w-9 h-9 rounded bg-[#1e293b] flex items-center justify-center text-white border border-slate-700 shadow-xs">
-              <Shield className="w-5 h-5 text-sky-300" />
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-base tracking-tight text-[#0f172a] font-sans">
-                  SETU RAKSHAK
-                </span>
-                <span className="text-xs text-slate-500 font-semibold">
-                  (सेतुरक्षक)
-                </span>
-                <span className="text-[10px] font-mono text-slate-500 bg-slate-100 border border-slate-200 px-1 py-0.2 rounded">
-                  v1.0.4
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 font-medium leading-none mt-0.5">
-                National Bridge Infrastructure Safety & Intelligence Grid
-              </p>
-            </div>
-          </Link>
-
-          {/* Right Status Block: System Status, Sync & Authority */}
-          <div className="flex items-center gap-4 text-xs font-mono">
-            {/* System Status */}
-            <div className="hidden md:flex items-center gap-1.5 bg-white px-2.5 py-1 rounded border border-slate-200">
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span className="text-[11px] text-slate-700 font-semibold font-sans">
-                STATUS: <span className="text-emerald-700 font-mono">NOMINAL</span>
-              </span>
+          {/* Right: System Online, Sync, Bell, PWD Authority, Lang Switcher */}
+          <div className="flex items-center gap-4 text-[11px] text-slate-600 font-medium">
+            {/* System Online Indicator */}
+            <div className="flex items-center gap-1.5 font-sans">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
+              <span className="text-emerald-800 font-semibold text-[11px]">System Online</span>
             </div>
 
             {/* Last Sync */}
-            <div className="hidden lg:flex items-center gap-1.5 text-slate-600 bg-white px-2.5 py-1 rounded border border-slate-200 text-[11px]">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <span>SYNC: {istTime || "19:21:00"} IST</span>
+            <div className="hidden sm:flex items-center gap-1 text-slate-500 font-mono text-[11px]">
+              <span>Last Sync: {mounted ? istTime : "19:16"} IST</span>
             </div>
 
-            {/* Authority Profile */}
-            <div className="hidden sm:flex items-center gap-1.5 bg-white px-2.5 py-1 rounded border border-slate-200 text-[11px] text-slate-700 font-sans">
-              <UserCheck className="w-3.5 h-3.5 text-slate-500" />
-              <span className="font-semibold">PWD DESK</span>
+            {/* Notification Bell */}
+            <button
+              onClick={() => triggerHaptic("light")}
+              className="relative p-1 text-slate-600 hover:text-slate-900 transition-colors"
+              title="Notifications"
+            >
+              <Bell className="w-3.5 h-3.5" />
+              <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+            </button>
+
+            {/* PWD Authority User Profile Dropdown */}
+            <div className="flex items-center gap-1.5 text-slate-800 font-semibold cursor-pointer hover:text-slate-950">
+              <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-slate-700">
+                <User className="w-3 h-3" />
+              </div>
+              <span className="text-[11px]">PWD Authority</span>
+              <ChevronDown className="w-3 h-3 text-slate-400" />
             </div>
 
             {/* Trilingual Selector */}
-            <div className="flex items-center bg-white p-0.5 rounded border border-slate-200 text-xs font-sans">
-              <Globe className="w-3 h-3 text-slate-400 ml-1.5 mr-1" />
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => handleLanguageChange(lang.code)}
-                  className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-                    activeLocale === lang.code
-                      ? "bg-[#1e293b] text-white"
-                      : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  {lang.label}
-                </button>
+            <div className="flex items-center bg-white px-1 py-0.5 rounded border border-slate-200 text-[10px] font-sans">
+              <Globe className="w-3 h-3 text-slate-400 mr-1" />
+              {languages.map((lang, idx) => (
+                <React.Fragment key={lang.code}>
+                  <button
+                    onClick={() => handleLanguageChange(lang.code)}
+                    className={`px-1.5 py-0.5 rounded transition-colors ${
+                      activeLocale === lang.code
+                        ? "bg-[#1e293b] text-white font-bold"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    {lang.label}
+                  </button>
+                  {idx < languages.length - 1 && <span className="text-slate-300 mx-0.5">|</span>}
+                </React.Fragment>
               ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* 3. Operational Workflow Navigation Bar (01 to 08) */}
-      <div className="bg-[#fcfbf9] px-4 sm:px-6 lg:px-8 border-b border-slate-200/90 overflow-x-auto scrollbar-none">
-        <div className="max-w-7xl mx-auto flex items-center gap-1 py-1 text-xs">
+      {/* 2. Main Header & Navigation Row (Exact match for reference screenshot) */}
+      <div className="px-4 sm:px-6 lg:px-8 py-2 bg-white flex items-center justify-between gap-4">
+        {/* Left: Brand / Logo */}
+        <Link
+          href="/"
+          onClick={() => triggerHaptic("light")}
+          className="flex items-center gap-3 shrink-0 group"
+        >
+          {/* Bridge Shield Icon */}
+          <div className="w-8 h-8 rounded bg-[#1e293b] flex items-center justify-center text-white border border-slate-700 shadow-2xs">
+            <svg
+              className="w-4 h-4 text-sky-300"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+              <path d="M7 14c2-2 4-2 6-2s4 0 6 2" />
+              <path d="M10 14v4" />
+              <path d="M14 14v4" />
+            </svg>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-1.5 leading-none">
+              <span className="font-extrabold text-[15px] tracking-tight text-[#0f172a] font-sans">
+                SETU RAKSHAK
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 font-normal leading-tight mt-0.5">
+              National Bridge Infrastructure Safety &amp; Intelligence Grid
+            </p>
+          </div>
+        </Link>
+
+        {/* Right: 01 to 07 Horizontal Engineering Workflow Navigation Tabs */}
+        <nav className="flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-none py-0.5">
           {navLinks.map((link) => {
-            const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href) && !link.href.includes("?"));
+            // Determine active state: on "/" path, 03 Live Monitoring is active
+            const isActive =
+              (pathname === "/" && link.step === "03") ||
+              (pathname === link.href && link.href !== "/") ||
+              (pathname.startsWith(link.href) && link.href !== "/" && !link.href.includes("?"));
+
             return (
               <Link
                 key={link.step}
                 href={link.href}
                 onClick={() => triggerHaptic("light")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded transition-all whitespace-nowrap text-[11px] font-semibold tracking-tight ${
+                className={`group relative flex items-center gap-1.5 px-3 py-1.5 rounded transition-all whitespace-nowrap text-xs font-medium ${
                   isActive
-                    ? "bg-[#1e293b] text-white font-bold"
-                    : "text-slate-700 hover:text-slate-950 hover:bg-slate-100/90"
+                    ? "text-[#0284c7] font-semibold bg-sky-50/70"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                 }`}
               >
-                <span className={`font-mono text-[10px] ${isActive ? "text-sky-300" : "text-slate-400"}`}>
+                <span className={`text-[10px] font-mono ${isActive ? "text-[#0284c7]" : "text-slate-400"}`}>
                   {link.step}
                 </span>
-                <span className={isActive ? "text-sky-300" : "text-slate-500"}>{link.icon}</span>
-                <span>{link.label}</span>
+                <span className={isActive ? "text-[#0284c7]" : "text-slate-400 group-hover:text-slate-600"}>
+                  {link.icon}
+                </span>
+                <span className={isActive ? "text-[#0f172a] font-bold" : "text-slate-700"}>
+                  {link.label}
+                </span>
+
+                {/* Active Indicator Underline Bar */}
+                {isActive && (
+                  <span className="absolute bottom-[-8px] left-2 right-2 h-[2.5px] bg-[#0284c7] rounded-full"></span>
+                )}
               </Link>
             );
           })}
-        </div>
+        </nav>
       </div>
     </header>
   );

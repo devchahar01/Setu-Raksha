@@ -1,583 +1,1052 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
-  Shield,
-  Layers,
-  FileCheck,
-  Cpu,
-  Eye,
-  AlertTriangle,
-  ArrowRight,
-  Database,
-  Radio,
-  CheckCircle2,
-  Clock,
-  ExternalLink,
+  Video,
   Box,
-  Activity,
+  Radio,
+  ClipboardList,
+  AlertTriangle,
+  Landmark,
+  FileText,
+  Settings,
+  Maximize2,
+  Minimize2,
+  ZoomIn,
+  ZoomOut,
   Compass,
+  ArrowRight,
+  ChevronDown,
+  CloudSun,
+  Droplets,
+  Eye,
+  Wind,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  Layers,
+  MapPin,
+  Flame,
+  Shield,
+  Activity,
 } from "lucide-react";
 import { BridgeHero3D } from "@/components/BridgeHero3D";
 import { useAppStore } from "@/lib/store";
-import { formatNumber } from "@/lib/formatters";
 import { triggerHaptic } from "@/lib/haptics";
-
-const I18N_HOME = {
-  en: {
-    heroSection: "Overview",
-    statBridges: "REGISTERED BRIDGES",
-    statBridgesSub: "Across 5 Strategic Basins",
-    statSensors: "TELEMETRY TRANSDUCERS",
-    statSensorsSub: "IMU, Stage, Tilt, Accel",
-    statLeadTime: "EARLY WARNING HEADROOM",
-    statLeadTimeSub: "Advance Disaster Margin",
-    statTarget: "RISK PREVENTION RATE",
-    statTargetSub: "IRC:SP:35 Safety Benchmark",
-
-    pipelineTitle: "SEVEN-STAGE STRUCTURAL LIFECYCLE SYSTEM",
-    pipelineSub:
-      "Standardized civil engineering data flow from design specifications to public transparency (IRC:SP:35 & IS 1893 compliant)",
-
-    basinTitle: "MAHARASHTRA STRATEGIC RIVER BASINS",
-    basinSub:
-      "Continuous hydrological and scour surveillance across 5 critical river basins in Maharashtra",
-
-    quickAccessTitle: "OPERATIONAL CONTROL ROOM MODULES",
-    quickAccessSub:
-      "Direct consoles for structural engineers, division executive officers, and field inspection crews",
-
-    disclaimerTitle: "STATUTORY CIVIL ENGINEERING NOTICE",
-    disclaimerText:
-      "Setu Rakshak is an authorized decision-support engineering grid designed to assist—never replace—certified civil engineering inspection, physical non-destructive testing (NDT), and professional human engineering judgment. All telemetry feeds are labeled source=simulated.",
-  },
-  hi: {
-    heroSection: "अवलोकन",
-    statBridges: "पंजीकृत पुल परिसंपत्तियां",
-    statBridgesSub: "५ प्रमुख नदी बेसिन में",
-    statSensors: "सक्रिय टेलीमेट्री ट्रांसड्यूसर",
-    statSensorsSub: "जल स्तर, झुकाव, कंपन",
-    statLeadTime: "चेतावनी अग्रिम समय",
-    statLeadTimeSub: "आपदा पूर्व सूचना अग्रिम",
-    statTarget: "जोखिम निवारण दर",
-    statTargetSub: "IRC:SP:35 सुरक्षा मानक",
-
-    pipelineTitle: "सात-चरणीय संरचनात्मक जीवन चक्र प्रणाली",
-    pipelineSub:
-      "डिजाइन विनिर्देशों से नागरिक पारदर्शिता तक मानकीकृत सिविल इंजीनियरिंग डेटा प्रवाह (IRC:SP:35 व IS 1893 अनुरूप)",
-
-    basinTitle: "महाराष्ट्र सामरिक नदी बेसिन निगरानी",
-    basinSub:
-      "महाराष्ट्र की ५ प्रमुख नदी घाटियों में निरंतर जलवैज्ञानिक और नींव कटाव सुरक्षा निगरानी",
-
-    quickAccessTitle: "कंट्रोल रूम परिचालन मॉड्यूल",
-    quickAccessSub:
-      "संरचनात्मक इंजीनियरों, कार्यकारी अधिकारियों और फील्ड निरीक्षण टीमों के लिए सीधे कंसोल",
-
-    disclaimerTitle: "वैधानिक सिविल इंजीनियरिंग सूचना",
-    disclaimerText:
-      "सेतु रक्षक एक निर्णय-सहायता इंजीनियरिंग ग्रिड है जो प्रमाणित सिविल इंजीनियरिंग निरीक्षण, भौतिक परीक्षण और मानवीय तकनीकी निर्णय की सहायता करता है, उनका स्थान नहीं लेता। सभी परीक्षण डेटा स्रोत=सिम्युलेटेड के रूप में चिह्नित हैं।",
-  },
-  mr: {
-    heroSection: "अवलोकन",
-    statBridges: "नोंदणीकृत पूल मालमत्ता",
-    statBridgesSub: "५ सामरिक नदी खोऱ्यांमध्ये",
-    statSensors: "सक्रिय टेलीमेट्री ट्रान्सड्यूसर",
-    statSensorsSub: "पातळी, टिल्ट, कंपन",
-    statLeadTime: "आगाऊ इशारा कालावधी",
-    statLeadTimeSub: "आपत्ती प्रतिबंधात्मक वेळ",
-    statTarget: "जोखीम निवारण दर",
-    statTargetSub: "IRC:SP:35 सुरक्षा निकष",
-
-    pipelineTitle: "सात-टप्प्यांची संरचनात्मक जीवनचक्र प्रणाली",
-    pipelineSub:
-      "डिझाइन निकषांपासून सार्वजनिक पारदर्शकतेपर्यंत मानकीकृत स्थापत्य अभियांत्रिकी डेटा प्रवाह (IRC:SP:35 व IS 1893 मानकांनुसार)",
-
-    basinTitle: "महाराष्ट्र सामरिक नदी खोरे देखरेख",
-    basinSub:
-      "महाराष्ट्रातील ५ प्रमुख नदी खोऱ्यांमध्ये अखंड जलवैज्ञानिक व पायाची झीज सुरक्षा देखरेख",
-
-    quickAccessTitle: "नियंत्रण कक्ष संचालन विभाग",
-    quickAccessSub:
-      "स्थापत्य अभियंता, कार्यकारी अधिकारी आणि प्रत्यक्ष तपासणी पथकांसाठी थेट नियंत्रण दालने",
-
-    disclaimerTitle: "वैधानिक स्थापत्य अभियांत्रिकी सूचना",
-    disclaimerText:
-      "सेतू रक्षक ही निर्णय-साहाय्य प्रणाली असून ती प्रत्यक्ष स्थापत्य अभियांत्रिकी तपासणी, प्रत्यक्ष चाचणी आणि मानवी अभियांत्रिकी निर्णयाची जागा घेत नाही. सर्व डेटा चाचणीसाठी source=सिम्युलेटेड म्हणून नोंदवला गेला आहे.",
-  },
-};
-
-const BASIN_METRICS = [
-  {
-    id: "mula-mutha",
-    name: "Mula-Mutha Basin",
-    nameLocal: "मुळा-मुठा खोरे (पुणे)",
-    bridges: 14,
-    status: "NORMAL",
-    statusText: "0–29 DRI",
-    waterLevel: "538.4m MSL",
-    flow: "Safe (1.2m below HFL)",
-    statusBg: "bg-emerald-50 text-emerald-800 border-emerald-300",
-  },
-  {
-    id: "bhima",
-    name: "Bhima River Basin",
-    nameLocal: "भीमा खोरे (सोलापूर / पुणे)",
-    bridges: 12,
-    status: "WATCH",
-    statusText: "30–54 DRI",
-    waterLevel: "462.1m MSL",
-    flow: "Elevated Scour Vigilance",
-    statusBg: "bg-amber-50 text-amber-800 border-amber-300",
-  },
-  {
-    id: "krishna",
-    name: "Krishna River Basin",
-    nameLocal: "कृष्णा खोरे (सातारा / सांगली)",
-    bridges: 15,
-    status: "NORMAL",
-    statusText: "0–29 DRI",
-    waterLevel: "554.8m MSL",
-    flow: "Controlled Discharge",
-    statusBg: "bg-emerald-50 text-emerald-800 border-emerald-300",
-  },
-  {
-    id: "godavari",
-    name: "Godavari River Basin",
-    nameLocal: "गोदावरी खोरे (नाशिक / नांदेड)",
-    bridges: 11,
-    status: "WARNING",
-    statusText: "55–74 DRI",
-    waterLevel: "565.3m MSL",
-    flow: "High Spillway Gate Flow",
-    statusBg: "bg-orange-50 text-orange-800 border-orange-300",
-  },
-  {
-    id: "konkan",
-    name: "Konkan Coastal Basin",
-    nameLocal: "कोकण किनारी खोरे (रत्नागिरी)",
-    bridges: 8,
-    status: "CRITICAL",
-    statusText: "75–100 DRI",
-    waterLevel: "Tidal Surge High",
-    flow: "Accelerated Chloride Action",
-    statusBg: "bg-rose-50 text-rose-800 border-rose-300",
-  },
-];
+import { MASTER_BRIDGES_DATABASE } from "@/lib/bridgesData";
 
 export default function Home() {
-  const { activeLocale, useDevanagariDigits } = useAppStore();
-  const t = I18N_HOME[activeLocale] || I18N_HOME.en;
+  const { activeLocale } = useAppStore();
 
-  const [selectedBasin, setSelectedBasin] = useState<string>("mula-mutha");
+  // State Management
+  const [sidebarActive, setSidebarActive] = useState<string>("live_view");
+  const [cameraMode, setCameraMode] = useState<"LIVE" | "STRUCTURE" | "RIVER" | "DECK" | "PIERS" | "APPROACH" | "AERIAL">("LIVE");
+  const [sensorTab, setSensorTab] = useState<"IMU" | "WATER" | "TOF" | "TEMP">("IMU");
+  const [mapLayer, setMapLayer] = useState<"satellite" | "terrain" | "map">("satellite");
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [lastPacketTime, setLastPacketTime] = useState<string>("19:16:32");
 
-  // Complete, sequential L1 through L7 Lifecycle
-  const lifecycles = [
-    {
-      code: "01",
-      systemLevel: "L1",
-      title: {
-        en: "Asset Registry & Infrastructure Locator",
-        hi: "परिसंपत्ति रजिस्ट्री एवं पुल-फ्लाईओवर खोज",
-        mr: "मालमत्ता नोंदवही व पूल-उड्डाणपूल शोध",
-      },
-      desc: {
-        en: "National infrastructure grid: historical provenance, commissioning era, calculated operational age, civil engineering parameters, and GIS mapping for 32+ major bridges and flyovers across India.",
-        hi: "राष्ट्रीय अवसंरचना ग्रिड: भारत भर के ३२+ प्रमुख पुलों और फ्लाईओवरों का इतिहास, सक्रिय आयु, सिविल पैरामीटर और सटीक जीआईएस मानचित्रण।",
-        mr: "राष्ट्रीय पायाभूत सुविधा ग्रीड: देशभरातील ३२+ प्रमुख पूल आणि उड्डाणपुलांचा इतिहास, सक्रिय वय, अभियांत्रिकी मापदंड आणि अचूक जीआयएस नकाशा.",
-      },
-      tag: "IRC:6 / IS 1893 / Wikipedia Verified",
-      href: "/bridges",
-      icon: <Layers className="w-4 h-4 text-slate-700" />,
+  // Dynamic Bridge Selection (defaults to Rabindra Setu / Howrah Bridge matching screenshot)
+  const [selectedBridgeId, setSelectedBridgeId] = useState<string>("howrah-bridge");
+  const activeBridge = MASTER_BRIDGES_DATABASE.find((b) => b.id === selectedBridgeId) || MASTER_BRIDGES_DATABASE[1];
+
+  // Dynamic packet time counter
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      setLastPacketTime(
+        `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`
+      );
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Sensor metrics depending on selected tab
+  const sensorConfigs = {
+    IMU: {
+      title: "IMU-04 (Modal Frequency)",
+      badge: "Normal",
+      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      current: "2.14 Hz",
+      baseline: "2.18 Hz",
+      deviation: "-1.8%",
+      deviationColor: "text-emerald-700",
+      signal: "Good",
+      yLabels: ["2.6", "2.4", "2.2", "2.0", "1.8"],
+      points: [
+        { x: 0, y: 55 },
+        { x: 30, y: 52 },
+        { x: 60, y: 56 },
+        { x: 90, y: 54 },
+        { x: 120, y: 48 },
+        { x: 150, y: 50 },
+        { x: 180, y: 42 },
+        { x: 210, y: 38 },
+        { x: 240, y: 45 },
+        { x: 270, y: 52 },
+        { x: 300, y: 48 },
+      ],
     },
-    {
-      code: "02",
-      systemLevel: "L2",
-      title: {
-        en: "Construction & Quality Testing",
-        hi: "निर्माण एवं गुणवत्ता परीक्षण",
-        mr: "बांधकाम व गुणवत्ता परीक्षण",
-      },
-      desc: {
-        en: "Concrete cube compressive strength logs (M35-M50), contractor defect liability tracking, and initial proof-load verification.",
-        hi: "कंक्रीट क्यूब संपीड़न शक्ति लॉग (M35-M50), ठेकेदार दोष दायित्व ट्रैकिंग और प्रारंभिक लोड टेस्ट सत्यापन।",
-        mr: "काँक्रीट क्यूब क्षमता नोंदी (M35-M50), कंत्राटदार दोष दायित्व कालावधी आणि भार चाचणी पडताळणी.",
-      },
-      tag: "IRC:SP:35 QA",
-      href: "/bridges?view=quality",
-      icon: <Database className="w-4 h-4 text-slate-700" />,
+    WATER: {
+      title: "WL-02 (Ultrasonic River Stage)",
+      badge: "Normal",
+      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      current: "4.82 m",
+      baseline: "4.50 m",
+      deviation: "+7.1%",
+      deviationColor: "text-emerald-700",
+      signal: "Good",
+      yLabels: ["6.0", "5.5", "5.0", "4.5", "4.0"],
+      points: [
+        { x: 0, y: 62 },
+        { x: 30, y: 60 },
+        { x: 60, y: 58 },
+        { x: 90, y: 55 },
+        { x: 120, y: 52 },
+        { x: 150, y: 50 },
+        { x: 180, y: 48 },
+        { x: 210, y: 46 },
+        { x: 240, y: 45 },
+        { x: 270, y: 44 },
+        { x: 300, y: 43 },
+      ],
     },
-    {
-      code: "03",
-      systemLevel: "L3",
-      title: {
-        en: "Live Structural Telemetry Cockpit",
-        hi: "लाइव संरचनात्मक टेलीमेट्री कॉकपिट",
-        mr: "थेट संरचनात्मक सेन्सर कॉकपिट",
-      },
-      desc: {
-        en: "Ultrasonic river stage, biaxial pier inclinometer tilt (1.0 mrad threshold), and 3-axis deck vibration accelerometers.",
-        hi: "अल्ट्रासोनिक नदी जल स्तर, पियर द्विएक्शियल झुकाव (1.0 mrad सीमा) और 3-अक्षीय डेक कंपन त्वरण।",
-        mr: "अल्ट्रासोनिक नदी पातळी, खांबाचा कल (1.0 mrad मर्यादा) आणि ३-अक्षीय डेक कंपन प्रवेग मापक.",
-      },
-      tag: "50Hz Edge Stream",
-      href: "/telemetry",
-      icon: <Radio className="w-4 h-4 text-slate-700" />,
+    TOF: {
+      title: "TOF-01 (Expansion Joint Gap)",
+      badge: "Warning",
+      badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+      current: "18.4 mm",
+      baseline: "14.2 mm",
+      deviation: "+29.5%",
+      deviationColor: "text-amber-700",
+      signal: "Watch",
+      yLabels: ["25.0", "20.0", "15.0", "10.0", "5.0"],
+      points: [
+        { x: 0, y: 45 },
+        { x: 30, y: 42 },
+        { x: 60, y: 40 },
+        { x: 90, y: 38 },
+        { x: 120, y: 32 },
+        { x: 150, y: 28 },
+        { x: 180, y: 25 },
+        { x: 210, y: 26 },
+        { x: 240, y: 24 },
+        { x: 270, y: 22 },
+        { x: 300, y: 20 },
+      ],
     },
-    {
-      code: "04",
-      systemLevel: "AR",
-      title: {
-        en: "Photogrammetry 3D Defect Twin",
-        hi: "फोटोग्रामेट्री 3D दोष ट्विन",
-        mr: "फोटोग्रामेट्री 3D दोष ट्विन",
-      },
-      desc: {
-        en: "CS543 multi-view SIFT feature matching, calibrated camera trajectories, and localized 3D spalling/scour bounding cubes.",
-        hi: "CS543 मल्टी-व्यू SIFT मिलान, अंशांकित कैमरा प्रक्षेपवक्र और वास्तविक 3D स्पॉलिंग/कटाव बाउंडिंग क्यूब्स।",
-        mr: "CS543 मल्टी-व्ह्यू SIFT जुळणी, कॅमेरा ट्रॅजेक्टरी आणि ३डी स्पॉलिंग/गाद बाउंडिंग क्युब्स.",
-      },
-      tag: "SIFT Multi-View",
-      href: "/defect-ar",
-      icon: <Box className="w-4 h-4 text-slate-700" />,
+    TEMP: {
+      title: "TH-03 (Ambient & Deck Temperature)",
+      badge: "Normal",
+      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      current: "31.4 °C",
+      baseline: "30.0 °C",
+      deviation: "+4.6%",
+      deviationColor: "text-emerald-700",
+      signal: "Good",
+      yLabels: ["40.0", "35.0", "30.0", "25.0", "20.0"],
+      points: [
+        { x: 0, y: 50 },
+        { x: 30, y: 46 },
+        { x: 60, y: 40 },
+        { x: 90, y: 34 },
+        { x: 120, y: 30 },
+        { x: 150, y: 32 },
+        { x: 180, y: 38 },
+        { x: 210, y: 42 },
+        { x: 240, y: 48 },
+        { x: 270, y: 52 },
+        { x: 300, y: 55 },
+      ],
     },
-    {
-      code: "05",
-      systemLevel: "L6",
-      title: {
-        en: "Deterministic SVI & RUL Engine",
-        hi: "संरचनात्मक संवेदनशीलता एवं शेष जीवन (RUL)",
-        mr: "संरचनात्मक संवेदनशीलता व उर्वरित आयुष्य (RUL)",
-      },
-      desc: {
-        en: "Piecewise-linear SVI scoring, Dynamic Risk Index (DRI), Markov-chain degradation, and 11-rule Prescriptive Catalogue.",
-        hi: "पीसवाइज़-रेखीय SVI स्कोरिंग, डायनामिक जोखिम सूचकांक (DRI), मार्कोव क्षरण और 11-नियम निर्धारित उपचार सूची।",
-        mr: "तुकडा-रेषीय SVI गुण, डायनामिक जोखीम निर्देशांक (DRI), मार्कोव्ह क्षय अंदाज आणि ११ अधिकृत दुरुस्ती उपाय.",
-      },
-      tag: "Appendix D Math",
-      href: "/risk",
-      icon: <Cpu className="w-4 h-4 text-slate-700" />,
-    },
-    {
-      code: "06",
-      systemLevel: "L4",
-      title: {
-        en: "Incident Triage & Emergency Response",
-        hi: "घटना नियंत्रण एवं आपातकालीन संचालन",
-        mr: "घटना नियंत्रण व आपत्कालीन कक्ष",
-      },
-      desc: {
-        en: "Automated alert scan, axle weight restrictions, arterial traffic diversions, and emergency bridge closure orders (CLOSE-01).",
-        hi: "स्वचालित अलर्ट स्कैन, धुरा भार प्रतिबंध, यातायात डायवर्जन और आपातकालीन पुल बंदी आदेश (CLOSE-01)।",
-        mr: "स्वयंचलित इशारा स्कॅन, वाहन भार मर्यादा, वाहतूक वळवणे आणि आपत्कालीन पूल बंदी आदेश (CLOSE-01).",
-      },
-      tag: "Division Ops",
-      href: "/triage",
-      icon: <AlertTriangle className="w-4 h-4 text-slate-700" />,
-    },
-    {
-      code: "07",
-      systemLevel: "L5",
-      title: {
-        en: "26-Factor Field Structural Audit",
-        hi: "२६-घटक फील्ड संरचनात्मक ऑडिट",
-        mr: "२६-घटक प्रत्यक्ष संरचनात्मक तपासणी",
-      },
-      desc: {
-        en: "Digital inspection wizard capturing Structural, Hydraulic, Seismic, Load, and Age factors with immutable locking.",
-        hi: "संरचनात्मक, हाइड्रोलिक, भूकंपीय, भार और आयु कारकों को अपरिवर्तनीय लॉकिंग के साथ दर्ज करने वाला डिजिटल विज़ार्ड।",
-        mr: "संरचनात्मक, जलवैज्ञानिक, भूकंपीय, भार आणि वय निकष अपरिवर्तनीय लॉकिंगसह नोंदवणारा डिजिटल विझार्ड.",
-      },
-      tag: "IRC:SP:35 Tab 4.1",
-      href: "/audits",
-      icon: <FileCheck className="w-4 h-4 text-slate-700" />,
-    },
-    {
-      code: "08",
-      systemLevel: "L7",
-      title: {
-        en: "Public Citizen Transparency Portal",
-        hi: "सार्वजनिक नागरिक पारदर्शिता पोर्टल",
-        mr: "नागरिक पारदर्शकता दालन",
-      },
-      desc: {
-        en: "Open citizen portal for bridge age, certified health tiers, open audit records, and direct public grievance lodging.",
-        hi: "पुल निर्माण आयु, प्रमाणित सुरक्षा स्तर, खुले ऑडिट रिकॉर्ड और नागरिक शिकायत दर्ज करने का खुला पोर्टल।",
-        mr: "पुलाचे वय, प्रमाणित सुरक्षा स्तर, खुली तपासणी माहिती आणि नागरिक तक्रार नोंदणीची खुली सोय.",
-      },
-      tag: "MoRTH Open Grid",
-      href: "/public",
-      icon: <Eye className="w-4 h-4 text-slate-700" />,
-    },
-  ];
+  };
+
+  const curSensor = sensorConfigs[sensorTab];
+
+  // SVG sparkline path calculation
+  const pathD = curSensor.points.reduce((acc, pt, idx, arr) => {
+    if (idx === 0) return `M ${pt.x} ${pt.y}`;
+    const prev = arr[idx - 1];
+    const cp1x = prev.x + (pt.x - prev.x) / 2;
+    const cp1y = prev.y;
+    const cp2x = prev.x + (pt.x - prev.x) / 2;
+    const cp2y = pt.y;
+    return `${acc} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${pt.x} ${pt.y}`;
+  }, "");
+
+  const fillD = `${pathD} L 300 80 L 0 80 Z`;
 
   return (
-    <div className="relative w-full text-slate-800 bg-[#fcfbf9]">
-      {/* 1. CINEMATIC 3D LIVE OBSERVATION SCENE */}
-      <BridgeHero3D />
-
-      {/* 2. MAIN OPERATIONS GRID (RESTYLED INTO ENGINEERING CONTROL ROOM) */}
-      <div id="operations-grid" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-        {/* Live National Metric Wall (Clean engineering cards) */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-white p-4 rounded-lg border border-slate-300 shadow-xs">
-            <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider block mb-1">
-              {t.statBridges}
-            </span>
-            <div className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 mb-1">
-              {formatNumber(60, activeLocale, useDevanagariDigits)}
-            </div>
-            <div className="text-[11px] text-slate-600 font-medium flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span>{t.statBridgesSub}</span>
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg border border-slate-300 shadow-xs">
-            <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider block mb-1">
-              {t.statSensors}
-            </span>
-            <div className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 mb-1">
-              {formatNumber(240, activeLocale, useDevanagariDigits)}
-            </div>
-            <div className="text-[11px] text-sky-800 font-medium flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
-              <span>{t.statSensorsSub}</span>
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg border border-slate-300 shadow-xs">
-            <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider block mb-1">
-              {t.statLeadTime}
-            </span>
-            <div className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 mb-1">
-              {formatNumber(6.63, activeLocale, useDevanagariDigits)} hrs
-            </div>
-            <div className="text-[11px] text-emerald-800 font-medium flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span>{t.statLeadTimeSub}</span>
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg border border-slate-300 shadow-xs">
-            <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider block mb-1">
-              {t.statTarget}
-            </span>
-            <div className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 mb-1">
-              99.2%
-            </div>
-            <div className="text-[11px] text-slate-600 font-medium flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-slate-400"></span>
-              <span>{t.statTargetSub}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 3. L1–L7 STRUCTURED DATA PIPELINE */}
-        <div>
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5 pb-3 border-b border-slate-300">
-            <div>
-              <span className="text-[11px] font-mono font-bold text-slate-500 uppercase tracking-widest block mb-0.5">
-                CIVIL ENGINEERING WORKFLOW PIPELINE
-              </span>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-[#0f172a] tracking-tight">
-                {t.pipelineTitle}
-              </h2>
-              <p className="text-xs text-slate-600 mt-1 max-w-2xl">{t.pipelineSub}</p>
-            </div>
-            <div className="flex items-center gap-2 text-xs font-mono text-slate-600">
-              <span className="px-2 py-0.5 bg-slate-100 rounded border border-slate-200">
-                PWD Standard Formats
-              </span>
-              <span className="px-2 py-0.5 bg-slate-100 rounded border border-slate-200">
-                MoRTH Specification
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-            {lifecycles.map((item) => {
-              const localizedTitle = item.title[activeLocale] || item.title.en;
-              const localizedDesc = item.desc[activeLocale] || item.desc.en;
-              return (
-                <Link
-                  key={item.code}
-                  href={item.href}
-                  onClick={() => triggerHaptic("light")}
-                  className="group bg-white p-4 rounded-lg border border-slate-300 hover:border-slate-500 transition-all shadow-xs flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-300">
-                          {item.code}
-                        </span>
-                        <span className="text-[10px] font-mono text-slate-500">
-                          {item.systemLevel}
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-mono font-semibold text-slate-600 bg-slate-50 px-1.5 py-0.2 rounded border border-slate-200">
-                        {item.tag}
-                      </span>
-                    </div>
-
-                    <h3 className="font-bold text-slate-900 text-xs mb-1 group-hover:text-sky-800 transition-colors">
-                      {localizedTitle}
-                    </h3>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">{localizedDesc}</p>
-                  </div>
-
-                  <div className="mt-4 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 group-hover:text-slate-900">
-                    <span className="font-medium text-[11px]">
-                      {activeLocale === "hi" ? "कंसोल खोलें" : activeLocale === "mr" ? "दालन उघडा" : "Open Console"}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 4. STRATEGIC RIVER BASINS SPOTLIGHT */}
-        <div>
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5 pb-3 border-b border-slate-300">
-            <div>
-              <span className="text-[11px] font-mono font-bold text-slate-500 uppercase tracking-widest block mb-0.5">
-                REGIONAL BASIN SURVEILLANCE
-              </span>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-[#0f172a] tracking-tight">
-                {t.basinTitle}
-              </h2>
-              <p className="text-xs text-slate-600 mt-1 max-w-2xl">{t.basinSub}</p>
-            </div>
-            <Link
-              href="/bridges"
-              onClick={() => triggerHaptic("light")}
-              className="text-xs text-slate-800 hover:text-black font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto bg-white px-3 py-1.5 rounded border border-slate-300 shadow-xs"
+    <div className="min-h-[calc(100vh-80px)] bg-[#f4f5f7] text-[#0f172a] p-3 sm:p-4">
+      <div className="max-w-[1720px] mx-auto flex gap-3">
+        {/* ============================================================ */}
+        {/* 1. LEFT VERTICAL SIDEBAR (Matching reference screenshot)     */}
+        {/* ============================================================ */}
+        <aside className="w-48 shrink-0 bg-white rounded-lg border border-slate-200/90 shadow-2xs p-2 flex flex-col justify-between hidden md:flex">
+          <div className="space-y-1 text-xs">
+            {/* Live View (Active) */}
+            <button
+              onClick={() => {
+                setSidebarActive("live_view");
+                setCameraMode("LIVE");
+                triggerHaptic("selection");
+              }}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-semibold transition-all ${
+                sidebarActive === "live_view"
+                  ? "bg-sky-50 text-[#0284c7] font-bold border-l-2 border-[#0284c7]"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+              }`}
             >
-              <span>
-                {activeLocale === "hi"
-                  ? "GIS मानचित्र पर देखें"
-                  : activeLocale === "mr"
-                  ? "GIS नकाशावर पहा"
-                  : "View in GIS Registry"}
-              </span>
-              <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-            </Link>
-          </div>
+              <Video className="w-4 h-4 text-[#0284c7]" />
+              <span>Live View</span>
+            </button>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-            {BASIN_METRICS.map((basin) => (
-              <div
-                key={basin.id}
-                onClick={() => {
-                  setSelectedBasin(basin.id);
-                  triggerHaptic("selection");
-                }}
-                className={`p-4 rounded-lg border transition-all cursor-pointer ${
-                  selectedBasin === basin.id
-                    ? "bg-white border-slate-600 shadow-sm ring-1 ring-slate-600"
-                    : "bg-white border-slate-300 hover:border-slate-400 shadow-xs"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-mono font-semibold text-slate-500">
-                    {formatNumber(basin.bridges, activeLocale, useDevanagariDigits)} ASSETS
-                  </span>
-                  <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${basin.statusBg}`}>
-                    {basin.status}
-                  </span>
-                </div>
-
-                <h4 className="font-bold text-slate-900 text-xs mb-0.5">{basin.name}</h4>
-                <div className="text-[11px] text-slate-500 mb-2">{basin.nameLocal}</div>
-
-                <div className="space-y-1 text-[11px] font-mono border-t border-slate-100 pt-2 text-slate-600">
-                  <div className="flex justify-between">
-                    <span className="text-slate-400 text-[10px]">STAGE:</span>
-                    <span className="font-semibold text-slate-800">{basin.waterLevel}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400 text-[10px]">DRI:</span>
-                    <span className="font-semibold text-slate-800">{basin.statusText}</span>
-                  </div>
-                  <div className="text-[10px] text-slate-500 truncate pt-0.5">{basin.flow}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 5. OPERATIONAL CONTROL ROOM MODULES */}
-        <div>
-          <div className="mb-4">
-            <span className="text-[11px] font-mono font-bold text-slate-500 uppercase tracking-widest block mb-0.5">
-              ENGINEER CONTROL CONSOLES
-            </span>
-            <h2 className="text-lg sm:text-xl font-extrabold text-[#0f172a] tracking-tight">
-              {t.quickAccessTitle}
-            </h2>
-            <p className="text-xs text-slate-600 mt-0.5">{t.quickAccessSub}</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <Link
-              href="/bridges"
-              onClick={() => triggerHaptic("light")}
-              className="p-3.5 bg-white border border-slate-300 rounded-lg flex items-center justify-between group hover:border-slate-500 transition-all shadow-xs"
+            {/* Digital Twin */}
+            <button
+              onClick={() => {
+                setSidebarActive("digital_twin");
+                setCameraMode("STRUCTURE");
+                triggerHaptic("selection");
+              }}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-medium transition-all ${
+                sidebarActive === "digital_twin"
+                  ? "bg-sky-50 text-[#0284c7] font-bold border-l-2 border-[#0284c7]"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+              }`}
             >
-              <div>
-                <span className="font-bold text-xs text-slate-900 block group-hover:text-sky-800">
-                  01 Asset Registry & GIS
-                </span>
-                <span className="text-[11px] text-slate-500 font-mono">60 Registered Bridges</span>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-all" />
-            </Link>
+              <Box className="w-4 h-4 text-slate-500" />
+              <span>Digital Twin</span>
+            </button>
 
+            {/* IoT Sensors */}
             <Link
               href="/telemetry"
               onClick={() => triggerHaptic("light")}
-              className="p-3.5 bg-white border border-slate-300 rounded-lg flex items-center justify-between group hover:border-slate-500 transition-all shadow-xs"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all"
             >
-              <div>
-                <span className="font-bold text-xs text-slate-900 block group-hover:text-sky-800">
-                  03 Live Telemetry Grid
-                </span>
-                <span className="text-[11px] text-slate-500 font-mono">240 Sensor Channels</span>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-all" />
+              <Radio className="w-4 h-4 text-slate-500" />
+              <span>IoT Sensors</span>
             </Link>
 
+            {/* Defects & Inspection */}
             <Link
-              href="/risk"
+              href="/audits"
               onClick={() => triggerHaptic("light")}
-              className="p-3.5 bg-white border border-slate-300 rounded-lg flex items-center justify-between group hover:border-slate-500 transition-all shadow-xs"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all"
             >
-              <div>
-                <span className="font-bold text-xs text-slate-900 block group-hover:text-sky-800">
-                  05 SVI Risk & RUL Engine
-                </span>
-                <span className="text-[11px] text-slate-500 font-mono">11 Prescriptive Rules</span>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-all" />
+              <ClipboardList className="w-4 h-4 text-slate-500" />
+              <span>Defects &amp; Inspection</span>
             </Link>
 
+            {/* Triage & Alerts */}
             <Link
               href="/triage"
               onClick={() => triggerHaptic("light")}
-              className="p-3.5 bg-white border border-slate-300 rounded-lg flex items-center justify-between group hover:border-slate-500 transition-all shadow-xs"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all"
             >
-              <div>
-                <span className="font-bold text-xs text-slate-900 block group-hover:text-rose-800">
-                  06 Incident Triage Console
-                </span>
-                <span className="text-[11px] text-slate-500 font-mono">Emergency Directives</span>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-all" />
+              <AlertTriangle className="w-4 h-4 text-slate-500" />
+              <span>Triage &amp; Alerts</span>
             </Link>
+
+            {/* Bridge Registry */}
+            <Link
+              href="/bridges"
+              onClick={() => triggerHaptic("light")}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all"
+            >
+              <Landmark className="w-4 h-4 text-slate-500" />
+              <span>Bridge Registry</span>
+            </Link>
+
+            {/* Reports */}
+            <Link
+              href="/public"
+              onClick={() => triggerHaptic("light")}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all"
+            >
+              <FileText className="w-4 h-4 text-slate-500" />
+              <span>Reports</span>
+            </Link>
+          </div>
+
+          {/* Settings at bottom */}
+          <div className="pt-2 border-t border-slate-200">
+            <button
+              onClick={() => triggerHaptic("light")}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all"
+            >
+              <Settings className="w-4 h-4 text-slate-400" />
+              <span>Settings</span>
+            </button>
+          </div>
+        </aside>
+
+        {/* ============================================================ */}
+        {/* 2. CENTER & RIGHT MAIN GRID (Matching reference screenshot)  */}
+        {/* ============================================================ */}
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 min-w-0">
+          {/* ========================================================== */}
+          {/* CENTER AREA (8 Columns on desktop): Feed + 3 Bottom Cards  */}
+          {/* ========================================================== */}
+          <div className="lg:col-span-8 flex flex-col gap-3">
+            {/* TOP: LIVE SURVEILLANCE FEED VIEWPORT */}
+            <div className="relative w-full h-[380px] sm:h-[440px] bg-slate-900 rounded-lg overflow-hidden border border-slate-200/90 shadow-2xs group">
+              {/* If in STRUCTURE / DIGITAL TWIN mode, render the 3D twin, otherwise render authentic photo feed */}
+              {cameraMode === "STRUCTURE" ? (
+                <div className="w-full h-full relative">
+                  <BridgeHero3D />
+                </div>
+              ) : (
+                <div
+                  className="w-full h-full relative transition-transform duration-700 ease-out"
+                  style={{
+                    transform:
+                      cameraMode === "DECK"
+                        ? "scale(1.35) translate(5%, -10%)"
+                        : cameraMode === "RIVER"
+                        ? "scale(1.25) translate(-5%, 15%)"
+                        : cameraMode === "PIERS"
+                        ? "scale(1.4) translate(-10%, 20%)"
+                        : cameraMode === "APPROACH"
+                        ? "scale(1.2) translate(15%, -5%)"
+                        : cameraMode === "AERIAL"
+                        ? "scale(0.95)"
+                        : `scale(${zoomLevel})`,
+                  }}
+                >
+                  <Image
+                    src="/images/howrah_live_feed.jpg"
+                    alt="Rabindra Setu Live Observation Feed"
+                    fill
+                    priority
+                    className="object-cover"
+                  />
+                  {/* Subtle live atmospheric sheen */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25 pointer-events-none" />
+                </div>
+              )}
+
+              {/* Top Left HUD: LIVE FEED – CAMERA 01 [HD] */}
+              <div className="absolute top-3 left-3 flex items-center gap-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded text-white text-[11px] font-mono tracking-wide z-10 border border-white/10">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="font-bold">LIVE FEED – CAMERA 01</span>
+                <span className="bg-white/20 text-[10px] px-1 py-0.2 rounded font-bold">HD</span>
+              </div>
+
+              {/* Top Right HUD: Fullscreen Action */}
+              <div className="absolute top-3 right-3 z-10">
+                <button
+                  onClick={() => {
+                    setIsFullscreen(!isFullscreen);
+                    triggerHaptic("light");
+                  }}
+                  className="bg-black/60 backdrop-blur-md hover:bg-black/80 text-white p-1.5 rounded transition-colors border border-white/10"
+                  title="Fullscreen"
+                >
+                  {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
+              {/* Middle Right Map / Camera Overlay Controls */}
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex flex-col gap-1.5 z-10">
+                <button
+                  onClick={() => {
+                    setZoomLevel((prev) => Math.min(prev + 0.15, 1.6));
+                    triggerHaptic("light");
+                  }}
+                  className="bg-black/60 backdrop-blur-md hover:bg-black/80 text-white w-7 h-7 rounded flex items-center justify-center font-bold text-xs border border-white/10"
+                  title="Zoom In"
+                >
+                  <ZoomIn className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => {
+                    setZoomLevel((prev) => Math.max(prev - 0.15, 0.85));
+                    triggerHaptic("light");
+                  }}
+                  className="bg-black/60 backdrop-blur-md hover:bg-black/80 text-white w-7 h-7 rounded flex items-center justify-center font-bold text-xs border border-white/10"
+                  title="Zoom Out"
+                >
+                  <ZoomOut className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => {
+                    setZoomLevel(1);
+                    setCameraMode("LIVE");
+                    triggerHaptic("light");
+                  }}
+                  className="bg-black/60 backdrop-blur-md hover:bg-black/80 text-white w-7 h-7 rounded flex items-center justify-center border border-white/10"
+                  title="Reset Orientation"
+                >
+                  <Compass className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Bottom Left HUD: RABINDRA SETU Overlay Card */}
+              <div className="absolute bottom-3 left-3 bg-black/65 backdrop-blur-md px-3 py-2 rounded-md text-white z-10 border border-white/10 max-w-sm">
+                <div className="font-extrabold text-sm tracking-tight text-white uppercase leading-none">
+                  {activeBridge.name}
+                </div>
+                <div className="text-[11px] text-slate-300 font-mono mt-1">
+                  Bridge ID: {activeBridge.code} | {activeBridge.river} | {activeBridge.district}
+                </div>
+              </div>
+
+              {/* Bottom Right HUD: Camera / Observation Modes Selector */}
+              <div className="absolute bottom-3 right-3 flex items-center bg-black/65 backdrop-blur-md p-1 rounded-md text-white text-[11px] font-semibold gap-1 z-10 border border-white/10">
+                {(["LIVE", "STRUCTURE", "RIVER", "DECK", "PIERS", "APPROACH", "AERIAL"] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    onClick={() => {
+                      setCameraMode(mode);
+                      triggerHaptic("selection");
+                    }}
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider transition-colors ${
+                      cameraMode === mode
+                        ? "bg-white text-slate-900 shadow-xs"
+                        : "text-slate-300 hover:text-white hover:bg-white/15"
+                    }`}
+                  >
+                    {mode}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* BOTTOM ROW (3 Cards: Bridge Details, Map View, Live Sensor Data) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {/* ======================================================== */}
+              {/* CARD 1: BRIDGE DETAILS                                   */}
+              {/* ======================================================== */}
+              <div className="bg-white rounded-lg border border-slate-200/90 p-3 shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#0f172a] mb-2.5 pb-1 border-b border-slate-100">
+                    <Landmark className="w-3.5 h-3.5 text-slate-700" />
+                    <span>Bridge Details</span>
+                  </div>
+
+                  <div className="flex gap-2.5 items-start">
+                    {/* Archival Thumbnail Photo */}
+                    <div className="relative w-20 h-20 rounded overflow-hidden shrink-0 border border-slate-200 bg-slate-100">
+                      <Image
+                        src="/images/howrah_thumbnail.jpg"
+                        alt="Rabindra Setu Archival View"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+
+                    {/* Metadata Specs */}
+                    <div className="flex-1 min-w-0 text-[11px] space-y-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="font-extrabold text-xs text-[#0f172a] truncate">
+                          {activeBridge.name.split("(")[0]}
+                        </span>
+                        <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          Active
+                        </span>
+                      </div>
+
+                      <div className="space-y-0.5 text-[10px] font-mono text-slate-600">
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Asset ID:</span>
+                          <span className="font-semibold text-slate-900">{activeBridge.code}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">District:</span>
+                          <span className="font-semibold text-slate-900">{activeBridge.district}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">River:</span>
+                          <span className="font-semibold text-slate-900">{activeBridge.river.split(" ")[0]}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Structure:</span>
+                          <span className="font-semibold text-slate-900">{activeBridge.category}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Commissioned:</span>
+                          <span className="font-semibold text-slate-900">{activeBridge.year_built}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Total Length:</span>
+                          <span className="font-semibold text-slate-900">{activeBridge.length_m} m</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">No. of Spans:</span>
+                          <span className="font-semibold text-slate-900">{activeBridge.spans}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Last Inspection:</span>
+                          <span className="font-semibold text-slate-900">{activeBridge.last_inspection_date}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Condition Grade:</span>
+                          <span className="font-bold text-emerald-700">B (Good)</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Link */}
+                <div className="pt-2 mt-2 border-t border-slate-100">
+                  <Link
+                    href={`/bridges/${activeBridge.id}`}
+                    onClick={() => triggerHaptic("light")}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0284c7] hover:text-sky-800 transition-colors"
+                  >
+                    <span>View Full Profile</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* ======================================================== */}
+              {/* CARD 2: MAP VIEW (GIS Satellite Viewport)                */}
+              {/* ======================================================== */}
+              <div className="bg-white rounded-lg border border-slate-200/90 p-3 shadow-2xs flex flex-col justify-between">
+                <div>
+                  {/* Map Header with Dropdowns & Layer Controls */}
+                  <div className="flex items-center justify-between gap-1 text-xs font-bold text-[#0f172a] mb-2 pb-1 border-b border-slate-100">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-slate-700" />
+                      <span>Map View</span>
+                    </div>
+
+                    {/* Layer Switcher */}
+                    <div className="flex items-center gap-0.5 bg-slate-100 p-0.5 rounded text-[10px] font-medium">
+                      <button
+                        onClick={() => {
+                          setMapLayer("satellite");
+                          triggerHaptic("light");
+                        }}
+                        className={`px-1.5 py-0.5 rounded font-semibold transition-colors ${
+                          mapLayer === "satellite" ? "bg-[#1e293b] text-white" : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        Satellite
+                      </button>
+                      <button
+                        onClick={() => {
+                          setMapLayer("terrain");
+                          triggerHaptic("light");
+                        }}
+                        className={`px-1.5 py-0.5 rounded font-semibold transition-colors ${
+                          mapLayer === "terrain" ? "bg-[#1e293b] text-white" : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        Terrain
+                      </button>
+                      <button
+                        onClick={() => {
+                          setMapLayer("map");
+                          triggerHaptic("light");
+                        }}
+                        className={`px-1.5 py-0.5 rounded font-semibold transition-colors ${
+                          mapLayer === "map" ? "bg-[#1e293b] text-white" : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        Map
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Filter Selectors Bar */}
+                  <div className="flex items-center gap-1 mb-2 text-[10px] font-medium text-slate-600">
+                    <select
+                      value={selectedBridgeId}
+                      onChange={(e) => {
+                        setSelectedBridgeId(e.target.value);
+                        triggerHaptic("selection");
+                      }}
+                      className="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[10px] focus:outline-none font-semibold text-slate-800"
+                    >
+                      <option value="howrah-bridge">Rabindra Setu (Howrah)</option>
+                      <option value="atal-setu-mthl">Atal Setu (MTHL)</option>
+                      <option value="bandra-worli-sea-link">Bandra-Worli Sea Link</option>
+                      <option value="chenab-rail-bridge">Chenab Rail Bridge</option>
+                      <option value="pamban-bridge">Pamban Sea Bridge</option>
+                    </select>
+                    <select className="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[10px] focus:outline-none text-slate-600">
+                      <option>Condition ▾</option>
+                      <option>Normal</option>
+                      <option>Watch</option>
+                      <option>Warning</option>
+                    </select>
+                    <select className="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[10px] focus:outline-none text-slate-600">
+                      <option>District ▾</option>
+                      <option>Howrah</option>
+                      <option>Kolkata</option>
+                      <option>Mumbai</option>
+                    </select>
+                  </div>
+
+                  {/* Satellite Aerial Map Image with Pins */}
+                  <div className="relative w-full h-[140px] rounded overflow-hidden border border-slate-200 bg-slate-900">
+                    <Image
+                      src="/images/howrah_satellite_map.jpg"
+                      alt="Howrah & Hooghly River Satellite View"
+                      fill
+                      className="object-cover"
+                    />
+
+                    {/* River Label */}
+                    <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/70 text-[9px] font-serif italic tracking-wider pointer-events-none rotate-[-45deg]">
+                      Hooghly River
+                    </span>
+
+                    {/* West Bank: Howrah Label */}
+                    <span className="absolute top-8 left-3 text-white/90 text-[10px] font-mono font-bold drop-shadow">
+                      Howrah
+                    </span>
+
+                    {/* East Bank: Kolkata Label */}
+                    <span className="absolute top-8 right-3 text-white/90 text-[10px] font-mono font-bold drop-shadow">
+                      Kolkata
+                    </span>
+
+                    {/* Main Target Bridge Pin (Blue) */}
+                    <div className="absolute top-[48%] left-[45%] -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 bg-[#0284c7] text-white px-1.5 py-0.5 rounded shadow-sm text-[9px] font-bold border border-white">
+                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                      <span>Rabindra Setu</span>
+                    </div>
+
+                    {/* Ambient Safety Markers */}
+                    <span className="absolute top-[35%] left-[25%] w-2.5 h-2.5 rounded-full bg-amber-400 border border-white shadow-xs"></span>
+                    <span className="absolute top-[28%] left-[38%] w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white shadow-xs"></span>
+                    <span className="absolute top-[68%] left-[58%] w-2.5 h-2.5 rounded-full bg-rose-500 border border-white shadow-xs"></span>
+
+                    {/* Controls & Scale */}
+                    <div className="absolute bottom-1.5 left-1.5 bg-black/60 backdrop-blur-xs text-white px-1.5 py-0.2 rounded text-[8px] font-mono">
+                      1 km
+                    </div>
+                    <div className="absolute bottom-1.5 right-1.5 flex flex-col gap-0.5">
+                      <button className="w-4 h-4 bg-white text-slate-800 rounded text-[9px] font-bold flex items-center justify-center shadow-xs">
+                        +
+                      </button>
+                      <button className="w-4 h-4 bg-white text-slate-800 rounded text-[9px] font-bold flex items-center justify-center shadow-xs">
+                        -
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 mt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                  <span>GPS: 22.5851° N, 88.3469° E</span>
+                  <Link href="/bridges" className="text-[#0284c7] font-semibold hover:underline">
+                    Expand GIS →
+                  </Link>
+                </div>
+              </div>
+
+              {/* ======================================================== */}
+              {/* CARD 3: LIVE SENSOR DATA (Engineering Waveform Chart)    */}
+              {/* ======================================================== */}
+              <div className="bg-white rounded-lg border border-slate-200/90 p-3 shadow-2xs flex flex-col justify-between">
+                <div>
+                  {/* Sensor Header */}
+                  <div className="flex items-center justify-between gap-1 text-xs font-bold text-[#0f172a] mb-2 pb-1 border-b border-slate-100">
+                    <div className="flex items-center gap-1.5">
+                      <Radio className="w-3.5 h-3.5 text-slate-700" />
+                      <span>Live Sensor Data</span>
+                    </div>
+
+                    {/* Sensor Type Tabs */}
+                    <div className="flex items-center gap-0.5 bg-slate-100 p-0.5 rounded text-[10px]">
+                      <button
+                        onClick={() => {
+                          setSensorTab("IMU");
+                          triggerHaptic("selection");
+                        }}
+                        className={`px-1.5 py-0.5 rounded font-bold transition-colors ${
+                          sensorTab === "IMU" ? "bg-[#1e293b] text-white" : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        IMU
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSensorTab("WATER");
+                          triggerHaptic("selection");
+                        }}
+                        className={`px-1.5 py-0.5 rounded font-bold transition-colors ${
+                          sensorTab === "WATER" ? "bg-[#1e293b] text-white" : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        Water Level
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSensorTab("TOF");
+                          triggerHaptic("selection");
+                        }}
+                        className={`px-1.5 py-0.5 rounded font-bold transition-colors ${
+                          sensorTab === "TOF" ? "bg-[#1e293b] text-white" : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        ToF Gap
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSensorTab("TEMP");
+                          triggerHaptic("selection");
+                        }}
+                        className={`px-1.5 py-0.5 rounded font-bold transition-colors ${
+                          sensorTab === "TEMP" ? "bg-[#1e293b] text-white" : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        Temperature
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Subtitle & Health Status Badge */}
+                  <div className="flex items-center justify-between gap-1 mb-2">
+                    <span className="text-xs font-bold text-slate-800">{curSensor.title}</span>
+                    <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold border ${curSensor.badgeColor}`}>
+                      {curSensor.badge}
+                    </span>
+                  </div>
+
+                  {/* 4-Metric Statistics Row */}
+                  <div className="grid grid-cols-4 gap-1 p-1.5 bg-[#f8fafc] rounded border border-slate-200 text-center font-mono text-[10px] mb-2">
+                    <div>
+                      <span className="text-slate-400 block text-[9px]">Current</span>
+                      <strong className="text-slate-900 text-[11px]">{curSensor.current}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[9px]">Baseline</span>
+                      <span className="text-slate-700 font-semibold">{curSensor.baseline}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[9px]">Deviation</span>
+                      <span className={`font-bold ${curSensor.deviationColor}`}>{curSensor.deviation}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[9px]">Signal</span>
+                      <span className="text-emerald-700 font-bold">{curSensor.signal}</span>
+                    </div>
+                  </div>
+
+                  {/* Engineering Frequency Curve Chart (SVG) */}
+                  <div className="relative w-full h-[85px] bg-[#fbfbfa] rounded border border-slate-200 p-1 flex">
+                    {/* Y-axis labels */}
+                    <div className="w-6 shrink-0 flex flex-col justify-between text-[8px] font-mono text-slate-400 text-right pr-1">
+                      {curSensor.yLabels.map((yl) => (
+                        <span key={yl}>{yl}</span>
+                      ))}
+                    </div>
+
+                    {/* Chart Canvas */}
+                    <div className="flex-1 relative h-full">
+                      {/* Horizontal Grid lines */}
+                      <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-40">
+                        <div className="border-b border-slate-200 w-full" />
+                        <div className="border-b border-slate-200 w-full" />
+                        <div className="border-b border-slate-200 w-full" />
+                        <div className="border-b border-slate-200 w-full" />
+                        <div className="border-b border-slate-200 w-full" />
+                      </div>
+
+                      {/* SVG Wave */}
+                      <svg className="w-full h-full" viewBox="0 0 300 80" preserveAspectRatio="none">
+                        <defs>
+                          <linearGradient id="sensorGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#0284c7" stopOpacity="0.25" />
+                            <stop offset="100%" stopColor="#0284c7" stopOpacity="0.0" />
+                          </linearGradient>
+                        </defs>
+                        <path d={fillD} fill="url(#sensorGrad)" />
+                        <path d={pathD} fill="none" stroke="#0284c7" strokeWidth="1.75" />
+                      </svg>
+
+                      {/* X-axis Timestamps */}
+                      <div className="absolute bottom-0 inset-x-0 flex justify-between text-[8px] font-mono text-slate-400 px-1">
+                        <span>12:00</span>
+                        <span>14:00</span>
+                        <span>16:00</span>
+                        <span>18:00</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 mt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                  <span>Last Packet: {lastPacketTime}</span>
+                  <Link href="/telemetry" className="text-[#0284c7] font-semibold hover:underline">
+                    View Full Rack →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ========================================================== */}
+          {/* RIGHT COLUMN (4 Columns on desktop): Bridge Condition &    */}
+          {/* Recent Alerts Panels                                       */}
+          {/* ========================================================== */}
+          <div className="lg:col-span-4 flex flex-col gap-3">
+            {/* ======================================================== */}
+            {/* PANEL 1: BRIDGE CONDITION & SETU SCORE                   */}
+            {/* ======================================================== */}
+            <div className="bg-white rounded-lg border border-slate-200/90 p-4 shadow-2xs space-y-3.5">
+              {/* Header Row */}
+              <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                <h3 className="font-extrabold text-xs text-[#0f172a] uppercase tracking-wider">
+                  BRIDGE CONDITION
+                </h3>
+                <span className="flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  NORMAL
+                </span>
+              </div>
+
+              {/* Setu Score Hero & Progress Meter */}
+              <div className="space-y-1.5">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[10px] font-mono text-slate-500 font-semibold tracking-wider">
+                    SETU SCORE
+                  </span>
+                  <div className="font-extrabold font-mono text-xl text-[#0f172a]">
+                    82 <span className="text-xs text-slate-400 font-normal">/ 100</span>
+                  </div>
+                </div>
+
+                {/* Primary Segmented Progress Bar */}
+                <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                  <div className="bg-emerald-700 h-full rounded-full" style={{ width: "82%" }} />
+                </div>
+              </div>
+
+              {/* 5 Sub-Factor Horizontal Rating Bars */}
+              <div className="space-y-1.5 text-[11px] font-mono">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-slate-600 w-24">Structural</span>
+                  <div className="flex-1 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-emerald-600 h-full rounded-full" style={{ width: "82%" }} />
+                  </div>
+                  <span className="w-6 text-right font-bold text-slate-800">82</span>
+                </div>
+
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-slate-600 w-24">Hydraulic</span>
+                  <div className="flex-1 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-teal-600 h-full rounded-full" style={{ width: "74%" }} />
+                  </div>
+                  <span className="w-6 text-right font-bold text-slate-800">74</span>
+                </div>
+
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-slate-600 w-24">Seismic</span>
+                  <div className="flex-1 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-emerald-700 h-full rounded-full" style={{ width: "91%" }} />
+                  </div>
+                  <span className="w-6 text-right font-bold text-slate-800">91</span>
+                </div>
+
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-slate-600 w-24">Traffic</span>
+                  <div className="flex-1 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-amber-500 h-full rounded-full" style={{ width: "68%" }} />
+                  </div>
+                  <span className="w-6 text-right font-bold text-slate-800">68</span>
+                </div>
+
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-slate-600 w-24">Environmental</span>
+                  <div className="flex-1 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-teal-600 h-full rounded-full" style={{ width: "77%" }} />
+                  </div>
+                  <span className="w-6 text-right font-bold text-slate-800">77</span>
+                </div>
+              </div>
+
+              {/* LIVE DATA: Sensors Count & Review Dates */}
+              <div className="pt-2.5 border-t border-slate-100 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 font-bold text-slate-800">
+                    <Radio className="w-3.5 h-3.5 text-slate-500" />
+                    <span>LIVE DATA</span>
+                  </div>
+                  <span className="text-xs font-semibold text-emerald-700 flex items-center gap-1 font-mono">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    12 / 12 Sensors Online
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-600 pt-0.5">
+                  <div className="bg-slate-50 p-1.5 rounded border border-slate-150">
+                    <span className="text-slate-400 block text-[9px]">Last Inspection</span>
+                    <strong className="text-slate-900">14 Oct 2026</strong>
+                  </div>
+                  <div className="bg-slate-50 p-1.5 rounded border border-slate-150">
+                    <span className="text-slate-400 block text-[9px]">Next Review</span>
+                    <strong className="text-slate-900">14 Jan 2027</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* ENVIRONMENT: 6-Item Atmospheric Matrix */}
+              <div className="pt-2.5 border-t border-slate-100 space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                  <CloudSun className="w-3.5 h-3.5 text-slate-500" />
+                  <span>ENVIRONMENT</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-1.5 text-[10px] text-slate-700">
+                  <div className="bg-[#f8fafc] p-1.5 rounded border border-slate-200 flex flex-col">
+                    <div className="flex items-center gap-1 text-slate-400 text-[9px]">
+                      <Clock className="w-2.5 h-2.5" />
+                      <span>Time</span>
+                    </div>
+                    <strong className="text-slate-900 font-mono mt-0.5">17:42 IST</strong>
+                  </div>
+
+                  <div className="bg-[#f8fafc] p-1.5 rounded border border-slate-200 flex flex-col">
+                    <div className="flex items-center gap-1 text-slate-400 text-[9px]">
+                      <CloudSun className="w-2.5 h-2.5" />
+                      <span>Weather</span>
+                    </div>
+                    <strong className="text-slate-900 font-medium truncate mt-0.5">Partly Cloudy</strong>
+                  </div>
+
+                  <div className="bg-[#f8fafc] p-1.5 rounded border border-slate-200 flex flex-col">
+                    <div className="flex items-center gap-1 text-slate-400 text-[9px]">
+                      <Droplets className="w-2.5 h-2.5" />
+                      <span>Rainfall</span>
+                    </div>
+                    <strong className="text-slate-900 font-mono mt-0.5">2.4 mm/hr</strong>
+                  </div>
+
+                  <div className="bg-[#f8fafc] p-1.5 rounded border border-slate-200 flex flex-col">
+                    <div className="flex items-center gap-1 text-slate-400 text-[9px]">
+                      <Eye className="w-2.5 h-2.5" />
+                      <span>Visibility</span>
+                    </div>
+                    <strong className="text-slate-900 font-mono mt-0.5">7.8 km</strong>
+                  </div>
+
+                  <div className="bg-[#f8fafc] p-1.5 rounded border border-slate-200 flex flex-col">
+                    <div className="flex items-center gap-1 text-slate-400 text-[9px]">
+                      <Activity className="w-2.5 h-2.5" />
+                      <span>River Stage</span>
+                    </div>
+                    <strong className="text-slate-900 font-mono mt-0.5">4.82 m</strong>
+                  </div>
+
+                  <div className="bg-[#f8fafc] p-1.5 rounded border border-slate-200 flex flex-col">
+                    <div className="flex items-center gap-1 text-slate-400 text-[9px]">
+                      <Wind className="w-2.5 h-2.5" />
+                      <span>Wind</span>
+                    </div>
+                    <strong className="text-slate-900 font-mono mt-0.5">18 km/h</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ======================================================== */}
+            {/* PANEL 2: RECENT ALERTS (Matching reference screenshot)   */}
+            {/* ======================================================== */}
+            <div className="bg-white rounded-lg border border-slate-200/90 p-4 shadow-2xs space-y-2.5">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#0f172a]">
+                  <AlertTriangle className="w-3.5 h-3.5 text-slate-700" />
+                  <span>Recent Alerts</span>
+                </div>
+                <Link
+                  href="/triage"
+                  onClick={() => triggerHaptic("light")}
+                  className="text-[11px] font-semibold text-[#0284c7] hover:text-sky-800 transition-colors"
+                >
+                  View All →
+                </Link>
+              </div>
+
+              {/* Alert Items List */}
+              <div className="space-y-2 text-xs">
+                {/* Alert 1: WARNING */}
+                <div className="p-2 rounded bg-slate-50/70 border border-slate-200/90 flex items-start gap-2.5">
+                  <div className="w-6 h-6 rounded bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-bold text-slate-900 text-xs">Expansion Joint J-02</span>
+                      <div className="flex items-center gap-1.5 text-[10px] font-mono">
+                        <span className="text-slate-400">18:42</span>
+                        <span className="px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 font-bold">
+                          WARNING
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Gap deviation detected</p>
+                  </div>
+                </div>
+
+                {/* Alert 2: CRITICAL */}
+                <div className="p-2 rounded bg-slate-50/70 border border-slate-200/90 flex items-start gap-2.5">
+                  <div className="w-6 h-6 rounded bg-rose-100 text-rose-800 flex items-center justify-center shrink-0 mt-0.5">
+                    <MapPin className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-bold text-slate-900 text-xs">Pier P-04</span>
+                      <div className="flex items-center gap-1.5 text-[10px] font-mono">
+                        <span className="text-slate-400">16:21</span>
+                        <span className="px-1.5 py-0.2 rounded bg-rose-50 text-rose-700 border border-rose-200 font-bold">
+                          CRITICAL
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Foundation scour above threshold</p>
+                  </div>
+                </div>
+
+                {/* Alert 3: WATCH */}
+                <div className="p-2 rounded bg-slate-50/70 border border-slate-200/90 flex items-start gap-2.5">
+                  <div className="w-6 h-6 rounded bg-sky-100 text-[#0284c7] flex items-center justify-center shrink-0 mt-0.5">
+                    <Eye className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-bold text-slate-900 text-xs">Deck D-07</span>
+                      <div className="flex items-center gap-1.5 text-[10px] font-mono">
+                        <span className="text-slate-400">14:03</span>
+                        <span className="px-1.5 py-0.2 rounded bg-sky-50 text-[#0284c7] border border-sky-200 font-bold">
+                          WATCH
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Vibration anomaly</p>
+                  </div>
+                </div>
+
+                {/* Alert 4: NORMAL */}
+                <div className="p-2 rounded bg-slate-50/70 border border-slate-200/90 flex items-start gap-2.5">
+                  <div className="w-6 h-6 rounded bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-bold text-slate-900 text-xs">All other systems</span>
+                      <div className="flex items-center gap-1.5 text-[10px] font-mono">
+                        <span className="text-slate-400">12:17</span>
+                        <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+                          NORMAL
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Operating normally</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -71,7 +71,7 @@ const AGE_ERAS = [
 
 const TIERS = ["All", "Good", "Watch", "Warning", "Critical"];
 
-export default function BridgesPage() {
+function BridgesPageContent() {
   const searchParams = useSearchParams();
   const { activeLocale, useDevanagariDigits } = useAppStore();
   const t = TRANSLATIONS[activeLocale];
@@ -981,5 +981,19 @@ export default function BridgesPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BridgesPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-[#f4f5f7] flex items-center justify-center p-8 text-slate-500 font-mono text-xs">
+          Loading Bridge Registry &amp; GIS Infrastructure...
+        </div>
+      }
+    >
+      <BridgesPageContent />
+    </React.Suspense>
   );
 }
