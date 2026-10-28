@@ -22,6 +22,7 @@ import {
 import { useAppStore } from "@/lib/store";
 import { TRANSLATIONS } from "@/lib/translations";
 import { triggerHaptic } from "@/lib/haptics";
+import { PublicAdvisoryNotificationCenter } from "./PublicAdvisoryNotificationCenter";
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
@@ -30,6 +31,7 @@ export const Header: React.FC = () => {
 
   const [istTime, setIstTime] = useState<string>("19:16:32");
   const [mounted, setMounted] = useState<boolean>(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
 
   useEffect(() => {
     setMounted(true);
@@ -149,14 +151,21 @@ export const Header: React.FC = () => {
               <span>Last Sync: {mounted ? istTime : "19:16"} IST</span>
             </div>
 
-            {/* Notification Bell */}
+            {/* Notification Bell with Advisory Indicator */}
             <button
-              onClick={() => triggerHaptic("light")}
-              className="relative p-1 text-slate-600 hover:text-slate-900 transition-colors"
-              title="Notifications"
+              onClick={() => {
+                setIsNotificationOpen(!isNotificationOpen);
+                triggerHaptic("selection");
+              }}
+              className={`relative p-1.5 rounded transition-colors ${
+                isNotificationOpen
+                  ? "bg-slate-200 text-slate-900 font-bold"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+              title="Official Bridge Safety & Public Advisories"
             >
               <Bell className="w-3.5 h-3.5" />
-              <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+              <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-rose-500 rounded-full animate-pulse"></span>
             </button>
 
             {/* PWD Authority User Profile Dropdown */}
@@ -268,6 +277,12 @@ export const Header: React.FC = () => {
           })}
         </nav>
       </div>
+
+      {/* Public Advisory & Critical Bridge Notification Modal */}
+      <PublicAdvisoryNotificationCenter
+        isOpen={isNotificationOpen}
+        onClose={() => setIsNotificationOpen(false)}
+      />
     </header>
   );
 };
