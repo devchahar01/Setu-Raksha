@@ -65,7 +65,7 @@ export const Header: React.FC = () => {
     },
     {
       step: "02",
-      href: "/bridges?view=quality",
+      href: "/condition",
       label: activeLocale === "hi" ? "स्थिति विश्लेषण" : activeLocale === "mr" ? "स्थिती विश्लेषण" : "Condition",
       icon: <Activity className="w-3.5 h-3.5" />,
     },
